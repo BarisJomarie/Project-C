@@ -27,20 +27,22 @@ import { useState, useEffect } from 'react'
 function App() {
   const [departments, setDepartments] = useState([]);
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   // To always load department sa header
   const fetchDepartments = () => {
     const token = localStorage.getItem('token');
     const role = localStorage.getItem('role');
 
     if (token && role === 'admin') {
-      axios.get("http://localhost:5000/api/users/departments", {
+      axios.get(`${API_URL}/api/users/departments`, {
         headers: { Authorization: `Bearer ${token}` }
       }).then(res => setDepartments(res.data));
     }
 
     if (token && (role === 'rph' || role === 'faculty')) {
       const id = localStorage.getItem('department_id');
-      axios.get(`http://localhost:5000/api/users/departments/${id}`, {
+      axios.get(`${API_URL}/api/users/departments/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       .then(res => setDepartments([res.data])) 
