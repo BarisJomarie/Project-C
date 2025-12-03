@@ -36,6 +36,6 @@ app.get('/api/ping', verifyToken, (req, res) => {
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
 
-app.listen(process.env.PORT, () => {
+app.listen(process.env.DB_PORT, () => {
   console.log(`Server running`);
 });
