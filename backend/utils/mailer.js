@@ -1,34 +1,18 @@
-const nodemailer = require("nodemailer");
 require("dotenv").config();
 
-const transporter = nodemailer.createTransport({
-  service: process.env.EMAIL_SERVICE,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
-
-// verify connection on startup
-transporter.verify((error, success) => {
-  if (error) {
-    console.error("Email server connection failed:", error);
-  } else {
-    console.log("Email server is ready to send messages");
-  }
-});
+const sgMail = require("@sendgrid/mail");
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 exports.sendEmail = async (to, subject, message) => {
   try {
-    const mailOptions = {
-      from: `"SDG Classification and Analytics" <${process.env.EMAIL_USER}>`,
+    const msg = {
       to,
+      from: process.env.EMAIL_USER,
       subject,
       text: message,
     };
-
-    const info = await transporter.sendMail(mailOptions);
-    console.log(`Email sent successfully`);
+    await sgMail.send(msg);
+    console.log("Email sent successfully");
   } catch (err) {
     console.error("Failed to send email:", err);
   }
