@@ -4,7 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import axios from "axios";
 import Loading from "../utils/Loading";
 import '../styles/style.css'
-import '../styles/UserPage.css'
+import '../styles/userPage.css'
 import '../styles/table.css'
 import '../styles/list.css'
 import '../styles/homepage.css'
