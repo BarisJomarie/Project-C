@@ -1,0 +1,142 @@
+.list-container {
+  border: 1px solid #8A0000;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.custom-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.list-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: flex-start;
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  border-bottom: 1px solid #eee;
+  transition: all 0.3s ease;
+  min-height: 60px;
+}
+
+.list-item:nth-child(even) {
+  background-color: #ebebeb;
+}
+
+.list-item:nth-child(odd) {
+  background-color: #fff;
+}
+
+.list-item:hover {
+  background-color: #f0f0f0;
+}
+
+.list-left {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.actor-user {
+  color: #8A0000;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.actor-system {
+  color: #C83F12;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.actor-external {
+  color: #a59c4a;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.actor- {
+  color: #3B060A; 
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+
+.action-text {
+  color: #333;
+  white-space: normal;    
+  word-wrap: break-word;  
+  overflow-wrap: break-word;
+  line-height: 1.4;
+}
+
+.list-right {
+  display: flex;
+  align-items: flex-start;
+  flex-shrink: 0;
+  text-align: right;
+  padding-top: 2px;
+}
+
+.list-right small {
+  color: #777;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.no-items {
+  text-align: center;
+  padding: 1rem;
+  color: #666;
+  font-style: italic;
+}
+
+body.dark .list-container {
+  border: 1px solid #f5f5f5;
+  background-color: #333;
+}
+
+body.dark .list-item {
+  background-color: transparent;
+  border-bottom: 1px solid #333;
+  transition: all 0.3s ease;
+}
+
+body.dark .actor- {
+  color: #f5f5f5;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+body.dark .actor-user {
+  color: #e25454;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+body.dark .actor-system {
+  color: #C83F12;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+body.dark .actor-external {
+  color: #a59c4a;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+body.dark .action-text {
+  color: #9b9b9b;
+}
+
+body.dark .list-right small {
+  color: #777;
+  font-size: 0.85rem;
+}

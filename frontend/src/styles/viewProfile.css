@@ -1,0 +1,69 @@
+.view-profile-container {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 24px;
+  background-color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.view-profile-container h2 {
+  text-align: center;
+  margin-bottom: 24px;
+  color: #3B060A;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.profile-info p {
+  font-size: 15px;
+  color: #3B060A;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 8px;
+  margin: 0;
+}
+
+.profile-info strong {
+  font-weight: bold;
+  margin-right: 4px;
+}
+
+.profile-info img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  align-self: center;
+  margin-bottom: 20px;
+  border: 2px solid #3B060A;
+}
+button[type="cancel"]:hover {
+  background-color: #8A0000;
+}
+
+
+body.dark .view-profile-container {
+  background-color: #282a2c;
+}
+
+body.dark .view-profile-container p {
+  color: #c4c7c5;
+}
+
+body.dark .view-profile-container strong,
+body.dark .view-profile-container h2 {
+  color: #f5f5f5;
+}
+
+body.dark .profile-info img {
+  border: 2px solid #f5f5f5;
+}

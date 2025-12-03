@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "transformer": "^1.2.8",
+    "transformers": "^3.1.0"
+  }
+}

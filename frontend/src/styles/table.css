@@ -1,0 +1,313 @@
+.table-container {
+  width: 100%;
+  table-layout: fixed;
+  transition: all 0.2s ease;
+  margin-bottom: 24px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e0e0;
+}
+
+.table-container table {
+  width: 100%;
+  text-align: center;
+  border-collapse: collapse;
+  border-spacing: 0;
+  border-top: none;
+  border-bottom: none;
+}
+
+.table-container thead {
+  color: white;
+  background-color: #1e293b;
+}
+
+.table-container th {
+  font-size: 1em;
+}
+
+.table-container td {
+  font-size: 0.8em;
+}
+
+.table-container th,
+.table-container td {
+  height: 50px;
+  padding: 10px 20px;
+}
+
+.table-container tbody tr.selected {
+  background-color: #C83F12;
+  color: #c4c7c5;
+  transition: 0.2s ease;
+}
+
+.table-container tbody .selected:hover {
+  background-color: #be3c11;
+  color: #c4c7c5;
+}
+
+.table-container tbody tr:nth-child(even):not(.selected) {
+  background-color: #fafafa;
+  transition: background-color 0.2s ease;
+}
+
+.table-container tbody tr:hover:not(.selected) {
+  background-color: #f0f0f0;
+}
+
+.table-container tbody tr:nth-child(odd):not(.selected) {
+  background-color: transparent;
+  transition: 0.2s ease;
+}
+
+.table-container tbody tr:nth-child(even):not(.selected):hover,
+.table-container tbody tr:nth-child(odd):not(.selected):hover{
+  background-color: #d8d8d8;
+}
+
+.table-container tbody td button {
+  margin: 0 4px;
+  border: none;
+  background-color: transparent;
+  background: none;
+  font-size: 0.8em;
+  padding: 5px;
+  
+  /*Tooltip*/
+  position: relative;
+}
+
+.table-container tbody td button .tooltip {
+  visibility: hidden;
+  opacity: 0;
+  width: max-content;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 4px 8px;
+  position: absolute;
+  z-index: 1;
+  bottom: 95%; /* Position above the button */
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.8em;
+  white-space: nowrap;
+  transition: opacity 0.3s;
+}
+
+.table-container tbody td button .tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: #333 transparent transparent transparent;
+}
+
+.table-container tbody td button:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+.table-container tbody td .edit-icon,
+.table-container tbody td .delete-icon,
+.table-container tbody td .save-icon,
+.table-container tbody td .cancel-icon,
+.table-container tbody td .view-icon {
+  font-size: 25px;
+  color: #3B060A;
+  cursor: pointer;      
+  transition: color 0.2s;
+}
+
+.table-container tbody td .edit-icon:hover,
+.table-container tbody td .delete-icon:hover,
+.table-container tbody td .save-icon:hover,
+.table-container tbody td .cancel-icon:hover,
+.table-container tbody td .view-icon:hover {
+  color: #C83F12;
+}
+
+.table-container tbody td input{
+  width: 80%;
+  height: 80%;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  backdrop-filter: blur(10px);
+  text-align: center;
+  font-size: 1em;
+}
+
+.table-container tbody td input:focus {
+  outline: 2px solid #3B060A;
+}
+
+.table-container .clickable {
+  cursor: pointer;
+}
+
+.table-container tr .clickable:active {
+  background-color: #c2c2c2;
+  transition: background-color 0.1s ease;
+}
+
+.table-container .role-admin {
+  color: #e74c3c;
+  font-weight: 600;
+}
+
+.table-container .role-faculty {
+  color: #f1c40f;
+  font-weight: 600;
+}
+
+.table-container .role-student {
+  color: #2ecc71;
+  font-weight: 600;
+}
+
+.table-container .active-1 {
+  color: #2ecc71;
+  font-weight: 600;
+}
+
+.table-container .active-0 {
+  color: #e74c3c;
+  font-weight: 600;
+}
+
+.table-container input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: #3B060A;
+  cursor: pointer;
+}
+
+.table-container input[type="checkbox"]:focus {
+  outline: none;
+  outline-offset: 2px;
+}
+
+.table-container input[type="checkbox"]::before {
+  border-radius: 4px;
+}
+
+
+
+/* Dark Mode */
+body.dark .table-container table {
+  border-top: 1px solid #131314;
+  border-bottom: 1px solid #131314;
+  color: #c4c7c5;
+}
+body.dark .table-container thead{
+  background-color: #131314;
+}
+
+body.dark .table-container tbody td .edit-icon,
+body.dark .table-container tbody td .delete-icon,
+body.dark .table-container tbody td .save-icon,
+body.dark .table-container tbody td .cancel-icon,
+body.dark .table-container tbody td .view-icon  {
+  font-size: 25px;
+  color: #c4c7c5;
+  cursor: pointer;      
+  transition: color 0.2s;
+}
+
+body.dark .table-container tbody td .edit-icon:hover,
+body.dark .table-container tbody td .delete-icon:hover,
+body.dark .table-container tbody td .save-icon:hover,
+body.dark .table-container tbody td .cancel-icon:hover,
+body.dark .table-container tbody td .view-icon:hover {
+  color: #C83F12;
+}
+
+
+body.dark .table-container tbody tr.selected {
+  background-color: #C83F12;
+  color: #c4c7c5;
+}
+
+body.dark .table-container tbody .selected:hover {
+  background-color: #be3c11;
+  color: #c4c7c5;
+}
+
+body.dark .table-container tbody tr:nth-child(even):not(.selected) {
+  background-color: #232324;
+}
+
+body.dark .table-container tbody tr:nth-child(odd):not(.selected) {
+  background-color: transparent;
+}
+
+body.dark .table-container tbody tr:nth-child(even):not(.selected):hover,
+body.dark .table-container tbody tr:nth-child(odd):not(.selected):hover{
+  background-color: #34343b;
+}
+
+body.dark .table-container input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: #131314;
+  cursor: pointer;
+}
+
+body.dark .table-container input[type="checkbox"]:hover {
+  accent-color: #3B060A;
+}
+
+body.dark .table-container input[type="checkbox"]:focus {
+  outline: none;
+  outline-offset: 2px;
+}
+
+body.dark .table-container input[type="checkbox"]::before {
+  border-radius: 4px;
+}
+
+.table-container tbody td input{
+  background-color: #c4c7c5;
+  color: black;
+}
+
+.table-container tbody td input:focus {
+  outline: 2px solid #3B060A;
+}
+
+.table-container .clickable {
+  cursor: pointer;
+}
+
+
+
+
+@media screen and (max-width: 800px) {
+  .table-container th,
+  .table-container td {
+    font-size: 0.6em;
+    padding: 8px 10px;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .table-container {
+    font-size: 0.6em;
+  }
+
+  .table-container button {
+    font-size: 0.6em;
+  }
+
+  .department-buttons-container button {
+    font-size: 0.6em;
+  }
+}

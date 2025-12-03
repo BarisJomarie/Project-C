@@ -1,0 +1,35 @@
+{
+  "year": 2025,
+  "departments": ["CCS"],
+  "paper_type": {
+    "student": {
+      "courses": [
+        {
+          "course_name": "BSINFOTECH",
+          "papers": [
+            { "sdg_labels": ["sdg1", "sdg7"] },
+            { "sdg_labels": ["sdg1"] }
+          ]
+        }
+      ]
+    },
+    "faculty": {
+      "funding": [
+        {
+          "funding_type": "self-funded",
+          "papers": [
+            { "sdg_labels": ["sdg3", "sdg4"] },
+            { "sdg_labels": ["sdg2"] }
+          ]
+        },
+        {
+          "funding_type": "earist",
+          "papers": [
+            { "sdg_labels": ["sdg5", "sdg6"] },
+            { "sdg_labels": ["sdg8"] }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,462 @@
+.form-container {
+  width: 50%;
+  margin: 24px auto;
+  padding: 24px;
+  border: 1px solid #e0e0e0;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transform: translateY(-20px);
+  opacity: 0;
+  max-height: 0;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.form-container.slide-down {
+  transform: translateY(0);
+  opacity: 1;
+  max-height: 2800px;
+  pointer-events: auto;
+}
+
+.form-container.slide-up {
+  transform: translateY(-20px);
+  opacity: 0;
+  max-height: 0;
+  margin: 0 auto;
+  pointer-events: none;
+}
+
+.form-container.default {
+  transform: none;
+  opacity: 1;
+  max-height: none;
+  pointer-events: auto;
+  transition: none; /* no animation */
+}
+
+.extra-fields {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.5s ease, opacity 0.5s ease, margin 0.5s ease;
+  margin-bottom: 0;
+}
+
+.extra-fields.slide-down {
+  max-height: 500px; /* enough to fit dropdowns */
+  opacity: 1;
+  margin-bottom: 15px;
+}
+
+.extra-fields.slide-up {
+  max-height: 0;
+  opacity: 0;
+  margin-bottom: 0;
+}
+
+
+
+.grouped-inputs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.form-input {
+  display: flex;
+  flex-direction: column-reverse;
+  margin-bottom: 15px;
+  position: relative;
+  overflow: visible;
+}
+
+.form-input label {
+  padding-left: 4px;
+  font-size: 0.85em;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 6px;
+  transition: color 0.2s ease;
+}
+
+.form-input input[type='text'],
+.form-input input[type='number'],
+.form-input input[type='email'],
+.form-input input[type='date'],
+.form-input select {
+  padding: 10px 16px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.95em;
+  transition: all 0.2s ease;
+  background-color: white;
+}
+
+.form-input textarea {
+  width: 100%;
+  max-width: 100%;
+  max-height: 500px;
+  padding: 10px 16px;
+  box-sizing: border-box;
+  resize: vertical;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.95em;
+  transition: all 0.2s ease;
+  background-color: white;
+}
+
+.form-input input[type='text']:hover,
+.form-input input[type='number']:hover,
+.form-input input[type='email']:hover,
+.form-input input[type='date']:hover,
+.form-input select:hover,
+.form-input textarea:hover {
+  border-color: #94a3b8;
+}
+
+.form-input input[type='text']:focus,
+.form-input input[type='number']:focus,
+.form-input input[type='email']:focus,
+.form-input input[type='date']:focus,
+.form-input select:focus,
+.form-input textarea:focus {
+  outline: none;
+  border-color: #1e293b;
+  box-shadow: 0 0 0 3px rgba(30, 41, 59, 0.1);
+  background-color: white;
+}
+
+.form-input input[type='text']:focus ~ label,
+.form-input input[type='number']:focus ~ label,
+.form-input input[type='email']:focus ~ label,
+form-input input[type='date']:focus ~ label,
+.form-input select:focus ~ label,
+.form-input textarea:focus ~ label {
+  color: #C83F12;
+}
+
+.form-input input[type='text']:disabled,
+.form-input input[type='text']:disabled::placeholder,
+.form-input input[type='number']:disabled,
+.form-input input[type='email']:disabled,
+.form-input input[type='email']:disabled::placeholder,
+.form-input select:disabled {
+  outline: none;
+  border: 1px solid lightgrey;
+  background-color: lightgrey;
+  color: #f5f5f5;
+}
+
+.form-input option {
+  background-color: #c83f122d;
+  padding: 5px;
+}
+
+.form-input .info {
+  display: flex;
+  align-items: center;
+  position: relative;
+  margin-right: 10px;
+}
+
+.form-input .info-icon {
+  font-size: 18px;
+  color: #3B060A;
+  cursor: help;
+}
+
+.form-input .tooltip {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  bottom: 130%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: #fff;
+  padding: 5px 8px;
+  border-radius: 5px;
+  font-size: 0.75em;
+  white-space: nowrap;
+  transition: opacity 0.3s ease;
+  z-index: 10;
+}
+
+.form-input .tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: #333 transparent transparent transparent;
+}
+
+
+.form-input .info:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+
+.add-inputs {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  overflow: visible;
+  position: relative;
+}
+
+.add-inputs input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  margin: 5px 5px;
+}
+
+.add-inputs label {
+  font-size: 0.5em;
+  margin: 0 5px;
+}
+
+
+.add-inputs .info-icon {
+  font-size: 0.8em;
+  cursor: default;
+}
+
+.add-inputs select {
+  flex: 1;
+  max-width: 100%;
+}
+
+.info {
+  position: relative;
+  display: inline-block;
+  overflow: visible;
+}
+
+.info .tooltip {
+  visibility: hidden;
+  opacity: 0;
+  width: max-content;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 4px 8px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%; /* above the icon */
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.5em;
+  white-space: nowrap;
+  z-index: 99;
+  transition: opacity 0.3s;
+}
+
+.info .tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: #333 transparent transparent transparent;
+}
+
+.info:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+.form-button-container {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.form-input option {
+  background-color: #3B060A;
+  color: #c4c7c5;
+}
+
+td.editing-fullname {
+  display: flex;
+  flex-wrap: wrap; /* allow inputs to go to next line if needed */
+  gap: 5px;        /* spacing between inputs */
+  align-items: center;
+}
+
+td.editing-fullname input {
+  width: 100px;     /* adjust width as needed */
+  padding: 5px 10px;
+  font-size: 0.9em;
+  border: 1px solid #3B060A;
+  border-radius: 5px;
+}
+
+td.editing-fullname input {
+  flex: 1 1 100px;       /* grow = 1, shrink = 1, min width = 100px */
+  max-width: 120px;      /* optional, prevent super wide inputs */
+  padding: 5px;
+  font-size: 0.9em;
+  box-sizing: border-box;
+}
+
+.editing-fullname .scrollable-inputs {
+  display: flex;
+  gap: 5px;
+  overflow-x: auto;      /* scroll horizontally */
+  max-width: 400px;      /* optional: set a max width for the cell */
+
+    /* Scrollbar styling */
+  scrollbar-width: thin;        /* for Firefox */
+  scrollbar-color: #C83F12 #f1f1f1; /* thumb and track colors for Firefox */
+}
+
+.editing-fullname .scrollable-inputs input {
+  min-width: 100px;      /* prevent inputs from shrinking too much */
+  flex: 0 0 auto;        /* keep their natural width */
+}
+
+
+.radio-group {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 equal columns */ 
+  align-items: left;                    /* vertically center items */
+  margin-bottom: 10px;
+}
+
+.radio-group label {
+  font-size: 0.9em;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.radio-group input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #3B060A;
+  cursor: pointer;
+}
+
+/* Reuse animation pattern */
+.extra-fields {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: max-height 0.5s ease, opacity 0.4s ease, transform 0.4s ease;
+}
+
+.extra-fields.slide-down {
+  max-height: 1000px; /* plenty of room for content */
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.extra-fields.slide-up {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+/* Checkbox styling */
+.sdg-checkboxes {
+  display: flex;
+  align-items: start;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.checkbox-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9em;
+  cursor: pointer;
+}
+
+.checkbox-option input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #3B060A;
+  cursor: pointer;
+}
+
+.manual-sdg-section {
+  max-height: 0;          /* start collapsed */
+  opacity: 0;             /* start transparent */
+  overflow: hidden;
+  transition: max-height 0.4s ease, opacity 0.4s ease;
+  pointer-events: none;   /* prevent interaction when hidden */
+}
+
+.manual-sdg-section.visible {
+  max-height: 1000px;     /* big enough to fit content */
+  opacity: 1;             /* fade in */
+  pointer-events: auto;   /* allow interaction */
+}
+
+.radio-group .disabled {
+  color: gray;
+  cursor: not-allowed;  
+}
+
+/* Dark Mode */
+body.dark .form-container {
+  border: 1px solid #c4c7c5;
+  background-color: #131314;
+}
+
+body.dark .form-input label {
+  color: #c4c7c5;
+}
+
+body.dark .form-input input,
+body.dark .form-input select {
+  background-color: #8e918f;
+  border: 1px solid #c4c7c5;
+  color: #131314;
+}
+
+body.dark .form-input textarea {
+  border: 1px solid #c4c7c5;
+  background-color: #8e918f;
+  color: #131314;
+}
+
+body.dark .form-input input::placeholder {
+  color: #131314;
+}
+
+
+body.dark .form-input input:focus,
+body.dark .form-input select:focus,
+body.dark .form-input textarea:focus {
+  outline: none;
+  border: 1px solid #C83F12;
+  background-color: #c83f122d;
+  color: #c4c7c5;
+}
+
+body.dark .form-input input:focus ~ label,
+body.dark .form-input select:focus ~ label,
+body.dark .form-input textarea:focus ~ label {
+  color: #C83F12;
+}
+
+body.dark .form-input option {
+  background-color: #131314;
+  color: #c4c7c5;
+}
+

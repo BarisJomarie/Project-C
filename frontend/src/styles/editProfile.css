@@ -1,0 +1,56 @@
+.edit-profile-container {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 24px;
+  background-color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.edit-profile-container h2 {
+  text-align: center;
+  margin-bottom: 24px;
+  color: #3B060A;
+}
+
+.form-group {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  margin-bottom: 6px;
+  font-weight: bold;
+  color: #3B060A;
+}
+
+.form-group input {
+  padding: 10px;
+  font-size: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  transition: border 0.3s ease;
+}
+
+.form-group input:focus {
+  border-color: #3B060A;
+  outline: none;
+}
+
+
+@media (max-width: 600px) {
+  .edit-profile-container {
+    margin: 10px;
+    padding: 16px;
+  }
+
+  .form-group input {
+    font-size: 14px;
+  }
+
+  button[type="submit"] {
+    font-size: 14px;
+  }
+}

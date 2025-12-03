@@ -1,0 +1,92 @@
+.paper-container {
+  display: flex;
+  gap: 50px;
+  padding: 20px;
+  background-color: #f9f9f9;
+
+  font-family: Arial, sans-serif;
+  flex-wrap: wrap; /* allows sidebar to move below main on small screens */
+}
+
+.main1 {
+  flex: 1 1 0; /* grow and shrink */
+  min-width: 300px; /* prevent shrinking too small */
+}
+
+.main1 p {
+  text-align: justify;
+  line-height: 1.6;
+  margin-bottom: 15px;
+  word-break: break-word;
+}
+
+.rightsidebar1 {
+  flex: 0 0 250px; /* fixed width but allows shrinking if needed */
+  box-sizing: border-box; /* include padding in width */
+  padding: 15px 20px;
+
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  word-wrap: break-word; /* wrap long text */
+}
+
+.rightsidebar1 h4 {
+  margin-bottom: 10px;
+  color: #3B060A;
+  font-size: 18px;
+}
+
+.rightsidebar1.info1 {
+  margin-bottom: 15px;
+}
+
+.rightsidebar1.info1 label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 5px;
+  color: #3B060A;
+}
+
+.rightsidebar1.info1 p,
+.rightsidebar1.info1 ul {
+  margin: 0;
+  padding-left: 15px;
+  font-size: 14px;
+  word-break: break-word; /* ensures text wraps */
+}
+
+.rightsidebar1.info1 ul li {
+  list-style-type: disc;
+  margin-bottom: 4px;
+}
+
+
+body.dark .paper-container{
+  background-color: #1e1f20;
+}
+
+body.dark .paper-container h2,
+body.dark .paper-container strong {
+  color: #f5f5f5;
+}
+
+body.dark .paper-container h1 {
+  color: #C83F12;
+}
+
+body.dark .rightsidebar1 h4 {
+  color: #C83F12;
+}
+body.dark .rightsidebar1 label {
+  color: #f5f5f5;
+}
+
+
+body.dark .rightsidebar1 {
+  background-color: #282a2c;
+}
+
+body.dark .rightsidebar1.info1 {
+  background-color: #313336;
+}
