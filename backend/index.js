@@ -15,7 +15,11 @@ const publicationRoutes = require("./routes/publicationRoutes");
 
 
 
-app.use(cors());
+// Allow your Netlify frontend
+app.use(cors({
+  origin: "https://sdgclassification.netlify.app", // your frontend URL
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true
 app.use(express.json());
 
 app.use('/api/users', userRoutes);
