@@ -4,7 +4,7 @@ import torch
 import os
 
 # Load model once
-model_path = os.path.join(os.path.dirname(__file__), "checkpoints/final_model")
+model_path = "/mnt/volume/final_model"
 tokenizer = BertTokenizerFast.from_pretrained(model_path)
 model = BertForSequenceClassification.from_pretrained(model_path)
 model.eval() # Set model to evaluation mode
