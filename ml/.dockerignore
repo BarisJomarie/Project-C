@@ -1,0 +1,11 @@
+__pycache__/
+checkpoints/
+final_model/
+runs/
+data/
+logs/
+*.pt
+*.bin
+*.safetensors
+*.ipynb
+.env
