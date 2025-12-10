@@ -330,8 +330,8 @@ exports.forgotPassword = (req, res) => {
     db.query(updateQuery, [token, expiry, email], async (err2) => {
       if (err2) return res.status(500).send(err2);
 
-
-      const resetLink = `http://localhost:5173/reset-password/${token}`; // adjust if needed
+      const FRONTEND_URL = process.env.FRONTEND_URL;
+      const resetLink = `${FRONTEND_URL}/reset-password/${token}`; // adjust if needed
 
 
       await sendEmail(
