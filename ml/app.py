@@ -9,17 +9,6 @@ app = FastAPI()
 
 class TextInput(BaseModel):
     text: str
-    
-@app.on_event("startup")
-def copy_model_to_volume():
-    src = os.path.join(os.path.dirname(__file__), "final_model")
-    dst = "/mnt/volume/final_model"
-    if not os.path.exists(dst):
-        shutil.copytree(src, dst)
-        print("Model copied to volume at startup.")
-    else:
-        print("Model already exists in volume. Skipping copy.")
-
 
 @app.get("/")
 def root():
