@@ -11,6 +11,8 @@ frontend/.env
 # ml
 ml/node_modules/
 ml/checkpoints/
+ml/final_model/
 ml/genai_model_list.py
 ml/logs/
 ml/data/
+ml/__pycache__/
