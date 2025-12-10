@@ -10,7 +10,6 @@ frontend/.env
 
 # ml
 ml/node_modules/
-ml/final_model/
 ml/checkpoints/
 ml/genai_model_list.py
 ml/logs/

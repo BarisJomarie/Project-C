@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 27, 2025 at 05:25 PM
+-- Generation Time: Dec 09, 2025 at 03:22 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -1230,7 +1230,67 @@ INSERT INTO `audit_log` (`id`, `user_code`, `user_role`, `action`, `actor_type`,
 (1461, '4445', 'admin', 'Added a new department: ada', 'user', '2025-11-27 12:27:43'),
 (1462, '4445', 'admin', 'Deleted department name: ada', 'user', '2025-11-27 12:27:50'),
 (1463, '4445', 'admin', 'Generated AI Report', 'user', '2025-11-27 12:38:06'),
-(1464, '4445', 'admin', 'Printed AI Report', 'user', '2025-11-27 12:38:52');
+(1464, '4445', 'admin', 'Printed AI Report', 'user', '2025-11-27 12:38:52'),
+(1465, '4445', 'admin', 'Session Ended - Token Expired', 'user', '2025-11-28 08:30:25'),
+(1466, '224-08807M', 'admin', 'Logged In', 'user', '2025-11-28 08:31:01'),
+(1467, '224-08807M', 'admin', 'Generated AI Report', 'user', '2025-11-28 09:24:27'),
+(1468, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-11-28 09:30:57'),
+(1469, '224-08807M', 'admin', 'Logged In', 'user', '2025-11-30 16:44:29'),
+(1470, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-11-30 16:52:58'),
+(1471, '224-08807M', 'admin', 'Logged In', 'user', '2025-11-30 17:16:34'),
+(1472, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-11-30 17:16:55'),
+(1473, '224-08807M', 'admin', 'Logged In', 'user', '2025-11-30 17:19:42'),
+(1474, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-11-30 17:19:53'),
+(1475, '224-08807M', 'admin', 'Logged In', 'user', '2025-11-30 17:20:20'),
+(1476, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-11-30 17:20:22'),
+(1477, '224-08807M', 'admin', 'Logged In', 'user', '2025-11-30 17:22:08'),
+(1478, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-11-30 17:22:11'),
+(1479, '224-08807M', 'admin', 'Logged In', 'user', '2025-11-30 17:22:22'),
+(1480, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-11-30 17:30:16'),
+(1481, '224-08807M', 'admin', 'Logged In', 'user', '2025-11-30 17:40:28'),
+(1482, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-11-30 17:40:42'),
+(1483, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-11-30 17:40:49'),
+(1484, '224-08807M', 'admin', 'Logged In', 'user', '2025-11-30 17:41:40'),
+(1485, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-11-30 17:41:50'),
+(1486, '1111', 'faculty', 'Logged In', 'user', '2025-11-30 17:42:41'),
+(1487, '1111', 'faculty', 'User Logged Out', 'user', '2025-11-30 17:43:20'),
+(1488, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-11-30 17:44:02'),
+(1489, '2222', 'rph', 'Account Created as rph', 'user', '2025-11-30 17:46:01'),
+(1490, '1111', 'faculty', 'User Logged Out', 'user', '2025-11-30 17:46:56'),
+(1491, '2222', 'rph', 'Logged In', 'user', '2025-11-30 17:47:16'),
+(1492, '1111', 'faculty', 'Logged In', 'user', '2025-11-30 17:47:47'),
+(1493, '1111', 'faculty', 'User Logged Out', 'user', '2025-11-30 17:48:03'),
+(1494, '1111', 'faculty', 'User Logged Out', 'user', '2025-11-30 18:02:33'),
+(1495, '224-08807M', 'admin', 'Logged In', 'user', '2025-12-01 17:38:03'),
+(1496, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-12-01 17:40:57'),
+(1497, '2222', 'rph', 'Logged In', 'user', '2025-12-01 17:41:30'),
+(1498, '2222', 'rph', 'User Logged Out', 'user', '2025-12-01 17:41:33'),
+(1499, '224-08807M', 'admin', 'Logged In', 'user', '2025-12-01 17:41:51'),
+(1500, '224-08807M', 'admin', 'Deleted user code: 2222', 'user', '2025-12-01 17:44:54'),
+(1501, '224-08807M', 'admin', 'Generated AI Report', 'user', '2025-12-01 18:05:47'),
+(1502, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-12-01 18:11:39'),
+(1503, '224-08807M', 'admin', 'Logged In', 'user', '2025-12-02 04:49:14'),
+(1504, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-12-02 06:11:40'),
+(1505, '224-08807M', 'admin', 'Logged In', 'user', '2025-12-02 06:42:20'),
+(1506, '224-08807M', 'admin', 'Logged In', 'user', '2025-12-03 02:21:11'),
+(1507, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-12-03 02:22:43'),
+(1508, '224-08807M', 'admin', 'Logged In', 'user', '2025-12-03 06:32:58'),
+(1509, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-12-03 06:34:00'),
+(1510, '224-08807M', 'admin', 'Logged In', 'user', '2025-12-03 20:41:32'),
+(1511, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-12-03 20:41:55'),
+(1512, '224-08807M', 'admin', 'Logged In', 'user', '2025-12-04 02:49:32'),
+(1513, '224-08807M', 'admin', 'Generated AI Report', 'user', '2025-12-04 03:00:44'),
+(1514, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-12-04 03:01:16'),
+(1515, '224-08807M', 'admin', 'Logged In', 'user', '2025-12-04 03:01:57'),
+(1516, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-12-04 03:18:58'),
+(1517, '224-08807M', 'admin', 'Logged In', 'user', '2025-12-04 03:35:06'),
+(1518, '224-08807M', 'admin', 'Added a new department: Infotech', 'user', '2025-12-04 03:37:38'),
+(1519, '12345', 'rph', 'Account Created as rph', 'user', '2025-12-04 03:40:26'),
+(1520, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-12-04 03:41:39'),
+(1521, '12345', 'rph', 'Logged In', 'user', '2025-12-04 03:42:58'),
+(1522, '12345', 'rph', 'Research Paper has been added. title: Development of an AI-Based System for SDG Classification and Analytics at EARIST - Manila', 'user', '2025-12-04 03:50:40'),
+(1523, '12345', 'rph', 'Generated AI Report', 'user', '2025-12-04 03:53:14'),
+(1524, '12345', 'rph', 'Printed AI Report', 'user', '2025-12-04 03:55:03');
 
 -- --------------------------------------------------------
 
@@ -1278,7 +1338,8 @@ CREATE TABLE `department` (
 
 INSERT INTO `department` (`department_id`, `department_abb`, `department_name`, `created_at`, `updated_at`) VALUES
 (1, 'CAS', 'College of Arts and Science', '2025-07-18 11:32:34', NULL),
-(2, 'CCS', 'College of Computing Studies', '2025-07-18 11:32:48', NULL);
+(2, 'CCS', 'College of Computing Studies', '2025-07-18 11:32:48', NULL),
+(32, 'IT', 'Infotech', '2025-12-04 03:37:38', NULL);
 
 -- --------------------------------------------------------
 
@@ -1415,7 +1476,7 @@ INSERT INTO `research_paper` (`research_id`, `research_type`, `semester`, `fundi
 (196, 'student', '2nd', '', 'A Application Pronunciation Exam Using Voice Recognition with Score Data Analytics On Grade 6 Of Dona Susana Madrigal Elementary School', 'This study presents a voice recognition-based pronunciation exam application designed for Grade 6 students at Dona Susana Madrigal Elementary School, incorporating score data analytics to monitor student performance. Traditional pronunciation assessments are often subjective, time-consuming, and limited in providing immediate feedback. The proposed system allows students to complete pronunciation tests via voice input, automatically evaluates their responses using speech recognition technology, and records scores for detailed analytics. Educators can track student progress, identify common errors, and adjust instruction accordingly. Developed using modern web and mobile technologies, the system emphasizes usability, accuracy, and real-time performance monitoring. Evaluation through testing with students demonstrates improved assessment efficiency, objective scoring, and actionable insights into learning outcomes. This study highlights the effectiveness of technology-enhanced language assessment in elementary education.', 'The development of the Pronunciation Exam Application with Voice Recognition and Score Analytics effectively addresses the limitations of traditional pronunciation assessments. By automating evaluation and providing immediate, data-driven feedback, the system ensures more objective, efficient, and informative assessment for both students and teachers. User testing indicates enhanced assessment accuracy, improved student engagement, and the ability to monitor performance trends over time.\n\nFuture improvements may include integrating adaptive learning algorithms to personalize practice exercises, multi-language support, advanced analytics dashboards for teachers, and gamification features to increase student motivation. Overall, this study demonstrates that voice recognition and data analytics can significantly enhance pronunciation learning and assessment in elementary education.', 'Jovel Advincula', '[\"Sediaco, Ryan Jay F. \",\"Reymundo, Mico Jay\",\"Cenido, Russel P.\",\"Barata, Antonio R.\"]', 2, 23, '[4]', '[\"Quality Education\"]', '{\"0\":0,\"1\":0,\"2\":0,\"3\":1,\"4\":0,\"5\":0,\"6\":0,\"7\":0,\"8\":0,\"9\":0,\"10\":0,\"11\":0,\"12\":0,\"13\":0,\"14\":0,\"15\":0,\"16\":0}', 'completed', '2025-11-18 04:41:48', 16, 2024),
 (197, 'faculty', '1st', 'earist', 'The Development of Mobile-Based Symptom Analysis for Early Detection of Diseases Using Hyper-Tuned C-Support Vector Classification Algorithm', 'This study presents a mobile-based symptom analysis system designed for the early detection of diseases by leveraging a hyper-tuned C-Support Vector Classification (C-SVC) algorithm. Traditional diagnostic approaches often require direct clinical assessment, which can be time-consuming and inaccessible in remote areas. The proposed system allows users to input their symptoms via a mobile application, which are then analyzed using a machine learning model optimized with hyperparameter tuning to improve classification accuracy. The system predicts potential diseases and provides recommendations for seeking medical attention. Developed using mobile technologies and secure data handling protocols, the application emphasizes usability, accuracy, and real-time response. Evaluation through testing on a dataset of medical records demonstrates improved detection accuracy, efficiency, and reliability, highlighting the potential of AI-driven mobile solutions in preventive healthcare.', 'The development of the mobile-based symptom analysis system using a hyper-tuned C-SVC algorithm effectively addresses the need for accessible and early disease detection. By analyzing user-reported symptoms and providing predictive insights, the system aids in timely medical consultation and decision-making. Evaluation results indicate enhanced prediction accuracy, faster response time, and usability for non-specialist users.\n\nFuture improvements may include integrating real-time data from wearable health devices, expanding the disease dataset for broader coverage, incorporating explainable AI for better transparency, and adding multilingual support to increase accessibility. Overall, this study demonstrates that combining mobile technology with hyper-tuned machine learning algorithms can significantly enhance early disease detection, preventive healthcare, and patient empowerment.', '', '[\"Tricia Anne M. Borcelis\",\"Ma. Maila A. Martinez\",\"Nelson V. Nolia\",\"Aivan Carlos B. Tuquero\",\"Jefferson A. Costales\"]', 2, 23, '[3,9]', '[\"Good Health and Well-being\",\"Industry, Innovation and Infrastructure\"]', '{\"0\":0,\"1\":0,\"2\":1,\"3\":0,\"4\":0,\"5\":0,\"6\":0,\"7\":0,\"8\":1,\"9\":0,\"10\":0,\"11\":0,\"12\":0,\"13\":0,\"14\":0,\"15\":0,\"16\":0}', 'completed', '2025-11-18 04:45:10', 16, 2024),
 (198, 'faculty', '1st', 'self-funded', 'Abundance Mapping of Commercial Fisheries Production using K-Means and Forecasting Algorithm in Manila Bay, Philippines', 'This study presents an approach to map and forecast commercial fisheries production in Manila Bay, Philippines using a combination of K-Means clustering and forecasting algorithms. Traditional methods of fisheries monitoring often rely on manual surveys and historical reports, which can be time-consuming and may not provide timely insights for resource management. The proposed system clusters fisheries production data using K-Means to identify high-yield and low-yield zones and applies forecasting techniques to predict future production trends. Developed using modern data analytics tools, the system provides visualizations and reports to support decision-making for fisheries management, policymakers, and local stakeholders. Evaluation using historical production data demonstrates accurate identification of fisheries hotspots and reliable production forecasts. This study highlights the potential of data-driven approaches in sustainable fisheries management and resource planning.', 'The development of the Abundance Mapping of Commercial Fisheries Production system effectively addresses the challenges of monitoring and predicting fisheries output in Manila Bay. By combining K-Means clustering for spatial analysis and forecasting algorithms for trend prediction, the system provides actionable insights for resource management, conservation planning, and policy formulation. Evaluation results indicate accurate identification of production clusters and reliable short-term production forecasts.\n\nFuture improvements may include integration of real-time sensor data, environmental factors such as water temperature and salinity, advanced machine learning models for improved prediction accuracy, and interactive dashboards for stakeholders. Overall, this study demonstrates that combining clustering and forecasting techniques can enhance sustainable fisheries management, optimize resource utilization, and support informed decision-making in coastal regions.', '', '[\"Jomel S. Limbago\",\"Arnel C. Fajardo\",\"Jefferson A. Costales\",\"Sherrlyn M. Rasdas\"]', 2, 23, '[14]', '[\"Life Below Water\"]', '{\"0\":0,\"1\":0,\"2\":0,\"3\":0,\"4\":0,\"5\":0,\"6\":0,\"7\":0,\"8\":0,\"9\":0,\"10\":0,\"11\":0,\"12\":0,\"13\":1,\"14\":0,\"15\":0,\"16\":0}', 'completed', '2025-11-18 04:48:30', 16, 2024),
-(206, 'student', '2nd', '', 'Strengthening Community Health Systems Through Mobile Medical Clinics', 'Limited access to healthcare services remains a significant barrier in underserved and remote regions. This paper examines the role of mobile medical clinics as an innovative, cost-effective strategy to strengthen community health systems. Mobile clinics provide essential services such as vaccinations, maternal care, chronic disease management, and health education. By bringing healthcare directly to populations with limited mobility or limited facility availability, these clinics reduce health disparities and improve early disease detection. The study highlights their effectiveness in enhancing primary care coverage, increasing patient trust, and promoting preventive health behaviors. Findings suggest that mobile medical clinics can play a critical role in advancing public health outcomes and creating more equitable healthcare delivery systems.\n', 'Mobile medical clinics are a practical solution for bridging gaps in healthcare access, particularly in rural or marginalized communities. Their ability to deliver essential services on-site improves health outcomes by reducing delays in treatment, increasing vaccination rates, and assisting with chronic disease management. To maximize their impact, future initiatives should integrate mobile clinics with existing health infrastructures, enhance digital health record systems, and train local health workers to ensure continuity of care. With adequate funding and community engagement, mobile medical clinics can significantly strengthen public health systems and support long-term well-being.\n\n', 'sample', '[\"s1\",\"s2\"]', 2, 23, '3', '\"Good Health and Well-being\"', '{\"0\":0.000024704859242774546,\"1\":0.00017241599562112242,\"2\":0.9993091821670532,\"3\":0.00005144399619894102,\"4\":0.0000023188079012470553,\"5\":0.00002370911170146428,\"6\":0.000006363160082401009,\"7\":0.00006059387669665739,\"8\":0.00013199813838582486,\"9\":0.000027102203603135422,\"10\":0.000014280428331403527,\"11\":0.000006585885785170831,\"12\":0.000009392461834067944,\"13\":0.000011265624380030204,\"14\":0.00003611175998230465,\"15\":0.00008174095273716375,\"16\":0.00003071676837862469}', 'completed', '2025-11-24 13:43:21', 44, 2024);
+(208, 'student', '1st', '', 'Development of an AI-Based System for SDG Classification and Analytics at EARIST - Manila', 'This study presents the Development of an AI-Based System for Sustainable Development Goal (SDG) Classification and Analytics specifically designed for the Eulogio “Amang” Rodriguez Institute of Science and Technology (EARIST) – Manila, designed to address the challenges of manually monitoring and analyzing research outputs aligned with the United Nations’ 17 SDGs. The project ensures consistency and efficiency in institutional reporting by automating the classification process.\nThe system employs a fine-tuned BERT model to classify research papers based on titles and abstracts, providing accurate and context-aware SDG tagging. An analytics dashboard complements this by offering visual insights into research trends and alignment, while evaluation using ISO/IEC 25010:2011 standards confirmed strong performance in functionality, usability, and reliability.\nBy integrating artificial intelligence into research management, the project strengthens institutional contributions to sustainable development. Future enhancements may include multilingual support, repository integration, and broader adoption across academic institutions. In line with SDG 4 (Quality Education) and SDG 9 (Industry, Innovation, and Infrastructure), the system promotes equitable access to knowledge and fosters innovation in academic research.\n', 'artificial intelligence, BERT, SDG classification, analytics, ISO 25010:2011, sustainable development.', 'Joevey Fajardo', '[\"Baris Jomarie \",\"Bautista, Jannelle L.\"]', 1, 9, '9', '\"Industry, Innovation and Infrastructure\"', '{\"0\":0.0007137213833630085,\"1\":0.0002919368271250278,\"2\":0.0009411441860720515,\"3\":0.008990731090307236,\"4\":0.00016795053670648485,\"5\":0.00018543205806054175,\"6\":0.00014715682482346892,\"7\":0.005307663697749376,\"8\":0.979838490486145,\"9\":0.000472137558972463,\"10\":0.001481157261878252,\"11\":0.00015437205729540437,\"12\":0.00016789785877335817,\"13\":0.0004545200790744275,\"14\":0.0001614922657608986,\"15\":0.000046937584556872025,\"16\":0.00047733428073115647}', 'completed', '2025-12-04 03:50:40', 58, 2025);
 
 -- --------------------------------------------------------
 
@@ -1529,12 +1590,13 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `user_code`, `username`, `lastname`, `firstname`, `middlename`, `extension`, `email`, `password`, `profile_img`, `created_at`, `updated_at`, `failed_attempts`, `lock_until`, `role`, `isActive`, `security_question`, `security_answer`, `reset_token`, `reset_token_expiry`, `department`, `course`) VALUES
-(16, '4445', 'Klasiko', 'Baris', 'Jomarie', 'Lanosa', '', 'jomarie.baris@gmail.com', '$2b$10$ixDO3tLRsQdReEvBV1ufdOb6pOJ/gA6VIeHiHeoRrPq3kEQUQ2Qh.', '1762576950653-710508151.png', '2025-10-10 12:26:16', '2025-11-14 14:55:51', 0, NULL, 'admin', 1, 'What is your favorite book/movie?', 'Chronicle', NULL, NULL, NULL, NULL),
+(16, '4445', 'Klasiko', 'Baris', 'Jomarie', 'Lanosa', '', 'jomarie.baris@gmail.com', '$2b$10$ixDO3tLRsQdReEvBV1ufdOb6pOJ/gA6VIeHiHeoRrPq3kEQUQ2Qh.', '1762576950653-710508151.png', '2025-10-10 12:26:16', '2025-11-14 14:55:51', 0, NULL, 'admin', 0, 'What is your favorite book/movie?', 'Chronicle', NULL, NULL, NULL, NULL),
 (40, '224-08804M', 'Jomarie', 'Baris', 'Jomarie', 'Lanosa', '', 'baris.j.bsinfotech@gmail.com', '$2b$10$mnaFK0IoNKMTFgEgEr29hu8PJ4Zv/.TQhVrbiA26FaF7ovzColkTK', '1763132627917-176494050.jpg', '2025-10-22 05:14:13', '2025-11-14 15:03:55', 0, NULL, 'rph', 0, 'What was your childhood nickname?', 'Jom', NULL, NULL, 2, 23),
 (42, '224-08806M', 'JA', 'Bautista', 'Janelle', 'Leynes', '', 'ajhay1730@gmail.com', '$2b$10$hATedq4b1mboUrbq1s8MguGmBwb9FnGIw26OEAm9/qSqtaLpzDcoe', 'default_profile.jpg', '2025-10-22 05:22:28', NULL, 0, NULL, 'faculty', 0, 'What is the name of your first pet?', 'N/A', NULL, NULL, 2, 23),
 (43, '224-08805M', 'Tal', 'Cabantog', 'Taliza', '', '', 'cabantog.t.bsinfotech@gmail.com', '$2b$10$ReH.wvqtW9GtyuyKjnaVW.K6TMuiRRnEkdRWPcOdwXftagBxHlOZ2', 'default_profile.jpg', '2025-10-22 05:24:33', NULL, 0, NULL, 'faculty', 0, 'What is the name of your first pet?', 'N/A', NULL, NULL, 2, 23),
-(44, '224-08807M', 'Igy Luis', 'Fuentiblanca', 'Igyluis', 'Veloso', '', 'fuentiblanca.il.bsinfotech@gmail.com', '$2b$10$1qSlX43fqyMAnwswE3JDQelwCGgjgi3vnOfgqEZ13e9ZeOzM97JCa', '1763298221130-412905604.jpg', '2025-10-22 05:25:28', '2025-11-24 13:46:16', 0, NULL, 'admin', 0, 'What is the name of your first pet?', 'Oggy', NULL, NULL, NULL, NULL),
-(55, '1111', 'Igy Luis', 'fuentiblanca', 'igy', 'VEloso', '', 'fuentiblancaigyluisv@gmail.com', '$2b$10$4pBq9JxtCMECMm/gax180OcxzdXZzvCMh95YNmBPlW4RXR1DdhLYW', 'default_profile.jpg', '2025-11-24 13:40:12', NULL, 0, NULL, 'faculty', 0, 'What is the name of your first pet?', 'Oggy', NULL, NULL, 2, 23);
+(44, '224-08807M', 'Igy Luis', 'Fuentiblanca', 'Igyluis', 'Veloso', '', 'fuentiblanca.il.bsinfotech@gmail.com', '$2b$10$ND7xUj13mLOQEe804Z0CDuqscDkpKcZT6wGpzX.Cz5knXBGyGdj0a', '1763298221130-412905604.jpg', '2025-10-22 05:25:28', '2025-11-24 13:46:16', 0, NULL, 'admin', 0, 'What is the name of your first pet?', 'Oggy', NULL, NULL, NULL, NULL),
+(55, '1111', 'Igy Luis', 'fuentiblanca', 'igy', 'VEloso', '', 'fuentiblancaigyluisv@gmail.com', '$2b$10$4pBq9JxtCMECMm/gax180OcxzdXZzvCMh95YNmBPlW4RXR1DdhLYW', 'default_profile.jpg', '2025-11-24 13:40:12', NULL, 5, '2025-12-02 15:04:42', 'faculty', 0, 'What is the name of your first pet?', 'Oggy', 'c00e1090975a0d92e41534cbb28147e85a6386e903b927049610be408cc7f8a2', '2025-12-02 15:16:32', 2, 23),
+(58, '12345', 'Jeff', 'Costales', 'Jefferson', 'A', '', 'jeffcostales@gmail.com', '$2b$10$pzG5VmY58..OzE8QYzWh5Ouh08viyVXzBLisT5GDyZAjLVJ5CFHWu', 'default_profile.jpg', '2025-12-04 03:40:23', NULL, 0, NULL, 'rph', 1, 'What is the name of your first pet?', 'N/A', NULL, NULL, 1, 8);
 
 --
 -- Indexes for dumped tables
@@ -1602,7 +1664,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `audit_log`
 --
 ALTER TABLE `audit_log`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1465;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1525;
 
 --
 -- AUTO_INCREMENT for table `course`
@@ -1614,7 +1676,7 @@ ALTER TABLE `course`
 -- AUTO_INCREMENT for table `department`
 --
 ALTER TABLE `department`
-  MODIFY `department_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `department_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT for table `history_report`
@@ -1626,7 +1688,7 @@ ALTER TABLE `history_report`
 -- AUTO_INCREMENT for table `research_paper`
 --
 ALTER TABLE `research_paper`
-  MODIFY `research_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=208;
+  MODIFY `research_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=209;
 
 --
 -- AUTO_INCREMENT for table `research_presentations`
@@ -1644,7 +1706,7 @@ ALTER TABLE `research_publications`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
 
 --
 -- Constraints for dumped tables

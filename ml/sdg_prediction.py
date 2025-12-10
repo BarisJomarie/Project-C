@@ -4,7 +4,7 @@ import torch
 import os
 
 # Load model once
-model_path = "/mnt/volume/final_model"
+model_path = "Klasik4444/earist_sdg_classification"
 tokenizer = BertTokenizerFast.from_pretrained(model_path)
 model = BertForSequenceClassification.from_pretrained(model_path)
 model.eval() # Set model to evaluation mode
