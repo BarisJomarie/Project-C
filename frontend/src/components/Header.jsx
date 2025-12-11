@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { ShimmerButton, ShimmerCircularImage } from "react-shimmer-effects";
 import '../styles/style.css';
 import '../styles/header.css';
 import earistLogo from '../assets/earist_logo.png';
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const Header = ({ departments, fetchDepartments })  => {
+const Header = ({ departments, fetchDepartments, deptLoading })  => {
   const [darkMode, setDarkMode] = useState(false);
   const [overlayVisible, setOverlayVisible] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -13,6 +14,7 @@ const Header = ({ departments, fetchDepartments })  => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [profileVisible, setProfileVisible] = useState(false);
   const [userData, setUserData] = useState({});
+  const [profileLoading, setProfileLoading] = useState(true);
   const profileMenuRef = useRef(null);
   const navigate = useNavigate();
 
@@ -23,6 +25,8 @@ const Header = ({ departments, fetchDepartments })  => {
   // Function to fetch user data
   const fetchUserData = () => {
     if(!token) return;
+
+    setProfileLoading(true);
     axios.get(`${API_URL}/api/users/me`, {
       headers: {
         Authorization: `Bearer ${token}`
@@ -31,7 +35,9 @@ const Header = ({ departments, fetchDepartments })  => {
       setUserData(response.data);
     }).catch(err => {
       // console.error('Failed to fetch user data', err);
-    }); 
+    }).finally(() => {
+      setProfileLoading(false);
+    });
   }
 
   useEffect(() => {
@@ -186,40 +192,52 @@ const Header = ({ departments, fetchDepartments })  => {
           <img src={earistLogo} alt="earist-logo" />
           <h1>SDG Classification and Analytics</h1>
         </div>
+        
         <div className="right" ref={profileMenuRef}>
-          <p onClick={toggleProfileMenu}>{userData.username || 'Error'}</p>
-          <div className="profile">
-            <img
-              src={`${API_URL}/uploads/${userData.profile_img || 'default_profile.jpg'}`}
-              alt="Profile"
-              onClick={toggleProfileMenu}
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = '/images/default_profile.jpg';
-              }}
-              style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '50%',
-                objectFit: 'cover',
-                cursor: 'pointer'
-              }}
-            />
-            {profileVisible && (
-              <div className={`user-profile-button ${showProfileMenu ? 'fade-in' : 'fade-out'}`}>
-                <button onClick={handleThemeChange}>
-                  {darkMode ? 'Change to Light Mode' : 'Change to Dark Mode'}
-                  <span className="material-symbols-outlined theme-toggle">
-                    {darkMode ? 'dark_mode' : 'light_mode'}
-                  </span>
-                </button>
-                <button onClick={() => navigate('/view-profile')}>
-                  User Profile
-                </button>
-                <button onClick={handleLogout}>Logout</button>
-              </div>
-            )}
+          <div className="username">
+            {profileLoading ? <ShimmerButton size="sm"/> 
+            : <>
+                <p onClick={toggleProfileMenu}>{userData.username || 'Error'}</p>
+            </>}
           </div>
+          
+          
+          {profileLoading ? <ShimmerCircularImage size={40}/> 
+            : <>
+              <div className="profile">
+                <img
+                  src={`${API_URL}/uploads/${userData.profile_img || 'default_profile.jpg'}`}
+                  alt="Profile"
+                  onClick={toggleProfileMenu}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = '/images/default_profile.jpg';
+                  }}
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    objectFit: 'cover',
+                    cursor: 'pointer'
+                  }}
+                />
+                {profileVisible && (
+                  <div className={`user-profile-button ${showProfileMenu ? 'fade-in' : 'fade-out'}`}>
+                    <button onClick={handleThemeChange}>
+                      {darkMode ? 'Change to Light Mode' : 'Change to Dark Mode'}
+                      <span className="material-symbols-outlined theme-toggle">
+                        {darkMode ? 'dark_mode' : 'light_mode'}
+                      </span>
+                    </button>
+                    <button onClick={() => navigate('/view-profile')}>
+                      User Profile
+                    </button>
+                    <button onClick={handleLogout}>Logout</button>
+                  </div>
+                )}
+              </div>
+            </>}
+          
         </div>
       </header>
       <div className="layout">
@@ -227,6 +245,7 @@ const Header = ({ departments, fetchDepartments })  => {
           className="sidebar"
           style={{ width: isSidebarOpen ? undefined : '0px' }}
         >
+          
           <div className="sidebar-content" style={{ opacity: isSidebarOpen ? 1 : 0 }}>
             {userData.role === 'admin' && (
               <>
@@ -263,11 +282,10 @@ const Header = ({ departments, fetchDepartments })  => {
                   onClick={handleNavClick}
                 >
                   <span className="material-symbols-outlined">history</span>
-                  <span>Audit Logs</span>
+                  <span>Audit&nbsp;Logs</span>
                 </NavLink>
               </>
             )}
-
             <hr className="sidebar-divider" />
 
             <div className="department-dropdown">
@@ -282,20 +300,29 @@ const Header = ({ departments, fetchDepartments })  => {
               </h4>
 
               {depListOpen && (
-                <div className="dropdown-menu">
-                  {departments.map((dept) => (
-                    <NavLink
-                      key={dept.department_id}
-                      to={`/user/department/${dept.department_id}`}
-                      className={({ isActive }) =>
-                        isActive ? "sidebar-link active" : "sidebar-link"
-                      }
-                    >
-                      <span className="material-symbols-outlined">account_tree</span>
-                      <span>{dept.department_abb}</span>
-                    </NavLink>
-                  ))}
-                </div>
+                deptLoading ? 
+                  <div style={{ margin: "10px 0px 10px 30px" }}>
+                    <div style={{marginBottom: '15px'}}><ShimmerButton size="md" /></div>
+                    <div style={{marginBottom: '15px'}}><ShimmerButton size="md" /></div>
+                    <div style={{marginBottom: '15px'}}><ShimmerButton size="md" /></div>
+                  </div> 
+                  : 
+                  <>
+                    <div className="dropdown-menu">
+                      {departments.map((dept) => (
+                        <NavLink
+                          key={dept.department_id}
+                          to={`/user/department/${dept.department_id}`}
+                          className={({ isActive }) =>
+                            isActive ? "sidebar-link active" : "sidebar-link"
+                          }
+                        >
+                          <span className="material-symbols-outlined">account_tree</span>
+                          <span>{dept.department_abb}</span>
+                        </NavLink>
+                      ))}
+                    </div>
+                  </>
               )}
             </div>
 
@@ -312,14 +339,14 @@ const Header = ({ departments, fetchDepartments })  => {
                 </button>
               </>
             )} */}
-            
           </div>
+          
+          
         </div>
         <main style={{ marginLeft: isSidebarOpen ? undefined : '10px' }}>
           <Outlet />
         </main>
       </div>
-      
     </>
   )
 }

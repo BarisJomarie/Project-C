@@ -1,5 +1,7 @@
 import axios from 'axios'
 import { Routes, Route, Navigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { ShimmerButton } from 'react-shimmer-effects'
 import ProtectedRoute from './components/ProtectedRoute'
 import Login from './components/Login'
 import SignUp from './components/SignUp'
@@ -20,12 +22,13 @@ import Users from './components/Users'
 import AuditLogs from './components/AuditLogs'
 import UserPage from './components/UserPage'
 import ResearchPaperPage from './components/ResearchPaperPage'
-import { useState, useEffect } from 'react'
+
 
 
 
 function App() {
   const [departments, setDepartments] = useState([]);
+  const [deptLoading, setDeptLoading] = useState(true);
 
   const API_URL = import.meta.env.VITE_API_URL;
 
@@ -34,10 +37,14 @@ function App() {
     const token = localStorage.getItem('token');
     const role = localStorage.getItem('role');
 
+    setDeptLoading(true);
+
     if (token && role === 'admin') {
       axios.get(`${API_URL}/api/users/departments`, {
         headers: { Authorization: `Bearer ${token}` }
-      }).then(res => setDepartments(res.data));
+      })
+      .then(res => setDepartments(res.data))
+      .finally(() => setDeptLoading(false));
     }
 
     if (token && (role === 'rph' || role === 'faculty')) {
@@ -46,7 +53,8 @@ function App() {
         headers: { Authorization: `Bearer ${token}` }
       })
       .then(res => setDepartments([res.data])) 
-      .catch(err => console.error("Failed to fetch department:", err));
+      .catch(err => console.error("Failed to fetch department:", err))
+      .finally(() => setDeptLoading(false));
     }
   };
 
@@ -69,7 +77,7 @@ function App() {
       <Route path='/new-password/:email' element={<NewPassword />} />
 
 
-      <Route element={<Header departments={departments} fetchDepartments={fetchDepartments} />}>
+      <Route element={<Header departments={departments} fetchDepartments={fetchDepartments} deptLoading={deptLoading}/>}>
         <Route path='/user/homepage' element={<ProtectedRoute allowedRoles={['admin']}> <Homepage/> </ProtectedRoute>}/>
         <Route path='/user/department/:dep_id' element={<ProtectedRoute allowedRoles={['admin', 'rph', 'faculty']}> <Department/> </ProtectedRoute>}/>
         <Route path='/user/department/:dep_id/research_add' element={<ProtectedRoute allowedRoles={['admin', 'rph', 'faculty']}> <AddResearch/> </ProtectedRoute>}/>
