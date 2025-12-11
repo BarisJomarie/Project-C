@@ -7,9 +7,14 @@ import '../styles/style.css';
 import '../styles/table.css'
 import '../styles/list.css'
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { ShimmerTitle, ShimmerThumbnail, ShimmerTable } from "react-shimmer-effects";
 
 
 const Homepage = () => {
+  const [userDataLoading, setUserDataLoading] = useState(true);
+  const [infoLoading, setInfoLoading] = useState(true);
+  const [cupLoading, setCupLoading] = useState(true);
+  const [departmentLoading, setDepartmentLoading] = useState(true);
   const [userData, setUserData] = useState([]);
   const [users, setUsers] = useState([]);
   const [audit, setAudit] = useState([]);
@@ -24,12 +29,15 @@ const Homepage = () => {
 
   const token = localStorage.getItem('token');
   const role = localStorage.getItem('role');
+  const height = 500;
+  const width = 500;
 
   const API_URL = import.meta.env.VITE_API_URL;
 
   // Get User Data
   const getUserData = () => {
     if (token) {
+      setUserDataLoading(true);
       axios.get(`${API_URL}/api/users/me`, {
         headers: { Authorization: `Bearer ${token}` }
       })
@@ -59,7 +67,8 @@ const Homepage = () => {
       .catch(err => {
         console.error('Failed to fetch user data', err);
         showToast('error', 'Error', 'Failed to fetch user data.');
-      });
+      })
+      .finally(() => setUserDataLoading(false));
     } else {
       showToast('error', 'Error', 'No token found. Please log in again.');
     }
@@ -68,7 +77,7 @@ const Homepage = () => {
 
   // Get Departments
   const getDepartment = () => {
-    axios.get(`${API_URL}/api/users/departments`, {
+    return axios.get(`${API_URL}/api/users/departments`, {
       headers: { Authorization: `Bearer ${token}`},
     }).then(response => {
       if (Array.isArray(response.data) && response.data.length > 0) {
@@ -84,7 +93,7 @@ const Homepage = () => {
 
   // Get Users
   const getUsers = () => {
-    axios.get(`${API_URL}/api/users/allUsers`, {
+    return axios.get(`${API_URL}/api/users/allUsers`, {
       headers: { Authorization: `Bearer ${token}`},
     }).then(response => {
       if (Array.isArray(response.data) && response.data.length > 0) {
@@ -100,7 +109,7 @@ const Homepage = () => {
 
   // Get Audit Logs max 100
   const getAuditLogs = () => {
-    axios.get(`${API_URL}/api/users/audit-logs`, {
+    return axios.get(`${API_URL}/api/users/audit-logs`, {
       headers: { Authorization: `Bearer ${token}`},
     }).then(response => {
       if (Array.isArray(response.data) && response.data.length > 0) {
@@ -193,35 +202,34 @@ const Homepage = () => {
   useEffect(() => {
     if (!role) return;
 
+    setInfoLoading(true);
+    setDepartmentLoading(true);
+
     if (role === 'admin') {
-      getTotalPapers();
-      getHighestLowestSDG();
       getDepartment();
-      getUsers();
-      getAuditLogs();
+      Promise.all([getUsers(), getAuditLogs()]).finally(() => {
+        setInfoLoading(false);
+      });
+      Promise.all([getTotalPapers(), getHighestLowestSDG()]).finally(() => {
+        setDepartmentLoading(false);
+      });
     }
 
-    if (role === 'faculty') {
+    if (role === 'faculty' || role === 'rph') {
       getDepartment();
-      getUsers();
-      getTotalPapers();
-      getHighestLowestSDG();
-      getUsers();
-    }
-    
-    if (role === 'student') {
-      getDepartment();
-      getUsers();
-      getTotalPapers();
-      getHighestLowestSDG();
-      getUsers();
+      Promise.all([getTotalPapers(), getHighestLowestSDG()]).finally(() => {
+        setDepartmentLoading(false);
+      });
     }
   }, [role]);
 
   // Fetch current uploaded papers when userData is set
   useEffect(() => {
-    if ((role === 'admin' || role === 'faculty' || role === 'student') && userData?.id) {
-      getCurrentUploadedResearchPapers();
+    if ((role === 'admin' || role === 'faculty' || role === 'rph') && userData?.id) {
+      setCupLoading(true);
+      Promise.all(getCurrentUploadedResearchPapers()).finally(() => {
+        setCupLoading(false);
+      });
     }
   }, [role, userData]);
 
@@ -276,8 +284,14 @@ const Homepage = () => {
       
       <div className="homepage-container">
         <div className="greetings">
-          <h1>{greetings.split(userData.username)[0]} <span className="username">{userData.username}</span> </h1>
-          <p>Email: {userData.email}</p>
+          {userDataLoading ? <>
+            <ShimmerTitle line={1} gap={10} variant="primary" />
+            <ShimmerTitle line={1} gap={10} variant="secondary" />
+          </> : <>
+            <h1>{greetings.split(userData.username)[0]} <span className="username">{userData.username}</span> </h1>
+            <p>Email: {userData.email}</p>
+          </>}
+          
         </div>
 
         {/* admin panel */}
@@ -285,86 +299,94 @@ const Homepage = () => {
           <>
             <div className="line"></div>
             <div className="summary-cards">
-              <div className="card-table" >
-                <div>
-                  <ResponsiveContainer width="100%" height={200}>
-                    <PieChart>
-                      <Pie
-                        data={pieData}
-                        dataKey="value"
-                        nameKey="name"
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={50}
-                        innerRadius={40}
-                        label
-                      >
-                        {pieData.map((entry, index) => (
-                          <Cell
-                            key={index}
-                            fill={entry.name === 'Active Users' ? '#C83F12' : '#3B060A'}
-                          />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
+              {infoLoading ? <ShimmerThumbnail height={height} width={width}/>
+              : <>
+                <div className="card-table" >
+                  <div>
+                    <ResponsiveContainer width="100%" height={200}>
+                      <PieChart>
+                        <Pie
+                          data={pieData}
+                          dataKey="value"
+                          nameKey="name"
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={50}
+                          innerRadius={40}
+                          label
+                        >
+                          {pieData.map((entry, index) => (
+                            <Cell
+                              key={index}
+                              fill={entry.name === 'Active Users' ? '#C83F12' : '#3B060A'}
+                            />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="table-container">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Role</th>
+                          <th>Total</th>
+                          <th>Active</th>
+                          <th>Inactive</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>Admin</td>
+                          <td>{totalAdmins}</td>
+                          <td>{users.filter(user => (user.role === 'admin' && user.isActive === 1)).length}</td>
+                          <td>{users.filter(user => (user.role === 'admin' && user.isActive === 0)).length}</td>
+                        </tr>
+                        <tr>
+                          <td>RPH</td>
+                          <td>{totalRPH}</td>
+                          <td>{users.filter(user => (user.role === 'rph' && user.isActive === 1)).length}</td>
+                          <td>{users.filter(user => (user.role === 'rph' && user.isActive === 0)).length}</td>
+                        </tr>
+                        <tr>
+                          <td>Student</td>
+                          <td>{totalFaculties}</td>
+                          <td>{users.filter(user => (user.role === 'faculty' && user.isActive === 1)).length}</td>
+                          <td>{users.filter(user => (user.role === 'faculty' && user.isActive === 0)).length}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
-                <div className="table-container">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Role</th>
-                        <th>Total</th>
-                        <th>Active</th>
-                        <th>Inactive</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>Admin</td>
-                        <td>{totalAdmins}</td>
-                        <td>{users.filter(user => (user.role === 'admin' && user.isActive === 1)).length}</td>
-                        <td>{users.filter(user => (user.role === 'admin' && user.isActive === 0)).length}</td>
-                      </tr>
-                      <tr>
-                        <td>RPH</td>
-                        <td>{totalRPH}</td>
-                        <td>{users.filter(user => (user.role === 'rph' && user.isActive === 1)).length}</td>
-                        <td>{users.filter(user => (user.role === 'rph' && user.isActive === 0)).length}</td>
-                      </tr>
-                      <tr>
-                        <td>Student</td>
-                        <td>{totalFaculties}</td>
-                        <td>{users.filter(user => (user.role === 'faculty' && user.isActive === 1)).length}</td>
-                        <td>{users.filter(user => (user.role === 'faculty' && user.isActive === 0)).length}</td>
-                      </tr>
-                    </tbody>
-                  </table>
+              </>}
+              
+              {infoLoading ? <ShimmerThumbnail height={height} width={width}/>
+              : <>
+                <div className="card-table">
+                  <h4>Audit Logs (25 max)</h4>
+                  <div className="list-container">
+                    <ul className="custom-list">
+                      {audit.length > 0 ? (
+                        audit.map((a) => (
+                          <li key={a.id} className="list-item">
+                            <div className="list-left">
+                              <strong className={`actor-${a.actor_type}`}>{a.user_code}</strong>
+                              <span className="action-text">— {a.action}</span>
+                            </div>
+                            <div className="list-right">
+                              <small>{new Date(a.timestamp).toLocaleString()}</small>
+                            </div>
+                          </li>
+                        ))
+                      ) : (
+                        <li className="no-items">No Audits currently...</li>
+                      )}
+                    </ul>
+                  </div>
                 </div>
-              </div>
-              <div className="card-table">
-                <h4>Audit Logs (25 max)</h4>
-                <div className="list-container">
-                  <ul className="custom-list">
-                    {audit.length > 0 ? (
-                      audit.map((a) => (
-                        <li key={a.id} className="list-item">
-                          <div className="list-left">
-                            <strong className={`actor-${a.actor_type}`}>{a.user_code}</strong>
-                            <span className="action-text">— {a.action}</span>
-                          </div>
-                          <div className="list-right">
-                            <small>{new Date(a.timestamp).toLocaleString()}</small>
-                          </div>
-                        </li>
-                      ))
-                    ) : (
-                      <li className="no-items">No Audits currently...</li>
-                    )}
-                  </ul>
-                </div>
-              </div>
+              </>}
+              
             </div>
           </>
         )}
@@ -387,115 +409,127 @@ const Homepage = () => {
             ))}
           </select>
           <div className="summary-cards">
-            <div className={`card ${totalPapers.length > 0 ? 'expanded' : ''}`}>
-              <h4>Amount of SDG Research created in a department</h4>
-              {totalPapers.length > 0 ? (
-                <>
-                  <ResponsiveContainer width="100%" height={400}>
-                    <BarChart
-            data={totalPapers}
-            layout="vertical"   // <-- Makes it horizontal
-            margin={{ top: 20, right: 30, left: 50, bottom: 20 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
 
-
-            {/* Left side labels */}
-            <YAxis
-              dataKey="sdg_labels"
-              type="category"
-              width={50}
-              tick={{ fontSize: 8 }}
-            />
-
-
-            {/* Bottom axis values */}
-            <XAxis
-              type="number"
-            />
-
-
-            <Tooltip />
-
-
-            <Bar dataKey="total">
-              {totalPapers.map((entry, index) => (
-                <Cell
-                  key={`bar-${index}`}
-                  fill={getSdgColor(entry.sdg_labels)}
-                />
-              ))}
-            </Bar>
-          </BarChart>
-
-                  </ResponsiveContainer>
-                </>
-              ) : (
-                <>
-                  <p>No Current Papers in this department</p>
-                </>
-              )}  
-            </div>
-            <div className={`card ${totalPapers.length > 0 ? 'expanded' : ''}`}>
-              <h4>Highest and Lowest SDG Created in each course.</h4>
-              {highestLowestSDG.length > 0 ? (
-                <>
-                  <ResponsiveContainer width='100%' height={400}>
-                    <BarChart data={groupedData}>
+            {departmentLoading ? <ShimmerThumbnail height={height} width={width}/>
+            : <>
+              <div className={`card ${totalPapers.length > 0 ? 'expanded' : ''}`}>
+                <h4>Amount of SDG Research created in a department</h4>
+                {totalPapers.length > 0 ? (
+                  <>
+                    <ResponsiveContainer width="100%" height={400}>
+                      <BarChart
+                        data={totalPapers}
+                        layout="vertical"   // <-- Makes it horizontal
+                        margin={{ top: 20, right: 30, left: 50, bottom: 20 }}
+                      >
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="course_abb" />
-                      <YAxis 
-                        allowDecimals={false}
-                        tickCount={highestLowestSDG.length + 1}
+
+
+                      {/* Left side labels */}
+                      <YAxis
+                        dataKey="sdg_labels"
+                        type="category"
+                        width={50}
+                        tick={{ fontSize: 8 }}
                       />
-                      <Tooltip 
-                        formatter={(value, name, props) => {
-                          if (name === "Highest SDG") {
-                            return [`${value}`, groupedData.find(d => d.course_abb === props.payload.course_abb)?.highest_label];
-                          }
-                          if (name === "Lowest SDG") {
-                            return [`${value}`, groupedData.find(d => d.course_abb === props.payload.course_abb)?.lowest_label];
-                          }
-                          return value;
-                        }}
+
+
+                      {/* Bottom axis values */}
+                      <XAxis
+                        type="number"
                       />
-                      <Bar dataKey="highest" fill="#8A0000" name="Highest SDG" />
-                      <Bar dataKey="lowest" fill="#3B060A" name="Lowest SDG" />
+
+
+                      <Tooltip />
+
+
+                      <Bar dataKey="total">
+                        {totalPapers.map((entry, index) => (
+                          <Cell
+                            key={`bar-${index}`}
+                            fill={getSdgColor(entry.sdg_labels)}
+                          />
+                        ))}
+                      </Bar>
                     </BarChart>
-                  </ResponsiveContainer>
-                </>
-              ) : (
-                <>
-                  <p>No highest/lowest SDG data available for this department</p>
-                </>
-              )}
-            </div>
+
+                    </ResponsiveContainer>
+                  </>
+                ) : (
+                  <>
+                    <p>No Current Papers in this department</p>
+                  </>
+                )}  
+              </div>
+            </>}
+            
+            {departmentLoading ? <ShimmerThumbnail height={height} width={width}/>
+            : <>
+              <div className={`card ${totalPapers.length > 0 ? 'expanded' : ''}`}>
+                <h4>Highest and Lowest SDG Created in each course.</h4>
+                {highestLowestSDG.length > 0 ? (
+                  <>
+                    <ResponsiveContainer width='100%' height={400}>
+                      <BarChart data={groupedData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="course_abb" />
+                        <YAxis 
+                          allowDecimals={false}
+                          tickCount={highestLowestSDG.length + 1}
+                        />
+                        <Tooltip 
+                          formatter={(value, name, props) => {
+                            if (name === "Highest SDG") {
+                              return [`${value}`, groupedData.find(d => d.course_abb === props.payload.course_abb)?.highest_label];
+                            }
+                            if (name === "Lowest SDG") {
+                              return [`${value}`, groupedData.find(d => d.course_abb === props.payload.course_abb)?.lowest_label];
+                            }
+                            return value;
+                          }}
+                        />
+                        <Bar dataKey="highest" fill="#8A0000" name="Highest SDG" />
+                        <Bar dataKey="lowest" fill="#3B060A" name="Lowest SDG" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </>
+                ) : (
+                  <>
+                    <p>No highest/lowest SDG data available for this department</p>
+                  </>
+                )}
+              </div>
+            </>}
           </div>
         </div>
         <div className="summary-container">
           <div className="summary-cards">
-            <div className="card-table">
-              <h4>Recently Added Papers</h4>
-              <div className="list-container">
-                <ul className="custom-list">
-                  {currentUploadedPapers.length > 0 ? (
-                    currentUploadedPapers.map((paper) => (
-                      <li key={paper.research_id} className="list-item">
-                        <div className="list-left">
-                          <strong className={`actor-`}>{paper.research_id}</strong>
-                          <span className="action-text">{paper.research_title}</span>
-                        </div>
-                        <div className="list-right">
-                          <small>{new Date(paper.created_at).toLocaleString()}</small>
-                        </div>
-                      </li>
-                    ))
-                  ) : (
-                    <li className="no-items">No recently added papers</li>
-                  )}
-                </ul>
-              </div>
-            </div>
+            {cupLoading ? <ShimmerThumbnail height={100} width={width} />
+            : <>
+                <div className="card-table">
+                  <h4>Recently Added Papers</h4>
+                  <div className="list-container">
+                    <ul className="custom-list">
+                      {currentUploadedPapers.length > 0 ? (
+                        currentUploadedPapers.map((paper) => (
+                          <li key={paper.research_id} className="list-item">
+                            <div className="list-left">
+                              <strong className={`actor-`}>{paper.research_id}</strong>
+                              <span className="action-text">{paper.research_title}</span>
+                            </div>
+                            <div className="list-right">
+                              <small>{new Date(paper.created_at).toLocaleString()}</small>
+                            </div>
+                          </li>
+                        ))
+                      ) : (
+                        <li className="no-items">No recently added papers</li>
+                      )}
+                    </ul>
+                  </div>
+                </div>
+              </>} 
+           
           </div>
         </div>
       </div>
