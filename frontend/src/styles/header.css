@@ -16,15 +16,11 @@ header {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.shimmer-avatar {
-  margin-bottom: 0;
-  z-index: 100;
+.shimmer-avatar,
+.shimmer-button {
+  margin: 0 !important;
 }
 
-.shimmer-button {
-  margin-bottom: 0;
-  z-index: 100;
-}
 
 @keyframes headerFadeIn {
   from {
