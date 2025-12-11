@@ -1,7 +1,6 @@
 import axios from 'axios'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
-import { ShimmerButton } from 'react-shimmer-effects'
 import ProtectedRoute from './components/ProtectedRoute'
 import Login from './components/Login'
 import SignUp from './components/SignUp'
