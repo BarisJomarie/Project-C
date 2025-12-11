@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { showToast } from "../utils/toast";
+import { ShimmerTable, ShimmerButton } from "react-shimmer-effects";
 import axios from "axios";
 import Loading from "../utils/Loading";
 import ConfirmModal from "../utils/ConfirmModal";
@@ -12,6 +13,7 @@ import '../styles/form.css';
 
 const Users = () => {
   const [loading, setLoading] = useState(false);
+  const [tableLoading, setTableLoading] = useState(true);
   const [userData, setUserData] = useState([]);
   const [users, setUsers] = useState([]);
   const [departments, setDepartments] = useState([]);
@@ -36,6 +38,7 @@ const Users = () => {
   });
   const [editingIndex, setEditingIndex] = useState(null);
   const [editedUser, setEditedUser] = useState({});
+  const [editCourses, setEditCourses] = useState([]);
   const [modalConfig, setModalConfig] = useState({
     show: false,
     title: "",
@@ -86,7 +89,7 @@ const Users = () => {
 
   // GET ALL USERS
   const getUsers = () => {
-    axios.get(`${API_URL}/api/users/allUsers`, {
+    return axios.get(`${API_URL}/api/users/allUsers`, {
       headers: { Authorization: `Bearer ${token}`},
     }).then(response => {
       if (Array.isArray(response.data) && response.data.length > 0) {
@@ -103,12 +106,12 @@ const Users = () => {
 
   // GET DEPARTMENTS
   const getDepartment = async () => {
-    axios.get(`${API_URL}/api/users/departments`, {
+    return axios.get(`${API_URL}/api/users/departments`, {
       headers: { Authorization: `Bearer ${token}` },
     }).then(response => {
       if (Array.isArray(response.data) && response.data.length > 0) {
         // console.log('Department Fetched');
-        // console.log(response.data);
+        console.log(response.data);
       } else {
         console.log('No department found');
       }
@@ -118,9 +121,9 @@ const Users = () => {
     });
   };
 
-  // GET COURSE
-  const getDepartmentCourses = async (department_id) => {
-    if (!department_id) return setCourses([]);
+  // GET COURSE WHEN DEPARTMENT IS SET IN EDITING AND ADDING USER
+  const getDepartmentCourses = async (department_id, isEditing = false) => {
+    if (!department_id) return isEditing ? setEditCourses([]) : setCourses([]);
 
     try {
       const response = await axios.get(`${API_URL}/api/users/department-courses`, {
@@ -129,19 +132,25 @@ const Users = () => {
       });
 
       if (Array.isArray(response.data)) {
-        setCourses(response.data);
-        // console.log('Courses fetched:', response.data);
+        if (isEditing) setEditCourses(response.data);
+        else setCourses(response.data);
       } else {
-        setCourses([]);
+        if (isEditing) setEditCourses([]);
+        else setCourses([]);
       }
+
+      console.log(response.data);
     } catch (err) {
-      console.error('Failed to fetch courses', err);
+      console.error("Failed to fetch courses", err);
     }
   };
 
+
   useEffect(() => {
-    getUsers();
-    getUserData();
+    setTableLoading(true);
+    Promise.all([getUserData(), getUsers(), getDepartment()]).finally(() => {
+      setTableLoading(false);
+    });
   }, []);
 
   const isValidPassword = (password) => {
@@ -228,9 +237,17 @@ const Users = () => {
       async () => {
         closeModal();
         try {
+          // Check if non-admin role requires department and course
+          if (editedUser.role !== 'admin' && (!editedUser.department || !editedUser.course)) {
+            showToast('warning', 'Edit User', 'Please select a department and course for faculty or RPH.');
+            return;
+          }
+
           await axios.put(`${API_URL}/api/users/update-role`, {
             id: editedUser.id,
             role: editedUser.role,
+            department: editedUser.role === 'admin' ? null : editedUser.department,
+            course: editedUser.role === 'admin' ? null : editedUser.course,
           }, {
             headers: { Authorization: `Bearer ${token}` },
           });
@@ -305,38 +322,28 @@ const Users = () => {
   };
 
 
-  // CALL getDepartments IF ROLE IS FACULTY OR RPH
   const handleRoleChange = async (e) => {
     const role = e.target.value;
     setFormData(prev => ({ ...prev, role }));
-
-    if (['faculty', 'rph'].includes(role)) {
-      await getDepartment();
-    } else {
-      setDepartments([]);
-      setCourses([]);
-    }
   };
 
   // CALL getDepartmentCourse IF DEPARTMENT IS CHOSEN
-  const handleDepartmentChange = async (e) => {
+  const handleDepartmentChange = async (e, isEditing = false) => {
     const department_id = e.target.value;
-    // console.log(department_id);
-    setFormData(prev => ({ ...prev, department: department_id, course: '' }));
 
-    if (department_id) {
-      await getDepartmentCourses(department_id);
+    if (isEditing) {
+      setEditedUser(prev => ({ ...prev, department: department_id, course: "" }));
     } else {
-      setCourses([]);
+      setFormData(prev => ({ ...prev, department: department_id, course: "" }));
     }
-  };
 
+    // fetch courses according to mode
+    await getDepartmentCourses(department_id, isEditing);
+  };
 
   return (
     <>
       {loading && <Loading text="Adding user..." />}
-      <h1 style={{textAlign: 'center'}}>Users</h1>
-      <div className='line'></div>
       <div className="department-buttons-container">
         {addUserForm ? (
           <button onClick={() => {
@@ -344,7 +351,13 @@ const Users = () => {
             resetFields();
           }} type="button">Close Form</button>
         ) : (
-          <button onClick={() => setAddUserForm(true)} type="button">Add A User</button>
+          tableLoading ? <ShimmerButton size="lg" />
+          : <>
+            <button 
+              onClick={() => setAddUserForm(true)} 
+              type="button"
+              disabled={editingIndex !== null}>Add A User</button>
+          </>
         )}
       </div>
         <>
@@ -432,7 +445,7 @@ const Users = () => {
               {/* RESEARCH PROJECT HEAD OR FACULTY */}
               <div className={`extra-fields ${['faculty', 'rph'].includes(formData.role) ? 'slide-down' : 'slide-up'}`}>
                 <div className="department form-input">
-                  <select name="department" value={formData.department || ''} onChange={handleDepartmentChange}>
+                  <select name="department" value={formData.department || ''} onChange={(e) => handleDepartmentChange(e, false)}>
                     <option value=''>--Select a Department--</option>
                     {departments.length > 0 && (
                       departments.map((dep) => (
@@ -491,99 +504,153 @@ const Users = () => {
             </form>
           </div>
         </>
+        
+        <div className="line"></div>
+
       
-      <div className="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>User Code</th>
-              <th>Username</th>
-              <th>Fullname</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Active</th>
-              <th>Created At</th>
-              <th>Updated At</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.length > 0 ? (
-              users.map((u, index) => (
-                <tr key={u.id}>
-                  <td>{u.user_code}</td>
-                  <td>{u.username}</td>
-                  <td>{u.lastname}, {u.firstname} {u.middlename}. {u.extension ? `. ${u.extension.toUpperCase()}` : ""}</td>
-                  <td>{u.email}</td>
-
-                  {/* Editable role */}
-                  <td>
-                    {editingIndex === index ? (
-                      <select
-                        value={editedUser.role || u.role}
-                        onChange={(e) => setEditedUser({ ...editedUser, role: e.target.value })}
-                      >
-                        <option value="admin">Admin</option>
-                        <option value="rph">Research Project Head</option>
-                        <option value="faculty">Faculty</option>
-                      </select>
-                    ) : (
-                      u.role.charAt(0).toUpperCase() + u.role.slice(1)
-                    )}
-                  </td>
-
-                  <td className={`active-${u.isActive}`}>{u.isActive === 1 ? 'Online' : 'Offline'}</td>
-                  <td>{new Date(u.created_at).toLocaleDateString()}</td>
-                  <td>{u.updated_at ? new Date(u.updated_at).toLocaleDateString() : 'No Changes'}</td>
-
-                  {/* Actions */}
-                  <td>
-                    {editingIndex === index ? (
-                      <>
-                        <button onClick={() => handleSave()}>
-                          <span className="material-symbols-outlined save-icon">save</span>
-                          <span className="tooltip">Save Edit</span>
-                        </button>
-                        <button onClick={() => setEditingIndex(null)}>
-                          <span className="material-symbols-outlined cancel-icon">cancel</span>
-                          <span className="tooltip">Cancel Edit</span>
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <button onClick={() => {
-                          setEditingIndex(index);
-                          setEditedUser({ id: u.id, role: u.role });
-                        }}>
-                          {addUserForm!== true && (
-                            <>
-                              <span className="material-symbols-outlined edit-icon">edit</span>
-                              <span className="tooltip">Edit Role</span>
-                            </>
-                          )}
-                        </button>
-                        <button onClick={() => navigate(`/user/users/${u.id}`)}>
-                          <span className="material-symbols-outlined view-icon">visibility</span>
-                          <span className="tooltip">View Adviser</span>
-                        </button>
-                        <button onClick={() => handleDelete(u.id, u.user_code)}>
-                          <span className="material-symbols-outlined delete-icon">delete</span>
-                          <span className="tooltip">Delete User</span>
-                        </button>
-                      </>
-                    )}
-                  </td>
+      {tableLoading ? <ShimmerTable row={5} col={9} />
+        : <>
+          <div className="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>User Code</th>
+                  <th>Username</th>
+                  <th>Fullname</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Active</th>
+                  <th>Action</th>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={9}>No users...</td>
-              </tr>
-            )}
-          </tbody>
+              </thead>
+              <tbody>
+                {users.length > 0 ? (
+                  users.map((u, index) => (
+                    <tr key={u.id}>
+                      <td>{u.user_code}</td>
+                      <td>{u.username}</td>
+                      <td>{u.lastname}, {u.firstname} {u.middlename}. {u.extension ? `. ${u.extension.toUpperCase()}` : ""}</td>
+                      <td>{u.email}</td>
 
-        </table>
-      </div>
+                      {/* Editable role */}
+                      <td style={{
+                            display: 'flex', 
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}>
+                        {editingIndex === index ? (
+                          <>
+                            {/* ROLE DROPDOWN */}
+                            <select
+                              value={editedUser.role || u.role}
+                              onChange={(e) => {
+                                const newRole = e.target.value;
+                                setEditedUser({ ...editedUser, role: newRole });
+                                // Reset course when role changes
+                                if (newRole === "admin") {
+                                  setEditedUser(prev => ({ ...prev, department: "", course: "" }));
+                                }
+                              }}
+                            >
+                              <option value="admin">Admin</option>
+                              <option value="rph">Research Project Head</option>
+                              <option value="faculty">Faculty</option>
+                            </select>
+
+                            {/* If not admin show department, course select */}
+                            {(editedUser.role || u.role) !== "admin" && (
+                              <select
+                                value={editedUser.department || ""}
+                                onChange={(e) => {
+                                  setEditedUser({ ...editedUser, department: e.target.value });
+                                  handleDepartmentChange(e, true);
+                                }}
+                              >
+                                <option value="">Select Department</option>
+                                {departments.map((d) => (
+                                  <option key={d.department_id} value={d.department_id}>
+                                    {d.department_abb}
+                                  </option>
+                                ))}
+                              </select>
+                            )}
+
+                            {/* COURSE dropdown */}
+                            {(editedUser.role || u.role) !== "admin" && (
+                              <select
+                                value={editedUser.course || ""}
+                                onChange={(e) => setEditedUser(prev => ({ ...prev, course: e.target.value }))}
+                              >
+                                <option value="">Select Course</option>
+                                {editCourses.map((c) => (
+                                  <option key={c.course_id} value={c.course_id}>
+                                    {c.course_abb}
+                                  </option>
+                                ))}
+                              </select>
+                            )}
+                          </>
+                        ) : (
+                          // Not editing → just display the role
+                          u.role === 'rph' ? 'Research Project Head' : u.role.charAt(0).toUpperCase() + u.role.slice(1)
+                        )}
+                      </td>
+                      <td className={`active-${u.isActive}`}>{u.isActive === 1 ? 'Online' : 'Offline'}</td>
+
+                      {/* Actions */}
+                      <td>
+                        {editingIndex === index ? (
+                          <>
+                            <button onClick={() => handleSave()}>
+                              <span className="material-symbols-outlined save-icon">save</span>
+                              <span className="tooltip">Save Edit</span>
+                            </button>
+                            <button onClick={() => setEditingIndex(null)}>
+                              <span className="material-symbols-outlined cancel-icon">cancel</span>
+                              <span className="tooltip">Cancel Edit</span>
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button onClick={async () => {
+                              setEditingIndex(index);
+                              setEditedUser({ id: u.id, role: u.role, department: u.department, course: u.course });
+                              if (u.department) {
+                                await getDepartmentCourses(u.department, true);
+                              }
+                            }}>
+                              {addUserForm!== true && (
+                                <>
+                                  <span className="material-symbols-outlined edit-icon">edit</span>
+                                  <span className="tooltip">Edit Role</span>
+                                </>
+                              )}
+                            </button>
+                            <button onClick={() => navigate(`/user/users/${u.id}`)}>
+                              <span className="material-symbols-outlined view-icon">visibility</span>
+                              <span className="tooltip">View Adviser</span>
+                            </button>
+                            <button onClick={() => handleDelete(u.id, u.user_code)}>
+                              <span className="material-symbols-outlined delete-icon">delete</span>
+                              <span className="tooltip">Delete User</span>
+                            </button>
+                          </>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={9}>No users...</td>
+                  </tr>
+                )}
+              </tbody>
+
+            </table>
+          </div>
+        </>}
+      
 
 
 

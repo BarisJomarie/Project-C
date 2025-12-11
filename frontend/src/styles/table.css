@@ -1,16 +1,30 @@
+.html-box-fix {
+  /* helper selector to avoid accidental global overrides */
+}
+
+html { box-sizing: border-box; }
+*, *::before, *::after { box-sizing: inherit; }
+
 .table-container {
   width: 100%;
   table-layout: fixed;
   transition: all 0.2s ease;
   margin-bottom: 24px;
   border-radius: 8px;
-  overflow: hidden;
+  /* allow horizontal scrolling inside the table container instead of on the page */
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   border: 1px solid #e0e0e0;
 }
 
 .table-container table {
   width: 100%;
+  /* allow the table to grow wider than the container when needed so the container
+     shows an internal horizontal scrollbar instead of the page overflowing */
+  min-width: max-content;
   text-align: center;
   border-collapse: collapse;
   border-spacing: 0;
@@ -35,6 +49,14 @@
 .table-container td {
   height: 50px;
   padding: 10px 20px;
+}
+
+
+.table-container th,
+.table-container td {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .table-container tbody tr.selected {

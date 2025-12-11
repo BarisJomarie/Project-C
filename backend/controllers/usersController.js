@@ -77,7 +77,8 @@ exports.getUserData = (req, res) => {
 
 //EDIT ROLE
 exports.updateUserRole = (req, res) => {
-  const { role, id } = req.body;
+  const { role, id, department, course } = req.body;
+  console.log(req.body);
 
   // Validate role
   const validRoles = ['admin', 'faculty', 'rph'];
@@ -89,8 +90,8 @@ exports.updateUserRole = (req, res) => {
     return res.status(400).send({ message: 'Invalid user ID' });
   }
 
-  const query = `UPDATE users SET role = ? WHERE id = ?`;
-  const values = [role, id];
+  const query = `UPDATE users SET role = ?, department = ?, course = ? WHERE id = ?`;
+  const values = [role, department, course, id];
   db.query(query, values, (err, result) => {
     if (err) return res.status(500).send(err);
     res.status(200).send({ message: 'Role successfully updated' });
