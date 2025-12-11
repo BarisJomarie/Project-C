@@ -2,8 +2,8 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-// Define the uploads folder dynamically
-const uploadPath = path.join(__dirname, '../../frontend/public/uploads');
+// Define the backend uploads folder dynamically
+const uploadPath = path.join(__dirname, '../uploads');
 
 // Ensure folder exists
 if (!fs.existsSync(uploadPath)) {
@@ -20,6 +20,22 @@ const storage = multer.diskStorage({
   }
 });
 
-const upload = multer({ storage });
+const fileFilter = (req, file, cb) => {
+  const allowedTypes = /jpeg|jpg|png|gif/;
+  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+  const mimetype = allowedTypes.test(file.mimetype);
+
+  if (extname && mimetype) {
+    cb(null, true);
+  } else {
+    cb(new Error('Only .jpg, .jpeg, .png, and .gif images are allowed!'));
+  }
+};
+
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 2 * 1024 * 1024 } // 2MB limit
+});
 
 module.exports = upload;

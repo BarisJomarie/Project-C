@@ -64,7 +64,7 @@ input[type="radio"] {
 
 button[type="button"] {
   max-width: max-content;
-  padding: 10px 20px;
+  padding: 10px 24px;
   background-color: white;
   color: #1e293b;
   border: 1.5px solid #cbd5e1;
@@ -73,7 +73,7 @@ button[type="button"] {
   cursor: pointer;
   font-size: 0.95em;
   transition: all 0.2s ease;
-  margin-top: 10px;
+  height: 50px;
 }
 
 button[type="button"]:hover {
@@ -97,15 +97,15 @@ button[type='button']:disabled {
 button[type="submit"] {
   max-width: max-content;
   padding: 10px 24px;
-  background-color: #1e293b;
+  background-color: #f97316;
   color: white;
   font-weight: 600;
-  border: 1.5px solid #1e293b;
+  border: 1.5px solid #f97316;
   border-radius: 8px;
   cursor: pointer;
   font-size: 0.95em;
   transition: all 0.2s ease;
-  margin-top: 10px;
+  height: 50px;
 }
 
 button[type="submit"]:hover {
@@ -162,7 +162,6 @@ body.dark button[type="button"] {
   cursor: pointer;
   font-size: 1em;
   transition: all 0.3s ease;
-  margin-top: 10px;
 }
 
 body.dark button[type="button"]:hover {
@@ -178,7 +177,6 @@ body.dark button[type="submit"] {
   cursor: pointer;
   font-size: 1em;
   transition: all 0.3s ease;
-  margin-top: 10px;
 }
 
 body.dark button[type="submit"]:hover {

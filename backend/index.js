@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const multer = require('multer');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const verifyToken = require('./middleware/authMiddleware');
 
@@ -50,7 +51,19 @@ app.get('/api/ping', verifyToken, (req, res) => {
 });
 
 
-app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Multer / general error handler
+app.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    // Multer-specific errors (like file too large)
+    return res.status(400).json({ message: err.message });
+  } else if (err) {
+    // Custom errors (like invalid file type)
+    return res.status(400).json({ message: err.message });
+  }
+  next();
+});
+
 
 
 app.listen(process.env.PORT, () => {

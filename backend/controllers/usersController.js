@@ -133,7 +133,8 @@ exports.updateUserProfile = (req, res) => {
     // Step 2: If a new file was uploaded, delete the old one (if not default)
     if (newProfileImg) {
       if (oldProfileImg && oldProfileImg !== 'default_profile.jpg') {
-        const oldPath = path.join(__dirname, '../../frontend/public/uploads', oldProfileImg);
+        const oldPath = path.join(__dirname, '../uploads', oldProfileImg);
+
         fs.unlink(oldPath, (unlinkErr) => {
           if (unlinkErr && unlinkErr.code !== 'ENOENT') {
             console.error('Error deleting old profile image:', unlinkErr);

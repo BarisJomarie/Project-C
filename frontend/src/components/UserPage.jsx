@@ -266,7 +266,7 @@ const UserPage = () => {
         <div className="sidebar-right">
           <div className="profile-container">
             <div className={`profile-image-container ${user?.isActive !== 0 ? 'active' : ''}`}>
-              <img src={`/uploads/${user?.profile_img || 'default_profile.jpg'}`} alt="Profile" onError={(e) => { e.currentTarget.src = '/uploads/default_profile.jpg'; }} />
+              <img src={user?.profile_img ? `${API_URL}/uploads/${user.profile_img}` : '/uploads/default_profile.jpg'} alt="Profile" onError={(e) => { e.currentTarget.src = '/uploads/default_profile.jpg'; }} />
             </div>
             <div className="profile-image-label">
               <label>{user?.username}</label>

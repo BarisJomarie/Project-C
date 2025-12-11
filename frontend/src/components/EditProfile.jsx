@@ -19,6 +19,7 @@ const EditProfile = () => {
     profile_img: ''
   });
   const [imageFile, setImageFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
   const navigate = useNavigate();
 
   const API_URL = import.meta.env.VITE_API_URL;
@@ -51,7 +52,11 @@ const EditProfile = () => {
   };
 
   const handleImageChange = e => {
-    setImageFile(e.target.files[0]);
+    const file = e.target.files[0];
+    setImageFile(file);
+    if (file) {
+      setPreviewUrl(URL.createObjectURL(file));
+    }
   };
 
   const handleCancel = () => {
@@ -73,10 +78,7 @@ const EditProfile = () => {
 
     try {
       await axios.put(`${API_URL}/api/users/update`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
-        }
+        headers: { Authorization: `Bearer ${token}` }
       });
 
       showToast('success', 'Profile Updated', 'Successfully Updated.');
@@ -87,7 +89,7 @@ const EditProfile = () => {
       setTimeout(() => navigate(-1), 1000);
     } catch (err) {
       console.error(err);
-      showToast('error', 'Update Failed', 'Failed to update your profile.');
+      showToast('error', 'Update Failed', err.response?.data?.message || 'Failed to update your profile.');
     }
   };
 
@@ -95,8 +97,45 @@ const EditProfile = () => {
     <>
       <div>
         <h1 style={{textAlign: 'center'}}>Edit Profile</h1>
+        <div style={{
+          display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginBottom: '-30px'
+          }}>
+          {(previewUrl || form.profile_img) && (
+            <div
+            style={{
+              width: '120px',
+              height: '120px',
+              marginBottom: '20px',
+              border: '2px solid #ddd',
+              borderRadius: '50%',
+            }}>
+              <img
+                src={previewUrl ? previewUrl : form.profile_img ? `${API_URL}/uploads/${form.profile_img}` : '/uploads/default_profile.jpg'}
+                alt="Profile"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: '50%',
+                  objectFit: 'cover',
+                  
+                }}
+              />
+            </div>
+          )}
+        </div>
+        
         <div className='form-container default'>
-          <form onSubmit={handleSubmit} encType="multipart/form-data">
+          <form onSubmit={handleSubmit}>
+            <div className="form-input center">
+              <label className="custom-file-upload">
+                <input type="file" onChange={handleImageChange} />
+                Change Profile Image
+              </label>
+            </div>
+
             {['firstname', 'lastname', 'middlename', 'extension', 'username', 'email'].map(field => (
               <div key={field} className="form-input">
                 <input
@@ -142,31 +181,13 @@ const EditProfile = () => {
               />
               <label>Security Answer:</label>
             </div>
-
-         
-            <div className="form-input">
-              {form.profile_img && (
-                <div style={{ marginTop: '10px' }}>
-                  <img
-                    src={`/uploads/${form.profile_img}`}
-                    alt="Profile"
-                    style={{ width: '100px', borderRadius: '8px' }}
-                  />
-                </div>
-              )}
-              <input type="file" accept="image/*" onChange={handleImageChange} />
-              <label>Upload Profile Image:</label>
-            </div>
             
             <div className='form-button-container'>
               <button type="button" onClick={handleCancel}>Cancel</button>
               <button type="submit">Save Changes</button>
             </div>
-            
           </form>
         </div>
-        
-
       </div>
 
       <div className="toast-box" id="toast-box"></div>

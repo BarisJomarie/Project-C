@@ -29,7 +29,7 @@ const ViewProfile = () => {
     <div className="view-profile-container">
         <h2>Your Profile</h2>
         <div className="profile-info">
-            <img src={`/uploads/${user.profile_img}`} alt="Profile" />
+            <img src={user.profile_img ? `${API_URL}/uploads/${user.profile_img}` : '/uploads/default_profile.jpg'} alt="Profile" />
 
             <p><strong>Username:</strong> {user.username}</p>
             <p><strong>Email:</strong> {user.email}</p>

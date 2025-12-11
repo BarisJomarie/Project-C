@@ -1,12 +1,17 @@
+# backend env
 .env
 
 # backend
 backend/node_modules/
+backend/uploads/*
 
 # frontend
 frontend/node_modules/
 frontend/dist/
 frontend/.env
+frontend/public/uploads/*
+!frontend/public/uploads/default_profile.jpg
+
 
 # ml
 ml/node_modules/

@@ -190,7 +190,7 @@ const Header = ({ departments, fetchDepartments })  => {
           <p onClick={toggleProfileMenu}>{userData.username || 'Error'}</p>
           <div className="profile">
             <img
-              src={`/uploads/${userData.profile_img || 'default-profile.png'}`}
+              src={`${API_URL}/uploads/${userData.profile_img}`|| `${API_URL}/uploads/default_profile.jpg`}
               alt="Profile"
               onClick={toggleProfileMenu}
               style={{

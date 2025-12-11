@@ -486,7 +486,7 @@ const Users = () => {
               </div>
               <div className="form-button-container">
                 <button type="button" onClick={resetFields}>Clear</button>
-                <button type="submit">Add User</button>
+                <button type="submit" style={{margin: 0}}>Add User</button>
               </div>
             </form>
           </div>
