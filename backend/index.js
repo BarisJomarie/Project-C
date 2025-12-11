@@ -15,9 +15,20 @@ const publicationRoutes = require("./routes/publicationRoutes");
 
 
 
-// Allow your Netlify frontend
+// Allow your Netlify frontend (if production) and localhost (if development) to access the backend
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://sdgclassification.netlify.app"
+];
+
 app.use(cors({
-  origin: "https://sdgclassification.netlify.app",
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true
 }));
@@ -43,5 +54,5 @@ app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
 
 app.listen(process.env.PORT, () => {
-  console.log(`Server running`);
+  console.log(`Server running on PORT: ${process.env.PORT}`);
 });
