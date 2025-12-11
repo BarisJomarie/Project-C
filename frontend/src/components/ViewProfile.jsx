@@ -29,7 +29,13 @@ const ViewProfile = () => {
     <div className="view-profile-container">
         <h2>Your Profile</h2>
         <div className="profile-info">
-            <img src={user.profile_img ? `${API_URL}/uploads/${user.profile_img}` : '/uploads/default_profile.jpg'} alt="Profile" />
+            <img 
+              src={`${API_URL}/uploads/${user.profile_img || 'default_profile.jpg'}`} 
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = '/images/default_profile.jpg';
+              }}
+              alt="Profile" />
 
             <p><strong>Username:</strong> {user.username}</p>
             <p><strong>Email:</strong> {user.email}</p>

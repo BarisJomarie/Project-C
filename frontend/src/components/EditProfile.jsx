@@ -114,6 +114,10 @@ const EditProfile = () => {
             }}>
               <img
                 src={previewUrl ? previewUrl : form.profile_img ? `${API_URL}/uploads/${form.profile_img}` : '/uploads/default_profile.jpg'}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = '/images/default_profile.jpg';
+                }}
                 alt="Profile"
                 style={{
                   width: '100%',
