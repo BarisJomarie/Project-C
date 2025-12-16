@@ -73,7 +73,7 @@ const AddCourse = () => {;
       headers: { Authorization: `Bearer ${token}` }
     }).then(res => {
       if (Array.isArray(res.data) && res.data.length > 0) {
-        console.log(`Courses fetched`);
+        // console.log(`Courses fetched`);
       } else {
         console.log(`No courses fetched`);
       }

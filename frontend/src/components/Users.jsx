@@ -111,7 +111,7 @@ const Users = () => {
     }).then(response => {
       if (Array.isArray(response.data) && response.data.length > 0) {
         // console.log('Department Fetched');
-        console.log(response.data);
+        // console.log(response.data);
       } else {
         console.log('No department found');
       }
@@ -139,7 +139,7 @@ const Users = () => {
         else setCourses([]);
       }
 
-      console.log(response.data);
+      // console.log(response.data);
     } catch (err) {
       console.error("Failed to fetch courses", err);
     }
