@@ -267,7 +267,7 @@ const UserPage = () => {
           <div className="profile-container">
             <div className={`profile-image-container ${user?.isActive !== 0 ? 'active' : ''}`}>
               <img 
-                src={`${API_URL}/uploads/${user.profile_img || 'default_profile.jpg'}`}
+                src={`${API_URL}/uploads/${user?.profile_img || 'default_profile.jpg'}`}
                 alt="Profile" 
                 onError={(e) => {
                   e.target.onerror = null;

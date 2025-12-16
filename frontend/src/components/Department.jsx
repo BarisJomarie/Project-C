@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { showToast } from "../utils/toast";
+import { ShimmerButton, ShimmerTable, ShimmerTitle } from "react-shimmer-effects";
 import ConfirmModal from "../utils/ConfirmModal";
 import axios from "axios";
 import * as XLSX from 'xlsx';
@@ -12,6 +13,8 @@ import '../styles/table.css';
 
 
 const Department = () => {
+  const [pageLoading, setPageLoading] = useState(true);
+  const [tableLoading, setTableLoading] = useState(true);
   const [modalConfig, setModalConfig] = useState({
     show: false,
     title: '',
@@ -178,7 +181,7 @@ const updatePubCoAuthor = (value, index) => {
 
   // GET USER DATA
   const getUserData = () => {
-    axios.get(`${API_URL}/api/users/user-info`, {
+    return axios.get(`${API_URL}/api/users/user-info`, {
       headers: { Authorization: `Bearer ${token}` },
       params: { id: userId }
     }).then(response => {
@@ -197,7 +200,7 @@ const updatePubCoAuthor = (value, index) => {
 
   // GET DEPARTMENT INFO
   const fetchDepartment = () => {
-    axios.get(`${API_URL}/api/users/department/info`, {
+    return axios.get(`${API_URL}/api/users/department/info`, {
       params: { department_id: dep_id },
       headers: { Authorization: `Bearer ${token}` }
     }).then(res => {
@@ -215,7 +218,8 @@ const updatePubCoAuthor = (value, index) => {
 
   // GET DEPARTMENT USERS
   const fetchDepartmentUsers = () => {
-    axios.get(`${API_URL}/api/users/user-department`, {
+    setTableLoading(true);
+    return axios.get(`${API_URL}/api/users/user-department`, {
       params: { department_id: dep_id },
       headers: { Authorization: `Bearer ${token}` }
     }).then(res => {
@@ -227,28 +231,35 @@ const updatePubCoAuthor = (value, index) => {
       setDepartmentUsers(res.data);
     }).catch(err => {console.error('Error fetching user:', err);
       setDepartmentUsers([]);
+    }).finally(() => {
+      setTableLoading(false);
     });
   };
 
   // GET DEPARTMENT STUDENT PAPERS
   const fetchStudentPapers = () => {
+    setTableLoading(true);
     axios.get(`${API_URL}/api/users/department-papers`, {
       params: { department_id: dep_id, type: 'student' },
       headers: { Authorization: `Bearer ${token}`}
     }).then(res => {
       if (Array.isArray(res.data) && res.data.length > 0) {
         // console.log(`Department (${dep_id}): Papers fetched`);
+        // console.log(res.data);
       } else {
         console.log(`Department (${dep_id}): No papers found`);
       }
       setDepartmentStudentPapers(res.data);
     }).catch(err => {console.error('Error fetching faculty papers:', err);
       setDepartmentStudentPapers([]);
+    }).finally(() => {
+      setTableLoading(false);
     });
   }
 
   // GET DEPARTMENT FACULTY PAPERS
   const fetchFacultyPapers = () => {
+    setTableLoading(true);
     axios.get(`${API_URL}/api/users/department-papers-faculty`, {
       params: { department_id: dep_id, type: 'faculty' },
       headers: { Authorization: `Bearer ${token}`}
@@ -261,37 +272,42 @@ const updatePubCoAuthor = (value, index) => {
       setDepartmentFacultyPapers(res.data);
     }).catch(err => {console.error('Error fetching faculty papers:', err);
       setDepartmentFacultyPapers([]);
+    }).finally(() => {
+      setTableLoading(false);
     });
   }
 
   // GET PRESENTATION PAPERS
- const fetchResearchPresentation = async () => {
-  try {
-    const res = await axios.get(`${API_URL}/api/research-presentation`, {
-      params: { department_id: dep_id },
-      headers: { Authorization: `Bearer ${token}` }
-    });
+  const fetchResearchPresentation = async () => {
+    setTableLoading(true);
+    try {
+      const res = await axios.get(`${API_URL}/api/research-presentation`, {
+        params: { department_id: dep_id },
+        headers: { Authorization: `Bearer ${token}` }
+      });
 
-    const data = res.data.map(item => ({
-      ...item,
-      co_authors: Array.isArray(item.co_authors) ? item.co_authors : [],
-      sdg_alignment: Array.isArray(item.sdg_alignment)
-        ? item.sdg_alignment
-        : (() => {
-            try {
-              return JSON.parse(item.sdg_alignment || "[]");
-            } catch {
-              return [];
-            }
-          })()
-    }));
+      const data = res.data.map(item => ({
+        ...item,
+        co_authors: Array.isArray(item.co_authors) ? item.co_authors : [],
+        sdg_alignment: Array.isArray(item.sdg_alignment)
+          ? item.sdg_alignment
+          : (() => {
+              try {
+                return JSON.parse(item.sdg_alignment || "[]");
+              } catch {
+                return [];
+              }
+            })()
+      }));
 
-    setDepartmentResearchPresentation(data);
-  } catch (err) {
-    console.error("Error fetching research presentations:", err);
-    setDepartmentResearchPresentation([]);
-  }
-};
+      setDepartmentResearchPresentation(data);
+    } catch (err) {
+      console.error("Error fetching research presentations:", err);
+      setDepartmentResearchPresentation([]);
+    } finally {
+      setTableLoading(false);
+    };
+  };
 
   // ADD PRESENTATION PAPERS
   const handleAddPresentation = async (e) => {
@@ -350,6 +366,7 @@ const updatePubCoAuthor = (value, index) => {
 
   // GET DEPARTMENT RESEARCH PUBLICATIONS
   const fetchResearchPublications = () => {
+    setTableLoading(true);
     axios.get(`${API_URL}/api/publication`, {
       params: { department_id: dep_id },
       headers: { Authorization: `Bearer ${token}` }
@@ -360,6 +377,9 @@ const updatePubCoAuthor = (value, index) => {
     .catch(err => {
       console.error("Error fetching research publications:", err);
       setDepartmentResearchPublications([]);
+    })
+    .finally(() => {
+      setTableLoading(false);
     });
   };
   
@@ -412,6 +432,7 @@ const updatePubCoAuthor = (value, index) => {
 
   // GET DEPARTMENT COURSES
   const fetchDepartmentCourses = () => {
+    setTableLoading(true);
     axios.get(`${API_URL}/api/users/department-courses`, {
       params: { department_id: dep_id },
       headers: { Authorization: `Bearer ${token}` }
@@ -424,24 +445,26 @@ const updatePubCoAuthor = (value, index) => {
       setDepartmentCourse(res.data);
     }).catch(err => {console.error('Error fetching courses:', err);
       setDepartmentCourse([]);
+    }).finally(() => {
+      setTableLoading(false);
     });
   };
 
   useEffect(() => {
-    getUserData();
-    fetchDepartment();
-  }, []);
-
-  useEffect(() => {
     if (!dep_id) return;
-    fetchDepartmentCourses();
-    fetchFacultyPapers();
-    fetchStudentPapers();
-    fetchDepartment();
-    fetchDepartmentUsers();
-    fetchResearchPresentation();
-    fetchResearchPublications();
+
+    setPageLoading(true);
+
+    Promise.all([
+      getUserData(),
+      fetchDepartment(),
+      fetchDepartmentUsers()
+    ])
+    .finally(() => {
+      setPageLoading(false);
+    });
   }, [dep_id]);
+
 
   useEffect(() => {
   const activeRef = activeTable === 'users' ? userRef : activeTable === 'student-paper' ? studentPaperRef : activeTable === 'faculty-paper' ? facultyPaperRef : activeTable === 'research-presentation' ? researchPresentationRef : activeTable === 'research-publications' ? researchPublicationRef: courseRef;
@@ -477,7 +500,8 @@ const updatePubCoAuthor = (value, index) => {
             headers: { Authorization: `Bearer ${token}` }
           });
           showToast('success', 'Paper Deleted', 'Paper deleted successfully.');
-          reFetch();
+          fetchStudentPapers();
+          fetchFacultyPapers();
         } catch (err) {
           console.error('Delete failed:', err);
           showToast('error', 'Delete Failed', 'Could not delete paper.');
@@ -566,7 +590,7 @@ const updatePubCoAuthor = (value, index) => {
             headers: { Authorization: `Bearer ${token}` }
           });
             showToast('success', 'Course Deleted', 'Course deleted successfully.');
-            reFetch();
+            fetchDepartmentCourses();
         } catch(err) {
               console.error('Delete failed:', err);
               showToast('error', 'Delete Failed', 'Could not delete course.');
@@ -579,26 +603,25 @@ const updatePubCoAuthor = (value, index) => {
   }
 
   // RE-FETCH ALL DATA
-  const reFetch = () => {
-    fetchDepartmentCourses();
-    fetchFacultyPapers();
-    fetchStudentPapers();
-    fetchDepartmentUsers();
-    fetchDepartment();
-  }
+  // const reFetch = () => {
+  //   fetchDepartmentCourses();
+  //   fetchFacultyPapers();
+  //   fetchStudentPapers();
+  //   fetchDepartmentUsers();
+  //   fetchDepartment();
+  // }
   
   // GET SDG COLOR
   function getSdgColor(numbers) {
-    if (!numbers) return '#C83F12';
-
+    if (!numbers || numbers.length === 0) return '#0f172a';
     // ✅ if it's an array, take the first SDG number
     const num = Array.isArray(numbers) ? numbers[0] : numbers;
-
     // ✅ convert to integer (handles strings like "15")
     const index = parseInt(num, 10) - 1;
 
-    return sdgColors[index] || '#C83F12';
+    return sdgColors[index] || '#0f172a';
   }
+
 
   // PRINT PRESENTATION
   const handleExportPresentationToExcel = () => {
@@ -1330,281 +1353,34 @@ function formatDateRange(startDate, endDate) {
   const toAiAnalysis = () => navigate(`/user/department/${dep_id}/ai_report`);
 
 
-
   return (
     <>
       <div className="department-container">
-        <h1>{department[0]?.department_name}</h1>
+        {pageLoading ? <ShimmerTitle line={1} gap={10} variant="primary"/> : <h1>{department[0]?.department_name}</h1>}
         <div className='line'></div>
         <div className="department-buttons-container">
-          <button onClick={() => toAddPaper()} type="button">
-            Add Paper
-          </button>
-          {userData?.role !== 'faculty' && <button onClick={() => toAiAnalysis()} type="button">AI Analysis</button>}
-        </div>  
 
-        <div className="table-selector">
-          <div className="tab-group">
-            {/* <p>Select: </p> */}
-            <div className="tab-labels">
-              <h3
-                ref={userRef}
-                className={activeTable === 'users' ? 'active-tab' : ''}
-                onClick={() => setActiveTable('users')}
-              >
-                Users
-              </h3>
-              <h3
-                ref={studentPaperRef}
-                className={activeTable === 'student-paper' ? 'active-tab' : ''}
-                onClick={() => setActiveTable('student-paper')}
-              >
-                Student&nbsp;Thesis
-              </h3>
-              <h3
-                ref={facultyPaperRef}
-                className={activeTable === 'faculty-paper' ? 'active-tab' : ''}
-                onClick={() => setActiveTable('faculty-paper')}
-              >
-                Faculty&nbsp;Research
-              </h3>
+          {pageLoading ? <>
+            <ShimmerButton size="lg"/>
+            <ShimmerButton size="lg"/>
+            <ShimmerButton size="lg"/>
+          </> : <>
+            {activeTable === 'users' && userData?.role === 'admin' && (
+              <button onClick={() => navigate('/user/users')} type="button">
+                Add A User
+              </button>
+            )}
 
-              {userData?.role !== 'faculty' && (
-                <>
-                  <h3
-                  ref={researchPresentationRef}
-                  className={activeTable === 'research-presentation' ? 'active-tab' : ''}
-                  onClick={() => setActiveTable('research-presentation')}
-                >
-                  Research&nbsp;Presentation
-                </h3>
-                <h3
-                  ref={researchPublicationRef}
-                  className={activeTable === 'research-publications' ? 'active-tab' : ''}
-                  onClick={() => setActiveTable('research-publications')}
-                >
-                  Research&nbsp;Publications
-                </h3>
-                </>
-              )}
-
-              <h3
-                ref={courseRef}
-                className={activeTable === 'course' ? 'active-tab' : ''}
-                onClick={() => setActiveTable('course')}
-                >
-                Course
-              </h3>
-              <div
-                className="tab-indicator"
-                style={indicatorStyle}
-              />
-            </div>
-          </div>
-        </div>
-
-        {activeTable === 'users' && (
-          <div className="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>Fullname</th>
-                  <th>Course</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {departmentUsers.length > 0 ? (
-                  departmentUsers.map((depU) => {
-                    return (
-                      <tr key={depU.id}>
-                        <td>
-                          {depU.lastname},&nbsp;
-                          {depU.firstname}&nbsp;
-                          {depU.middlename ? depU.middlename + "." : ""}&nbsp;
-                          {depU.extension ? depU.extension.toUpperCase() : ""}
-                        </td>
-
-                        <td>
-                          {depU.course_abb ? depU.course_abb : "N/A"}
-                        </td>
-
-                        <td>
-                          <button onClick={() => navigate(`/user/users/${depU.id}`)}>
-                            <span className="material-symbols-outlined view-icon">visibility</span>
-                            <span className="tooltip">View User</span>
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })
-                ) : (
-                  <tr>
-                    <td colSpan={3}>No users in this department...</td>
-                  </tr>
-                )}
-                
-              </tbody>
-            </table>
-          </div>
-          
-        )}
-
-        {activeTable === 'student-paper' && (
-          <div className="table-container">
-            <table>
-              <thead>
-                <tr className="esp-tr">
-                  <th>Title Thesis</th>
-                  <th>Researchers</th>
-                  <th>Adviser</th>
-                  <th>Academic&nbsp;Year<br/>Sem&nbsp;and&nbsp;SY</th>
-                  <th>SDG Label</th>
-                  <th>Course</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {departmentStudentPapers.length > 0 ? (
-                  departmentStudentPapers.map((paper) => {
-                    const color = getSdgColor(paper.sdg_number);
-
-                    return (
-                      <tr key={paper.research_id} style={{ borderLeft: `8px solid ${color}` }}>
-                        <td>
-                          {paper.research_title}
-                        </td>
-
-                        <td>
-                          {Array.isArray(paper.researchers)
-                            ? paper.researchers.map((name, index) => (
-                                <div key={index} style={{margin: '8px 0', textAlign: 'left'}}>{name}</div>
-                              ))
-                            : <div style={{textAlign: 'left'}}>{paper.researchers}</div>}
-                        </td>
-
-                        <td>
-                          {paper.adviser}
-                        </td> 
-
-                        <td>
-                          {paper.semester}  {paper.academic_year}-{paper.academic_year + 1}
-                        </td>
-
-                        <td style={{color: color, fontWeight: '500'}}>
-                          {Array.isArray(paper.sdg_labels) 
-                          ? paper.sdg_labels.map((label, index) => (
-                            <div key={index} style={{margin: '8px 0', textAlign: 'left'}}>{label}</div>
-                            ))
-                          : <div style={{textAlign: 'left'}}>{paper.sdg_labels}</div>}
-                        </td>
-
-                        <td>
-                          {paper.course_abb}
-                        </td>
-
-                        <td>
-                          <button onClick={() => navigate(`/user/department/${dep_id}/paper/${paper.research_id}`)}>
-                            <span className="material-symbols-outlined view-icon">visibility</span>
-                            <span className="tooltip">View Paper</span>
-                          </button>
-                          <button onClick={() => handleDeletePaper(paper.research_id)}>
-                            <span className="material-symbols-outlined delete-icon">delete</span>
-                            <span className="tooltip">Delete Paper</span>
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })
-                ) : (
-                  <tr>
-                    <td colSpan="7">No papers found.</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {activeTable === 'faculty-paper' && (
-          <div className="table-container">
-            <table>
-              <thead>
-                <tr className="esp-tr">
-                  <th>Title of Research</th>
-                  <th>Name&nbsp;of&nbsp;Researcher/s</th>
-                  <th>Funding&nbsp;Source<br/>(if any)</th>
-                  <th>Academic&nbsp;Year<br/>Sem&nbsp;and&nbsp;SY</th>
-                  <th>SDG Label</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {departmentFacultyPapers.length > 0 ? (
-                  departmentFacultyPapers.map((paper) => {
-                    const color = getSdgColor(paper.sdg_number);
-
-                    return (
-                      <tr key={paper.research_id} style={{ borderLeft: `8px solid ${color}` }}>
-                        <td>
-                          {paper.research_title}
-                        </td>
-
-                        <td>
-                          {Array.isArray(paper.researchers)
-                            ? paper.researchers.map((name, index) => (
-                                <div key={index} style={{margin: '8px 0', textAlign: 'left'}}>{name}</div>
-                              ))
-                            : <div style={{textAlign: 'left'}}>{paper.researchers}</div>}
-                        </td>
-
-                        <td>
-                          {
-                            paper.funding_source === 'self-funded' 
-                            ? 'Self-Funded' : paper.funding_source === 'earist' 
-                            ? 'EARIST' 
-                            : 'N/A'
-                          }
-                        </td> 
-                        
-                        <td>
-                          {paper.semester}  {paper.academic_year}-{paper.academic_year + 1}
-                        </td>
-
-                        <td style={{color: color, fontWeight: '500'}}>
-                          {Array.isArray(paper.sdg_labels) 
-                          ? paper.sdg_labels.map((label, index) => (
-                            <div key={index} style={{margin: '8px 0', textAlign: 'left'}}>{label}</div>
-                            ))
-                          : <div style={{textAlign: 'left'}}>{paper.sdg_labels}</div>}
-                        </td>
-
-                        <td>
-                          <button onClick={() => navigate(`/user/department/${dep_id}/paper/${paper.research_id}`)}>
-                            <span className="material-symbols-outlined view-icon">visibility</span>
-                            <span className="tooltip">View Paper</span>
-                          </button>
-                          <button onClick={() => handleDeletePaper(paper.research_id)}>
-                            <span className="material-symbols-outlined delete-icon">delete</span>
-                            <span className="tooltip">Delete Paper</span>
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })
-                ) : (
-                  <tr>
-                    <td colSpan="7">No papers found.</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {activeTable === 'research-presentation' && (
-          <div>
-            <div className="department-buttons-container">
+            {activeTable === 'student-paper' || activeTable === 'faculty-paper' ? (
+              <>
+                <button onClick={() => toAddPaper()} type="button">
+                  Add Paper
+                </button>
+                {userData?.role !== 'faculty' && <button onClick={() => toAiAnalysis()} type="button">AI Analysis</button>}
+              </>
+            ) : null}
+            
+            {activeTable === 'research-presentation' && userData?.role !== 'faculty' ? (<>
               <button
                 type="button"
                 onClick={() => setShowAddForm(!showAddForm)}
@@ -1613,314 +1389,9 @@ function formatDateRange(startDate, endDate) {
               </button>
               <button type="button" onClick={confirmPrint}>Print Table</button>
               <button type="button" onClick={handleExportPresentationToExcel}>Save as Excel</button>
-            </div>
+            </>) : null}
 
-            <div className={`form-container ${showAddForm ? 'slide-down' : 'slide-up'}`}>
-              <div className="add-form-container">
-                <h3>Add Research Paper Presentation</h3>
-
-                <form onSubmit={handleAddPresentation} className="form">
-                  <div className="grouped-inputs">
-                    <div className="form-input">
-                      <input 
-                        name="author" 
-                        type="text" 
-                        placeholder="Author Name" 
-                        value={author} 
-                        onChange={(e) => setAuthor(e.target.value)} 
-                        required/>
-                      <label htmlFor="user-code">Author</label>
-                    </div>
-                  </div>
-
-                  <div className="form-input">
-                    <button type="button" onClick={addCoAuthor} className="add-coauthor-btn">
-                      +
-                    </button>
-                    {coAuthors.map((co, index) => (
-                      <div key={index} className="coauthor-row">
-                        <input
-                          type="text"
-                          value={co}
-                          onChange={(e) => updateCoAuthor(e.target.value, index)}
-                          placeholder={`Co-author ${index + 1}`}
-                          style={{
-                            width: '80%', margin: '5px 0'
-                          }}
-                        />
-                        {index > 0 && (
-                          <button
-                            type="button"
-                            onClick={() => removeCoAuthor(index)}
-                            style={{
-                              height: '25px', padding: '0', margin: 'auto 0'
-                            }}
-                          >
-                            <span className="material-symbols-outlined"
-                              style={{
-                                margin: 'auto 0' 
-                              }}
-                              >
-                            remove
-                            </span>
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                    <label htmlFor="username">Co-Authors</label>
-                  </div>
-
-                  <div className="form-input">
-                    <input 
-                      name="title" 
-                      type="text" 
-                      placeholder="Enter Research Title" 
-                      value={researchTitle} 
-                      onChange={(e) => setResearchTitle(e.target.value)}
-                      required/>
-                    <label htmlFor="user-code">Title of Research Paper</label>
-                  </div>
-
-                  <div className="form-input">
-                    <div className="sdg-checkboxes" name="sdg">
-                      {sdgOptions.map((sdg, idx) => (
-                        <label key={idx} className="checkbox-option">
-                          <input
-                            type="checkbox"
-                            value={sdg}
-                            checked={sdgAlignment.includes(sdg)}
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              if (sdgAlignment.includes(value)) {
-                                setSdgAlignment(sdgAlignment.filter(item => item !== value));
-                              } else {
-                                setSdgAlignment([...sdgAlignment, value]);
-                              }
-                            }}
-                          />
-                          {sdg}     
-                        </label>
-                      ))}
-                    </div>
-                    <label htmlFor="sdg">SDG Alignment</label>
-                  </div>
-
-                  <div className="form-input">
-                    <input 
-                      name="conference" 
-                      type="text" 
-                      placeholder="Enter Conference" 
-                      value={conferenceTitle}
-                      onChange={(e) => setConferenceTitle(e.target.value)}
-                      required/>
-                    <label htmlFor="conference">Conference Title</label>
-                  </div>
-
-                  <div className="form-input">
-                    <input 
-                      name="organizer" 
-                      type="text" 
-                      placeholder="Enter Organizer" 
-                      value={organizer}
-                      onChange={(e) => setOrganizer(e.target.value)}
-                      required/>
-                    <label htmlFor="organizer">Organizer</label>
-                  </div>
-
-                  <div className="form-input">
-                    <input 
-                      name="venue" 
-                      type="text" 
-                      placeholder="Enter Venue" 
-                      value={venue}
-                      onChange={(e) => setVenue(e.target.value)}
-                      required/>
-                    <label htmlFor="venue">Venue</label>
-                  </div>
-
-                   <div className="form-input">
-                    <input 
-                      name="s-date" 
-                      type="date" 
-                      value={startDate}
-                      onChange={(e) => setStartDate(e.target.value)}
-                      required/>
-                    <label htmlFor="s-date">Start Date</label>
-                  </div>
-
-                  <div className="form-input">
-                    <input 
-                      name="e-date" 
-                      type="date" 
-                      value={endDate}
-                      onChange={(e) => setEndDate(e.target.value)}
-                      required/>
-                    <label htmlFor="e-date">End Date</label>
-                  </div>
-
-                  <div className="form-input">
-                    <select 
-                      value={conferenceType}
-                      onChange={(e) => setConferenceType(e.target.value)}
-                      required
-                      >
-                      <option value="">Select Type</option>
-                      {conferenceOptions.map((option, index) => (
-                        <option key={index} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
-                    <label>Type of Conference</label>
-                  </div>
-
-                  <div className="form-input">
-                    <input 
-                      name="so_no" 
-                      type="text" 
-                      placeholder="Special Order No." 
-                      value={specialOrder}
-                      onChange={(e) => setSpecialOrder(e.target.value)}
-                      required
-                      />
-                    <label htmlFor="so_no">Special Order No:</label>
-                  </div>
-
-                  <div className="form-input">
-                    <select 
-                      value={status}
-                      onChange={(e) => setStatus(e.target.value)}
-                      required
-                      >
-                      <option value="">Select Type</option>
-                      {statusOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                    <label>Status</label>
-                  </div>
-                  
-                  <div className="form-input">
-                    <select 
-                      value={funding}
-                      onChange={(e) => setFunding(e.target.value)}
-                      required
-                      >
-                      <option value="">Select Type</option>
-                      {fundingOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                    <label>Funding Source</label>
-                  </div>
-                  
-
-                  <div className="form-group">
-                    <button type="submit" className="submit-btn">Submit</button>
-                  </div>
-
-                </form>
-              </div>
-            </div>
-
-            <div className="table-container" id="printable-table"
-              style={{
-                overflowX: 'auto'
-              }}>
-
-              <table>
-                <thead className="hid-default">
-                  <tr>
-                    <th colSpan={3} style={{textAlign: 'left', border: 'none', padding: '15px 10px', fontSize: '1em', fontWeight: 'bold', textTransform: 'uppercase'}}>FACULTY RESEARCH ENGAGEMENT<br/></th>
-                    <th colSpan={8} style={{textAlign: 'center', border: 'none', padding: '15px 10px', fontSize: '1em', fontWeight: 'bold', textTransform: 'uppercase'}}>RESEARCH PAPER PRESENTATION<br/></th>
-                    <th colSpan={3} style={{textAlign: 'right', border: 'none', padding: '15px 10px', fontSize: '1em', fontWeight: 'bold'}}>{new Date().getFullYear()}</th>
-                    <th style={{display: 'none'}}></th>
-                  </tr>
-
-                  <tr className="esp-tr" style={{borderLeft: '2px solid #1E4A40'}}>
-                    <th style={{backgroundColor: '#1E4A40', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif'}}>Department</th>
-                    <th style={{backgroundColor: '#1E4A40', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif'}}>Author</th>
-                    <th style={{backgroundColor: '#1E4A40', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif'}}>Co-author</th>
-                    <th style={{backgroundColor: '#1E4A40', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif'}}>Title of Research Paper</th>
-                    <th style={{backgroundColor: '#1E4A40', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif'}}>SDG Alignment</th>
-                    <th style={{backgroundColor: '#1E4A40', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif'}}>Conference Title</th>
-                    <th style={{backgroundColor: '#1E4A40', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif'}}>Organizer</th>
-                    <th style={{backgroundColor: '#1E4A40', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif'}}>Venue</th>
-                    <th style={{backgroundColor: '#1E4A40', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif'}}>Date Presented</th>
-                    <th style={{backgroundColor: '#1E4A40', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif'}}>Type of Conference</th>
-                    <th style={{backgroundColor: '#1E4A40', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif'}}>Special Order No.</th>
-                    <th style={{backgroundColor: '#1E4A40', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif'}}>Status</th>
-                    <th style={{backgroundColor: '#1E4A40', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif'}}>Funding Source</th>
-                    <th style={{backgroundColor: '#1E4A40', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', fontFamily: 'Arial, Helvetica, sans-serif'}} className="action-column">Action</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {departmentResearchPresentation.length > 0 ? (
-                    departmentResearchPresentation.map(item => {
-                      const isSelfFunded = item.funding_source_engage?.toLowerCase() === "self funded";
-
-                      return (
-                        <tr key={item.id} className={isSelfFunded ? "self-funded" : ""} style={{borderLeft: '2px solid #1e293b'}}>
-                          <td style={{textAlign: 'center', padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.department_abb || department[0]?.department_abb || 'N/A'}</td>
-                          <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.author}</td>
-                          <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>
-                            {Array.isArray(item.co_authors) && item.co_authors.length > 0
-                              ? item.co_authors.filter(co => co && co.trim()).map((co, idx) => <div key={idx} style={{marginBottom: '4px'}}>{co}</div>)
-                              : item.co_authors || 'N/A'}
-                          </td>
-                          <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.research_title}</td>
-                          <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>
-                            {Array.isArray(item.sdg_alignment) && item.sdg_alignment.length > 0
-                              ? item.sdg_alignment.map((sdg, i) => (
-                                  <div key={i} style={{marginBottom: '4px'}}>{sdg}</div>
-                                ))
-                              : item.sdg_alignment || 'N/A'}
-                          </td>
-                          <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.conference_title}</td>
-                          <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.organizer}</td>
-                          <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.venue}</td>
-                          <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{formatDateRange(item.date_presented, item.end_date_presented)}</td>
-                          <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.conference_category}</td>
-                          <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.special_order_no || "N/A"}</td>
-                          <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.status_engage}</td>
-                          <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.funding_source_engage}</td>
-                        <td className="action-column" style={{padding: '8px 6px', border: '1px solid #000'}}>
-                          <button
-                            onClick={() => handleDeletePresentation(item.id)}
-                            className="delete-btn"
-                          >
-                            <span className="material-symbols-outlined delete-icon">delete</span>
-                            <span className="tooltip">Delete Presentation</span>
-                          </button>
-                        </td>
-                        </tr>
-                      );
-                    })
-                  ) : (
-                    <tr>
-                      <td colSpan={15}>No research presentation records found.</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table> 
-              <div className="print-footer-left">
-                PREPARED BY: {userData ? `${userData.firstname} ${userData.lastname}` : ""}
-              </div>
-              <div className="print-footer-center">
-                {department[0]?.department_name}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTable === "research-publications" && (
-          <div>
-            <div className="department-buttons-container">
+            {activeTable === 'research-publications' && userData?.role !== 'faculty' ? (<>
               <button
                 type="button"
                 onClick={() => setShowAddPublicationForm(!showAddPublicationForm)}
@@ -1930,294 +1401,899 @@ function formatDateRange(startDate, endDate) {
 
               <button type="button" onClick={confirmPrint2}> Print Table </button>
               <button type="button" onClick={handleExportPublicationToExcel}>Save as Excel</button>
-            </div>
+            </>) : null}
 
-            <div className={`form-container ${showAddPublicationForm ? "slide-down" : "slide-up"}`}>
-              <div className="add-form-container">
-                <h3>Add Research Publication</h3>
+            {activeTable === 'course' && userData?.role === 'admin' && (
+              <button onClick={() => navigate('/user/course_add')} type="button">
+                Add A Course
+              </button>
+            )}
+          </>}  
+        </div>  
 
-                <form onSubmit={handleAddPublication} className="form">
+        <div className="table-selector">
+          {pageLoading ? <ShimmerTitle line={1} gap={10} variant="primary"/> : <>
+            <div className="tab-group">
+              {/* <p>Select: </p> */}
+              <div className="tab-labels">
+                <h3
+                  ref={userRef}
+                  className={activeTable === 'users' ? 'active-tab' : ''}
+                  onClick={() => {
+                    fetchDepartmentUsers();
+                    setActiveTable('users');
+                  }}
+                >
+                  Users
+                </h3>
+                <h3
+                  ref={studentPaperRef}
+                  className={activeTable === 'student-paper' ? 'active-tab' : ''}
+                  onClick={() => {
+                    fetchStudentPapers();
+                    setActiveTable('student-paper');
+                  }}
+                >
+                  Student&nbsp;Thesis
+                </h3>
+                <h3
+                  ref={facultyPaperRef}
+                  className={activeTable === 'faculty-paper' ? 'active-tab' : ''}
+                  onClick={() => {
+                    fetchFacultyPapers();
+                    setActiveTable('faculty-paper');
+                  }}
+                >
+                  Faculty&nbsp;Research
+                </h3>
 
-                  <div className="form-input">
-                    <input
-                      type="text"
-                      placeholder="Published Title"
-                      value={published_title}
-                      onChange={(e) => setPubTitle(e.target.value)}
-                      required
-                    />
-                    <label>Published Title</label>
-                  </div>
+                {userData?.role !== 'faculty' && (
+                  <>
+                    <h3
+                    ref={researchPresentationRef}
+                    className={activeTable === 'research-presentation' ? 'active-tab' : ''}
+                    onClick={() => {
+                      fetchResearchPresentation();
+                      setActiveTable('research-presentation');
+                    }}
+                  >
+                    Research&nbsp;Presentation
+                  </h3>
+                  <h3
+                    ref={researchPublicationRef}
+                    className={activeTable === 'research-publications' ? 'active-tab' : ''}
+                    onClick={() => {
+                      fetchResearchPublications();
+                      setActiveTable('research-publications');
+                    }}
+                  >
+                    Research&nbsp;Publications
+                  </h3>
+                  </>
+                )}
 
-                  <div className="grouped-inputs">
-                    <div className="form-input">
-                      <input
-                        type="text"
-                        placeholder="Author Name"
-                        value={pub_author}
-                        onChange={(e) => setPubAuthor(e.target.value)}
-                        required
-                      />
-                      <label>Author</label>
-                    </div>
-                  </div>
-
-                  <div className="form-input">
-                    <button type="button" onClick={addPubCoAuthor} className="add-coauthor-btn">+</button>
-
-                    {pub_co_authors.map((pub_co_authors, index) => (
-                      <div key={index} className="coauthor-row">
-                        <input
-                          type="text"
-                          value={pub_co_authors}
-                          onChange={(e) => updatePubCoAuthor(e.target.value, index)}
-                          placeholder={`Co-author ${index + 1}`}
-                          style={{ width: "80%", margin: "5px 0" }}
-                        />
-
-                        {index > 0 && (
-                          <button
-                            type="button"
-                            onClick={() => removePubCoAuthor(index)}
-                            style={{ height: "25px", padding: "0" }}
-                          >
-                            <span className="material-symbols-outlined">remove</span>
-                          </button>
-                        )}
-                      </div>
-                    ))}
-
-                    <label>Co-Authors</label>
-                  </div>
-                  
-
-                  <div className="form-input">
-                    <input
-                      type="text"
-                      placeholder="Journal / Publication Title"
-                      value={journal_title}
-                      onChange={(e) => setPubJournal(e.target.value)}
-                      required
-                    />
-                    <label>Title of Journal / Publication</label>
-                  </div>
-
-                  <div className="form-input">
-                    <input
-                      type="text"
-                      placeholder="Conference / Proceedings"
-                      value={ conference_or_proceedings}
-                      onChange={(e) => setPubConference(e.target.value)}
-                      required
-                    />
-                    <label>Conference / Proceedings</label>
-                  </div>
-
-                  <div className="form-input">
-                    <input
-                      type="text"
-                      placeholder="Publisher"
-                      value={ publisher}
-                      onChange={(e) => setPubPublisher(e.target.value)}
-                      required
-                    />
-                    <label>Publisher</label>
-                  </div>
-
-                  <div className="form-input">
-                    <input 
-                      name="s-date" 
-                      type="date" 
-                      value={pubDatePresented}
-                      onChange={(e) => setPubDatePresented(e.target.value)}
-                      required/>
-                    <label htmlFor="s-date">Start Date</label>
-                  </div>
-                  <div className="form-input">
-                    <input 
-                      name="e-date" 
-                      type="date" 
-                      value={pubEndDatePresented}
-                      onChange={(e) => setPubEndDatePresented(e.target.value)}
-                      required/>
-                    <label htmlFor="e-date">End Date</label>
-                  </div>
-
-                  <div className="form-input">
-                    <input
-                      type="text"
-                      placeholder="DOI"
-                      value={doi}
-                      onChange={(e) => setPubDOI(e.target.value)}
-                      required
-                    />
-                    <label>DOI</label>
-                  </div>
-
-                  <div className="form-input">
-                    <input
-                      type="text"
-                      placeholder="ISSN / ISBN"
-                      value={ issn_isbn}
-                      onChange={(e) => setPubISSN(e.target.value)}
-                    />
-                    <label>ISSN / ISBN</label>
-                  </div>
-
-                  <div className="form-input">
-                    <input
-                      type="text"
-                      placeholder="Volume & Issue No."
-                      value={volume_issue}
-                      onChange={(e) => setPubVolumeIssue(e.target.value)}
-                      required
-                    />
-                    <label>Volume & Issue No.</label>
-                  </div>
-
-                  <div className="form-input">
-                    <input
-                      type="text"
-                      placeholder="Index Type"
-                      value={index_type}
-                      onChange={(e) => setPubIndex(e.target.value)}
-                      required
-                    />
-                    <label>Index</label>
-                  </div>
-
-                  <div className="form-group">
-                    <button type="submit" className="submit-btn">Submit</button>
-                  </div>
-                </form>
+                <h3
+                  ref={courseRef}
+                  className={activeTable === 'course' ? 'active-tab' : ''}
+                  onClick={() => {
+                    fetchDepartmentCourses();
+                    setActiveTable('course');
+                  }}
+                >
+                  Course
+                </h3>
+                <div
+                  className="tab-indicator"
+                  style={indicatorStyle}
+                />
               </div>
             </div>
+          </>}
+        </div>
 
-            {/* TABLE BELOW FORM */}
-            <div 
-              className="table-container"
-              id="printable-table"
-              style={{ overflowX: "auto" }}
-            >
-                    <table>
-                <thead className="hid-default">
+        {activeTable === 'users' && (
+          tableLoading ? <ShimmerTable row={5} col={3} /> : <>
+            <div className="table-container">
+              <table>
+                <thead>
                   <tr>
-                    <th colSpan={3} style={{ textAlign: "left", border: 'none', padding: '15px 10px', fontSize: '1em', fontWeight: 'bold', textTransform: 'uppercase' }}>
-                      FACULTY RESEARCH ENGAGEMENT<br />
-                    </th>
-                    <th colSpan={7} style={{ textAlign: "center", border: 'none', padding: '15px 10px', fontSize: '1em', fontWeight: 'bold', textTransform: 'uppercase' }}>
-                      RESEARCH PUBLICATIONS<br />
-                    </th>
-                    <th colSpan={3} style={{ textAlign: "right", border: '1px solid black', padding: '15px 10px', fontSize: '1em', fontWeight: 'bold' }}>
-                      {new Date().getFullYear()}
-                    </th>
-                    <th style={{display: 'none'}}></th>
-                  </tr>
-
-                  <tr className="esp-tr" style={{backgroundColor: '#000f3f'}}>
-                    <th style={{backgroundColor: '#000f3f', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'center', fontFamily: 'Arial, Helvetica, sans-serif'}}>#</th>
-                    <th style={{backgroundColor: '#000f3f', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'center', fontFamily: 'Arial, Helvetica, sans-serif'}}>Published Title</th>
-                    <th style={{backgroundColor: '#000f3f', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'center', fontFamily: 'Arial, Helvetica, sans-serif'}}>Author</th>
-                    <th style={{backgroundColor: '#000f3f', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'center', fontFamily: 'Arial, Helvetica, sans-serif'}}>Co-author</th>
-                    <th style={{backgroundColor: '#000f3f', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'center', fontFamily: 'Arial, Helvetica, sans-serif'}}>Title of Journal / Publication</th>
-                    <th style={{backgroundColor: '#000f3f', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'center', fontFamily: 'Arial, Helvetica, sans-serif'}}>Conference / Proceedings</th>
-                    <th style={{backgroundColor: '#000f3f', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'center', fontFamily: 'Arial, Helvetica, sans-serif'}}>Publisher</th>
-                    <th style={{backgroundColor: '#000f3f', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'center', fontFamily: 'Arial, Helvetica, sans-serif'}}>Date of Publication</th>
-                    <th style={{backgroundColor: '#000f3f', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'center', fontFamily: 'Arial, Helvetica, sans-serif'}}>DOI</th>
-                    <th style={{backgroundColor: '#000f3f', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'center', fontFamily: 'Arial, Helvetica, sans-serif'}}>ISSN / ISBN</th>
-                    <th style={{backgroundColor: '#000f3f', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'center', fontFamily: 'Arial, Helvetica, sans-serif'}}>Volume & Issue No.</th>
-                    <th style={{backgroundColor: '#000f3f', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'center', fontFamily: 'Arial, Helvetica, sans-serif'}}>Index</th>
-                    <th style={{backgroundColor: '#000f3f', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', fontFamily: 'Arial, Helvetica, sans-serif'}} className="action-column">Action</th>
+                    <th>Fullname</th>
+                    <th>Course</th>
+                    <th>Action</th>
                   </tr>
                 </thead>
-
                 <tbody>
-                  {departmentResearchPublications.length > 0 ? (
-                    departmentResearchPublications.map((item, index) => (
-                      <tr key={item.id}>
-                        <td style={{textAlign: 'center', padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{index + 1}</td>
-                        <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.published_title}</td>
-                        <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.pub_author}</td>
-                        <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>
-                            {Array.isArray(item.pub_co_authors) && item.pub_co_authors.length > 0
-                              ? item.pub_co_authors.filter(co => co && co.trim()).map((co, idx) => <div key={idx} style={{marginBottom: '4px'}}>{co}</div>)
-                              : item.pub_co_authors || 'N/A'}
+                  {departmentUsers.length > 0 ? (
+                    departmentUsers.map((depU) => {
+                      return (
+                        <tr key={depU.id}>
+                          <td>
+                            {depU.lastname},&nbsp;
+                            {depU.firstname}&nbsp;
+                            {depU.middlename ? depU.middlename + "." : ""}&nbsp;
+                            {depU.extension ? depU.extension.toUpperCase() : ""}
                           </td>
-                        <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.journal_title}</td>
-                        <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.conference_or_proceedings || "N/A"}</td>
-                        <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.publisher}</td>
-                        <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.pub_date_presented ? formatDateRange(item.pub_date_presented, item.pub_end_date_presented): "N/A"}</td>
-                        <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.doi || "N/A"}</td>
-                        <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.issn_isbn}</td>
-                        <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.volume_issue || "N/A"}</td>
-                        <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.index_type}</td>
-                        <td className="action-column" style={{padding: '8px 6px', border: '1px solid #000'}}>
-                          <button
-                            onClick={() => handleDeletePublication(item.id)}
-                            className="delete-btn"
-                            >
-                            <span className="material-symbols-outlined delete-icon">delete</span>
-                            <span className="tooltip">Delete Publication</span>
-                          </button>
-                        </td>
-                      </tr>
-                    ))
+
+                          <td>
+                            {depU.course_abb ? depU.course_abb : "N/A"}
+                          </td>
+
+                          <td>
+                            <button onClick={() => navigate(`/user/users/${depU.id}`)}>
+                              <span className="material-symbols-outlined view-icon">visibility</span>
+                              <span className="tooltip">View User</span>
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })
                   ) : (
                     <tr>
-                      <td colSpan="15">No research publication records found.</td>
+                      <td colSpan={3}>No users in this department...</td>
+                    </tr>
+                  )}
+                  
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+        
+        {activeTable === 'student-paper' && (
+          tableLoading ? <ShimmerTable row={5} col={7}/> : <>
+            <div className="table-container">
+              <table>
+                <thead>
+                  <tr className="esp-tr">
+                    <th>Title Thesis</th>
+                    <th>Researchers</th>
+                    <th>Adviser</th>
+                    <th>Academic&nbsp;Year<br/>Sem&nbsp;and&nbsp;SY</th>
+                    <th>SDG Label</th>
+                    <th>Course</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {departmentStudentPapers.length > 0 ? (
+                    departmentStudentPapers.map((paper) => {
+                      const color = getSdgColor(paper.sdg_number);
+
+                      return (
+                        <tr key={paper.research_id} style={{ borderLeft: `8px solid ${color}` }}>
+                          <td>
+                            {paper.research_title}
+                          </td>
+
+                          <td>
+                            {Array.isArray(paper.researchers)
+                              ? paper.researchers.map((name, index) => (
+                                  <div key={index} style={{margin: '8px 0', textAlign: 'left'}}>{name}</div>
+                                ))
+                              : <div style={{textAlign: 'left'}}>{paper.researchers}</div>}
+                          </td>
+
+                          <td>
+                            {paper.adviser}
+                          </td> 
+
+                          <td>
+                            {paper.semester}  {paper.academic_year}-{paper.academic_year + 1}
+                          </td>
+
+                          <td style={{color: color, fontWeight: '500'}}>
+                            {Array.isArray(paper.sdg_labels) 
+                            ? paper.sdg_labels.map((label, index) => (
+                              <div key={index} style={{margin: '8px 0', textAlign: 'left'}}>{label}</div>
+                              ))
+                            : <div style={{textAlign: 'left'}}>{paper.sdg_labels}</div>}
+                          </td>
+
+                          <td>
+                            {paper.course_abb}
+                          </td>
+
+                          <td>
+                            <button onClick={() => navigate(`/user/department/${dep_id}/paper/${paper.research_id}`)}>
+                              <span className="material-symbols-outlined view-icon">visibility</span>
+                              <span className="tooltip">View Paper</span>
+                            </button>
+                            <button onClick={() => handleDeletePaper(paper.research_id)}>
+                              <span className="material-symbols-outlined delete-icon">delete</span>
+                              <span className="tooltip">Delete Paper</span>
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  ) : (
+                    <tr>
+                      <td colSpan="7">No papers found.</td>
                     </tr>
                   )}
                 </tbody>
               </table>
-              <div className="print-footer-left">
-                PREPARED BY: {userData ? `${userData.firstname} ${userData.lastname}` : ""}
+            </div>
+          </>
+        )}
+
+        {activeTable === 'faculty-paper' && (
+          tableLoading ? <ShimmerTable row={5} col={6}/> : <>
+            <div className="table-container">
+              <table>
+                <thead>
+                  <tr className="esp-tr">
+                    <th>Title of Research</th>
+                    <th>Name&nbsp;of&nbsp;Researcher/s</th>
+                    <th>Funding&nbsp;Source<br/>(if any)</th>
+                    <th>Academic&nbsp;Year<br/>Sem&nbsp;and&nbsp;SY</th>
+                    <th>SDG Label</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {departmentFacultyPapers.length > 0 ? (
+                    departmentFacultyPapers.map((paper) => {
+                      const color = getSdgColor(paper.sdg_number);
+
+                      return (
+                        <tr key={paper.research_id} style={{ borderLeft: `8px solid ${color}` }}>
+                          <td>
+                            {paper.research_title}
+                          </td>
+
+                          <td>
+                            {Array.isArray(paper.researchers)
+                              ? paper.researchers.map((name, index) => (
+                                  <div key={index} style={{margin: '8px 0', textAlign: 'left'}}>{name}</div>
+                                ))
+                              : <div style={{textAlign: 'left'}}>{paper.researchers}</div>}
+                          </td>
+
+                          <td>
+                            {
+                              paper.funding_source === 'self-funded' 
+                              ? 'Self-Funded' : paper.funding_source === 'earist' 
+                              ? 'EARIST' 
+                              : 'N/A'
+                            }
+                          </td> 
+                          
+                          <td>
+                            {paper.semester}  {paper.academic_year}-{paper.academic_year + 1}
+                          </td>
+
+                          <td style={{color: color, fontWeight: '500'}}>
+                            {Array.isArray(paper.sdg_labels) 
+                            ? paper.sdg_labels.map((label, index) => (
+                              <div key={index} style={{margin: '8px 0', textAlign: 'left'}}>{label}</div>
+                              ))
+                            : <div style={{textAlign: 'left'}}>{paper.sdg_labels}</div>}
+                          </td>
+
+                          <td>
+                            <button onClick={() => navigate(`/user/department/${dep_id}/paper/${paper.research_id}`)}>
+                              <span className="material-symbols-outlined view-icon">visibility</span>
+                              <span className="tooltip">View Paper</span>
+                            </button>
+                            <button onClick={() => handleDeletePaper(paper.research_id)}>
+                              <span className="material-symbols-outlined delete-icon">delete</span>
+                              <span className="tooltip">Delete Paper</span>
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  ) : (
+                    <tr>
+                      <td colSpan="7">No papers found.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+
+        {activeTable === 'research-presentation' && (
+          tableLoading ? <ShimmerTable row={5} col={13}/> : <>
+            <div>
+              <div className={`form-container ${showAddForm ? 'slide-down' : 'slide-up'}`}>
+                <div className="add-form-container">
+                  <h3>Add Research Paper Presentation</h3>
+
+                  <form onSubmit={handleAddPresentation} className="form">
+                    <div className="grouped-inputs">
+                      <div className="form-input">
+                        <input 
+                          name="author" 
+                          type="text" 
+                          placeholder="Author Name" 
+                          value={author} 
+                          onChange={(e) => setAuthor(e.target.value)} 
+                          required/>
+                        <label htmlFor="user-code">Author</label>
+                      </div>
+                    </div>
+
+                    <div className="form-input">
+                      <button type="button" onClick={addCoAuthor} className="add-coauthor-btn">
+                        +
+                      </button>
+                      {coAuthors.map((co, index) => (
+                        <div key={index} className="coauthor-row">
+                          <input
+                            type="text"
+                            value={co}
+                            onChange={(e) => updateCoAuthor(e.target.value, index)}
+                            placeholder={`Co-author ${index + 1}`}
+                            style={{
+                              width: '80%', margin: '5px 0'
+                            }}
+                          />
+                          {index > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => removeCoAuthor(index)}
+                              style={{
+                                height: '25px', padding: '0', margin: 'auto 0'
+                              }}
+                            >
+                              <span className="material-symbols-outlined"
+                                style={{
+                                  margin: 'auto 0' 
+                                }}
+                                >
+                              remove
+                              </span>
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                      <label htmlFor="username">Co-Authors</label>
+                    </div>
+
+                    <div className="form-input">
+                      <input 
+                        name="title" 
+                        type="text" 
+                        placeholder="Enter Research Title" 
+                        value={researchTitle} 
+                        onChange={(e) => setResearchTitle(e.target.value)}
+                        required/>
+                      <label htmlFor="user-code">Title of Research Paper</label>
+                    </div>
+
+                    <div className="form-input">
+                      <div className="sdg-checkboxes" name="sdg">
+                        {sdgOptions.map((sdg, idx) => (
+                          <label key={idx} className="checkbox-option">
+                            <input
+                              type="checkbox"
+                              value={sdg}
+                              checked={sdgAlignment.includes(sdg)}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                if (sdgAlignment.includes(value)) {
+                                  setSdgAlignment(sdgAlignment.filter(item => item !== value));
+                                } else {
+                                  setSdgAlignment([...sdgAlignment, value]);
+                                }
+                              }}
+                            />
+                            {sdg}     
+                          </label>
+                        ))}
+                      </div>
+                      <label htmlFor="sdg">SDG Alignment</label>
+                    </div>
+
+                    <div className="form-input">
+                      <input 
+                        name="conference" 
+                        type="text" 
+                        placeholder="Enter Conference" 
+                        value={conferenceTitle}
+                        onChange={(e) => setConferenceTitle(e.target.value)}
+                        required/>
+                      <label htmlFor="conference">Conference Title</label>
+                    </div>
+
+                    <div className="form-input">
+                      <input 
+                        name="organizer" 
+                        type="text" 
+                        placeholder="Enter Organizer" 
+                        value={organizer}
+                        onChange={(e) => setOrganizer(e.target.value)}
+                        required/>
+                      <label htmlFor="organizer">Organizer</label>
+                    </div>
+
+                    <div className="form-input">
+                      <input 
+                        name="venue" 
+                        type="text" 
+                        placeholder="Enter Venue" 
+                        value={venue}
+                        onChange={(e) => setVenue(e.target.value)}
+                        required/>
+                      <label htmlFor="venue">Venue</label>
+                    </div>
+
+                    <div className="form-input">
+                      <input 
+                        name="s-date" 
+                        type="date" 
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                        required/>
+                      <label htmlFor="s-date">Start Date</label>
+                    </div>
+
+                    <div className="form-input">
+                      <input 
+                        name="e-date" 
+                        type="date" 
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                        required/>
+                      <label htmlFor="e-date">End Date</label>
+                    </div>
+
+                    <div className="form-input">
+                      <select 
+                        value={conferenceType}
+                        onChange={(e) => setConferenceType(e.target.value)}
+                        required
+                        >
+                        <option value="">Select Type</option>
+                        {conferenceOptions.map((option, index) => (
+                          <option key={index} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+                      <label>Type of Conference</label>
+                    </div>
+
+                    <div className="form-input">
+                      <input 
+                        name="so_no" 
+                        type="text" 
+                        placeholder="Special Order No." 
+                        value={specialOrder}
+                        onChange={(e) => setSpecialOrder(e.target.value)}
+                        required
+                        />
+                      <label htmlFor="so_no">Special Order No:</label>
+                    </div>
+
+                    <div className="form-input">
+                      <select 
+                        value={status}
+                        onChange={(e) => setStatus(e.target.value)}
+                        required
+                        >
+                        <option value="">Select Type</option>
+                        {statusOptions.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                      <label>Status</label>
+                    </div>
+                    
+                    <div className="form-input">
+                      <select 
+                        value={funding}
+                        onChange={(e) => setFunding(e.target.value)}
+                        required
+                        >
+                        <option value="">Select Type</option>
+                        {fundingOptions.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                      <label>Funding Source</label>
+                    </div>
+                    
+
+                    <div className="form-group">
+                      <button type="submit" className="submit-btn">Submit</button>
+                    </div>
+
+                  </form>
+                </div>
               </div>
-              <div className="print-footer-center">
-                {department[0]?.department_name}
+
+              <div className="table-container" id="printable-table"
+                style={{
+                  overflowX: 'auto'
+                }}>
+
+                <table>
+                  <thead className="hid-default">
+                    <tr>
+                      <th colSpan={3} style={{textAlign: 'left', border: 'none', padding: '15px 10px', fontSize: '1em', fontWeight: 'bold', textTransform: 'uppercase'}}>FACULTY RESEARCH ENGAGEMENT<br/></th>
+                      <th colSpan={8} style={{textAlign: 'center', border: 'none', padding: '15px 10px', fontSize: '1em', fontWeight: 'bold', textTransform: 'uppercase'}}>RESEARCH PAPER PRESENTATION<br/></th>
+                      <th colSpan={3} style={{textAlign: 'right', border: 'none', padding: '15px 10px', fontSize: '1em', fontWeight: 'bold'}}>{new Date().getFullYear()}</th>
+                      <th style={{display: 'none'}}></th>
+                    </tr>
+
+                    <tr className="esp-tr" style={{borderLeft: '2px solid #1E4A40'}}>
+                      <th style={{backgroundColor: '#1E4A40', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif'}}>Department</th>
+                      <th style={{backgroundColor: '#1E4A40', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif'}}>Author</th>
+                      <th style={{backgroundColor: '#1E4A40', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif'}}>Co-author</th>
+                      <th style={{backgroundColor: '#1E4A40', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif'}}>Title of Research Paper</th>
+                      <th style={{backgroundColor: '#1E4A40', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif'}}>SDG Alignment</th>
+                      <th style={{backgroundColor: '#1E4A40', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif'}}>Conference Title</th>
+                      <th style={{backgroundColor: '#1E4A40', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif'}}>Organizer</th>
+                      <th style={{backgroundColor: '#1E4A40', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif'}}>Venue</th>
+                      <th style={{backgroundColor: '#1E4A40', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif'}}>Date Presented</th>
+                      <th style={{backgroundColor: '#1E4A40', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif'}}>Type of Conference</th>
+                      <th style={{backgroundColor: '#1E4A40', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif'}}>Special Order No.</th>
+                      <th style={{backgroundColor: '#1E4A40', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif'}}>Status</th>
+                      <th style={{backgroundColor: '#1E4A40', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'left', fontFamily: 'Arial, Helvetica, sans-serif'}}>Funding Source</th>
+                      <th style={{backgroundColor: '#1E4A40', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', fontFamily: 'Arial, Helvetica, sans-serif'}} className="action-column">Action</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {departmentResearchPresentation.length > 0 ? (
+                      departmentResearchPresentation.map(item => {
+                        const isSelfFunded = item.funding_source_engage?.toLowerCase() === "self funded";
+
+                        return (
+                          <tr key={item.id} className={isSelfFunded ? "self-funded" : ""} style={{borderLeft: '2px solid #1e293b'}}>
+                            <td style={{textAlign: 'center', padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.department_abb || department[0]?.department_abb || 'N/A'}</td>
+                            <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.author}</td>
+                            <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>
+                              {Array.isArray(item.co_authors) && item.co_authors.length > 0
+                                ? item.co_authors.filter(co => co && co.trim()).map((co, idx) => <div key={idx} style={{marginBottom: '4px'}}>{co}</div>)
+                                : item.co_authors || 'N/A'}
+                            </td>
+                            <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.research_title}</td>
+                            <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>
+                              {Array.isArray(item.sdg_alignment) && item.sdg_alignment.length > 0
+                                ? item.sdg_alignment.map((sdg, i) => (
+                                    <div key={i} style={{marginBottom: '4px'}}>{sdg}</div>
+                                  ))
+                                : item.sdg_alignment || 'N/A'}
+                            </td>
+                            <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.conference_title}</td>
+                            <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.organizer}</td>
+                            <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.venue}</td>
+                            <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{formatDateRange(item.date_presented, item.end_date_presented)}</td>
+                            <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.conference_category}</td>
+                            <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.special_order_no || "N/A"}</td>
+                            <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.status_engage}</td>
+                            <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.funding_source_engage}</td>
+                          <td className="action-column" style={{padding: '8px 6px', border: '1px solid #000'}}>
+                            <button
+                              onClick={() => handleDeletePresentation(item.id)}
+                              className="delete-btn"
+                            >
+                              <span className="material-symbols-outlined delete-icon">delete</span>
+                              <span className="tooltip">Delete Presentation</span>
+                            </button>
+                          </td>
+                          </tr>
+                        );
+                      })
+                    ) : (
+                      <tr>
+                        <td colSpan={15}>No research presentation records found.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table> 
+                <div className="print-footer-left">
+                  PREPARED BY: {userData ? `${userData.firstname} ${userData.lastname}` : ""}
+                </div>
+                <div className="print-footer-center">
+                  {department[0]?.department_name}
+                </div>
               </div>
             </div>
-          </div>
+          </>
+        )}
+
+        {activeTable === "research-publications" && (
+          tableLoading ? <ShimmerTable row={5} col={13}/> : <>
+            <div>
+              <div className={`form-container ${showAddPublicationForm ? "slide-down" : "slide-up"}`}>
+                <div className="add-form-container">
+                  <h3>Add Research Publication</h3>
+
+                  <form onSubmit={handleAddPublication} className="form">
+
+                    <div className="form-input">
+                      <input
+                        type="text"
+                        placeholder="Published Title"
+                        value={published_title}
+                        onChange={(e) => setPubTitle(e.target.value)}
+                        required
+                      />
+                      <label>Published Title</label>
+                    </div>
+
+                    <div className="grouped-inputs">
+                      <div className="form-input">
+                        <input
+                          type="text"
+                          placeholder="Author Name"
+                          value={pub_author}
+                          onChange={(e) => setPubAuthor(e.target.value)}
+                          required
+                        />
+                        <label>Author</label>
+                      </div>
+                    </div>
+
+                    <div className="form-input">
+                      <button type="button" onClick={addPubCoAuthor} className="add-coauthor-btn">+</button>
+
+                      {pub_co_authors.map((pub_co_authors, index) => (
+                        <div key={index} className="coauthor-row">
+                          <input
+                            type="text"
+                            value={pub_co_authors}
+                            onChange={(e) => updatePubCoAuthor(e.target.value, index)}
+                            placeholder={`Co-author ${index + 1}`}
+                            style={{ width: "80%", margin: "5px 0" }}
+                          />
+
+                          {index > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => removePubCoAuthor(index)}
+                              style={{ height: "25px", padding: "0" }}
+                            >
+                              <span className="material-symbols-outlined">remove</span>
+                            </button>
+                          )}
+                        </div>
+                      ))}
+
+                      <label>Co-Authors</label>
+                    </div>
+                    
+
+                    <div className="form-input">
+                      <input
+                        type="text"
+                        placeholder="Journal / Publication Title"
+                        value={journal_title}
+                        onChange={(e) => setPubJournal(e.target.value)}
+                        required
+                      />
+                      <label>Title of Journal / Publication</label>
+                    </div>
+
+                    <div className="form-input">
+                      <input
+                        type="text"
+                        placeholder="Conference / Proceedings"
+                        value={ conference_or_proceedings}
+                        onChange={(e) => setPubConference(e.target.value)}
+                        required
+                      />
+                      <label>Conference / Proceedings</label>
+                    </div>
+
+                    <div className="form-input">
+                      <input
+                        type="text"
+                        placeholder="Publisher"
+                        value={ publisher}
+                        onChange={(e) => setPubPublisher(e.target.value)}
+                        required
+                      />
+                      <label>Publisher</label>
+                    </div>
+
+                    <div className="form-input">
+                      <input 
+                        name="s-date" 
+                        type="date" 
+                        value={pubDatePresented}
+                        onChange={(e) => setPubDatePresented(e.target.value)}
+                        required/>
+                      <label htmlFor="s-date">Start Date</label>
+                    </div>
+                    <div className="form-input">
+                      <input 
+                        name="e-date" 
+                        type="date" 
+                        value={pubEndDatePresented}
+                        onChange={(e) => setPubEndDatePresented(e.target.value)}
+                        required/>
+                      <label htmlFor="e-date">End Date</label>
+                    </div>
+
+                    <div className="form-input">
+                      <input
+                        type="text"
+                        placeholder="DOI"
+                        value={doi}
+                        onChange={(e) => setPubDOI(e.target.value)}
+                        required
+                      />
+                      <label>DOI</label>
+                    </div>
+
+                    <div className="form-input">
+                      <input
+                        type="text"
+                        placeholder="ISSN / ISBN"
+                        value={ issn_isbn}
+                        onChange={(e) => setPubISSN(e.target.value)}
+                      />
+                      <label>ISSN / ISBN</label>
+                    </div>
+
+                    <div className="form-input">
+                      <input
+                        type="text"
+                        placeholder="Volume & Issue No."
+                        value={volume_issue}
+                        onChange={(e) => setPubVolumeIssue(e.target.value)}
+                        required
+                      />
+                      <label>Volume & Issue No.</label>
+                    </div>
+
+                    <div className="form-input">
+                      <input
+                        type="text"
+                        placeholder="Index Type"
+                        value={index_type}
+                        onChange={(e) => setPubIndex(e.target.value)}
+                        required
+                      />
+                      <label>Index</label>
+                    </div>
+
+                    <div className="form-group">
+                      <button type="submit" className="submit-btn">Submit</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+
+              {/* TABLE BELOW FORM */}
+              <div 
+                className="table-container"
+                id="printable-table"
+                style={{ overflowX: "auto" }}
+              >
+                      <table>
+                  <thead className="hid-default">
+                    <tr>
+                      <th colSpan={3} style={{ textAlign: "left", border: 'none', padding: '15px 10px', fontSize: '1em', fontWeight: 'bold', textTransform: 'uppercase' }}>
+                        FACULTY RESEARCH ENGAGEMENT<br />
+                      </th>
+                      <th colSpan={7} style={{ textAlign: "center", border: 'none', padding: '15px 10px', fontSize: '1em', fontWeight: 'bold', textTransform: 'uppercase' }}>
+                        RESEARCH PUBLICATIONS<br />
+                      </th>
+                      <th colSpan={3} style={{ textAlign: "right", border: '1px solid black', padding: '15px 10px', fontSize: '1em', fontWeight: 'bold' }}>
+                        {new Date().getFullYear()}
+                      </th>
+                      <th style={{display: 'none'}}></th>
+                    </tr>
+
+                    <tr className="esp-tr" style={{backgroundColor: '#000f3f'}}>
+                      <th style={{backgroundColor: '#000f3f', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'center', fontFamily: 'Arial, Helvetica, sans-serif'}}>#</th>
+                      <th style={{backgroundColor: '#000f3f', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'center', fontFamily: 'Arial, Helvetica, sans-serif'}}>Published Title</th>
+                      <th style={{backgroundColor: '#000f3f', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'center', fontFamily: 'Arial, Helvetica, sans-serif'}}>Author</th>
+                      <th style={{backgroundColor: '#000f3f', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'center', fontFamily: 'Arial, Helvetica, sans-serif'}}>Co-author</th>
+                      <th style={{backgroundColor: '#000f3f', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'center', fontFamily: 'Arial, Helvetica, sans-serif'}}>Title of Journal / Publication</th>
+                      <th style={{backgroundColor: '#000f3f', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'center', fontFamily: 'Arial, Helvetica, sans-serif'}}>Conference / Proceedings</th>
+                      <th style={{backgroundColor: '#000f3f', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'center', fontFamily: 'Arial, Helvetica, sans-serif'}}>Publisher</th>
+                      <th style={{backgroundColor: '#000f3f', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'center', fontFamily: 'Arial, Helvetica, sans-serif'}}>Date of Publication</th>
+                      <th style={{backgroundColor: '#000f3f', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'center', fontFamily: 'Arial, Helvetica, sans-serif'}}>DOI</th>
+                      <th style={{backgroundColor: '#000f3f', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'center', fontFamily: 'Arial, Helvetica, sans-serif'}}>ISSN / ISBN</th>
+                      <th style={{backgroundColor: '#000f3f', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'center', fontFamily: 'Arial, Helvetica, sans-serif'}}>Volume & Issue No.</th>
+                      <th style={{backgroundColor: '#000f3f', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', textAlign: 'center', fontFamily: 'Arial, Helvetica, sans-serif'}}>Index</th>
+                      <th style={{backgroundColor: '#000f3f', color: 'white', padding: '10px 6px', fontSize: '0.9em', fontWeight: '600', fontFamily: 'Arial, Helvetica, sans-serif'}} className="action-column">Action</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {departmentResearchPublications.length > 0 ? (
+                      departmentResearchPublications.map((item, index) => (
+                        <tr key={item.id}>
+                          <td style={{textAlign: 'center', padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{index + 1}</td>
+                          <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.published_title}</td>
+                          <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.pub_author}</td>
+                          <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>
+                              {Array.isArray(item.pub_co_authors) && item.pub_co_authors.length > 0
+                                ? item.pub_co_authors.filter(co => co && co.trim()).map((co, idx) => <div key={idx} style={{marginBottom: '4px'}}>{co}</div>)
+                                : item.pub_co_authors || 'N/A'}
+                            </td>
+                          <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.journal_title}</td>
+                          <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.conference_or_proceedings || "N/A"}</td>
+                          <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.publisher}</td>
+                          <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.pub_date_presented ? formatDateRange(item.pub_date_presented, item.pub_end_date_presented): "N/A"}</td>
+                          <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.doi || "N/A"}</td>
+                          <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.issn_isbn}</td>
+                          <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.volume_issue || "N/A"}</td>
+                          <td style={{padding: '8px 6px', fontSize: '0.85em', border: '1px solid #000', verticalAlign: 'top', fontFamily: 'Arial, Helvetica, sans-serif'}}>{item.index_type}</td>
+                          <td className="action-column" style={{padding: '8px 6px', border: '1px solid #000'}}>
+                            <button
+                              onClick={() => handleDeletePublication(item.id)}
+                              className="delete-btn"
+                              >
+                              <span className="material-symbols-outlined delete-icon">delete</span>
+                              <span className="tooltip">Delete Publication</span>
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="15">No research publication records found.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+                <div className="print-footer-left">
+                  PREPARED BY: {userData ? `${userData.firstname} ${userData.lastname}` : ""}
+                </div>
+                <div className="print-footer-center">
+                  {department[0]?.department_name}
+                </div>
+              </div>
+            </div>
+          </>
         )}
 
         {activeTable === 'course' && (
-          <div className="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>Course&nbsp;ID</th>
-                  <th>Course&nbsp;Name</th>
-                  <th>Course&nbsp;Abbreviation</th>
-                  {userData?.role === 'admin' && <th>Action</th>}
-                </tr>
-              </thead>
-              <tbody>
-                {departmentCourse.length > 0 ? (
-                  departmentCourse.map((course) => {
-
-                    return (
-                      <tr key={course.course_id}>
-                        <td>{course.course_id}</td>
-                        <td>{course.course_name}</td>
-                        <td>{course.course_abb}</td>
-                        {userData?.role === 'admin' && (
-                          <td>
-                            <button onClick={() => handleDeleteCourse(course.course_id)}>
-                              <span className="material-symbols-outlined delete-icon">delete</span>
-                              <span className="tooltip">Delete Course</span>
-                            </button>
-                          </td>
-                        )}
-                      </tr>
-                    );
-                  })
-                ) : (
+          tableLoading ? <ShimmerTable row={5} col={4}/> : <>
+            <div className="table-container">
+              <table>
+                <thead>
                   <tr>
-                    <td colSpan="7">No papers found.</td>
+                    <th>Course&nbsp;ID</th>
+                    <th>Course&nbsp;Name</th>
+                    <th>Course&nbsp;Abbreviation</th>
+                    {userData?.role === 'admin' && <th>Action</th>}
                   </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {departmentCourse.length > 0 ? (
+                    departmentCourse.map((course) => {
+
+                      return (
+                        <tr key={course.course_id}>
+                          <td>{course.course_id}</td>
+                          <td>{course.course_name}</td>
+                          <td>{course.course_abb}</td>
+                          {userData?.role === 'admin' && (
+                            <td>
+                              <button onClick={() => handleDeleteCourse(course.course_id)}>
+                                <span className="material-symbols-outlined delete-icon">delete</span>
+                                <span className="tooltip">Delete Course</span>
+                              </button>
+                            </td>
+                          )}
+                        </tr>
+                      );
+                    })
+                  ) : (
+                    <tr>
+                      <td colSpan="7">No papers found.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
 

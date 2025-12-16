@@ -732,7 +732,8 @@ const query = `
     const formattedResult = result.map(row => ({
       ...row,
       researchers: JSON.parse(row.researchers || '[]'),
-      sdg_labels: JSON.parse(row.sdg_labels || '[]')
+      sdg_labels: JSON.parse(row.sdg_labels || '[]'),
+      sdg_number: JSON.parse(row.sdg_number || '[]')
     }));
 
     res.status(200).send(formattedResult);
@@ -766,7 +767,8 @@ const query = `
     const formattedResult = result.map(row => ({
       ...row,
       researchers: JSON.parse(row.researchers || '[]'),
-      sdg_labels: JSON.parse(row.sdg_labels || '[]')
+      sdg_labels: JSON.parse(row.sdg_labels || '[]'),
+      sdg_number: JSON.parse(row.sdg_number || '[]')
     }));
 
     res.status(200).send(formattedResult);

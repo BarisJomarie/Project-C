@@ -9,7 +9,7 @@ import '../styles/auditLogs.css';
 
 
 const AuditLogs = () => {
-  const [pageLoading, setPageLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
   const [modalConfig, setModalConfig] = useState({
     show: false,
     title: '',
