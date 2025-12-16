@@ -52,7 +52,7 @@ const AddCourse = () => {;
 
   // FETCH DEPARTMENT
   const fetchDepartment = () => {
-    axios.get(`${API_URL}/api/users/departments`, {
+    return axios.get(`${API_URL}/api/users/departments`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then(res => {
       if (res.data) {
@@ -69,7 +69,7 @@ const AddCourse = () => {;
   };
 
   const fetchCourses = () => {
-    axios.get(`${API_URL}/api/users/all-course`, {
+    return axios.get(`${API_URL}/api/users/all-course`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then(res => {
       if (Array.isArray(res.data) && res.data.length > 0) {
