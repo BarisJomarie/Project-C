@@ -50,9 +50,9 @@ const {
   getFacultyTypePapers,
   getStudentTypePapers,
   getMostCommonSDG,
-  addHistoryReport
-
-  
+  addHistoryReport,
+  getAllCourses,
+  updateCourse
 } = require('../controllers/usersController');
 
 const upload = require('../middleware/uploadMiddleware');
@@ -88,10 +88,12 @@ router.delete('/departments/delete/:deptId', verifyToken, deleteDepartment);
 
 
 //------------------------------------------------------------COURSES-------------------------------------------------------------------------------------------------
+router.get('/all-course', verifyToken, getAllCourses);
 router.get('/courses', verifyToken, getCourses);
 router.get('/department-courses', verifyToken, getDepartmentCourses);
 router.get('/adviser-course', verifyToken, getAdviserCourses);
 router.post('/course/add', verifyToken, addCourse);
+router.put('/course-edit/:courseId', verifyToken, updateCourse);
 router.delete('/course/delete/:id', verifyToken, deleteCourse);
 
 

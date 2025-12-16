@@ -39,21 +39,22 @@ function App() {
     setDeptLoading(true);
 
     if (token && role === 'admin') {
-      axios.get(`${API_URL}/api/users/departments`, {
+      return axios.get(`${API_URL}/api/users/departments`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       .then(res => setDepartments(res.data))
+      .catch(err => console.error("Admin fetch error:", err))
       .finally(() => setDeptLoading(false));
-    }
-
-    if (token && (role === 'rph' || role === 'faculty')) {
+    } else if (token && (role === 'rph' || role === 'faculty')) {
       const id = localStorage.getItem('department_id');
-      axios.get(`${API_URL}/api/users/departments/${id}`, {
+      return axios.get(`${API_URL}/api/users/departments/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       .then(res => setDepartments([res.data])) 
       .catch(err => console.error("Failed to fetch department:", err))
       .finally(() => setDeptLoading(false));
+    } else {
+      setDeptLoading(false);
     }
   };
 

@@ -14,6 +14,10 @@
   gap: 10px;
 }
 
+.selection .shimmer-title {
+  width: 150px;
+}
+
 .selection-container .selection label {
   font-size: 0.8em;
   font-weight: 600;

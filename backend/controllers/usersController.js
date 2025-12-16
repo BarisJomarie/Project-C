@@ -547,6 +547,24 @@ exports.addCourse = (req, res) => {
   });
 }
 
+// GET ALL COURSE ORDER BY DEPARTMENT
+exports.getAllCourses = (req, res) => {
+  const query = `SELECT c.*, d.department_name 
+  FROM course c
+  JOIN department d ON d.department_id = c.department_id
+  ORDER BY c.department_id`;
+  db.query(query, (err, result) => {
+    if (err) {
+      console.error("Error fetching courses:", err);
+      return res.status(500).json({ error: "Database error" });
+    }
+    if (!result || result.length === 0) {
+      return res.status(404).json({ message: 'No courses found.' });
+    }
+    res.status(200).json(result);
+  });
+};
+
 //GET COURSE
 exports.getCourses = (req, res) => {
   const query = `SELECT * FROM course`;
@@ -559,6 +577,27 @@ exports.getCourses = (req, res) => {
       return res.status(404).json({ message: 'No courses found.' });
     }
     res.status(200).json(result);
+  });
+};
+
+//UPDATE DEPARTMENT
+exports.updateCourse = (req, res) => {
+  const { 
+    course_name,
+    course_abb
+  } = req.body;
+  const { courseId } = req.params;
+  const query = `
+    UPDATE course SET 
+      course_name = ?,
+      course_abb = ?
+    WHERE course_id = ?
+  `;
+  const values = [course_name, course_abb, courseId];
+
+  db.query(query, values, (err, result) => {
+    if (err) return res.status(500).send(err);
+    res.status(200).send({ message: 'Course successfully updated' });
   });
 };
 

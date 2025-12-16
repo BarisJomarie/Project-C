@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { showToast } from "../utils/toast";
+import { ShimmerButton, ShimmerTable } from "react-shimmer-effects";
 import ConfirmModal from "../utils/ConfirmModal";
-import earistLogo from '../assets/earist_logo.png';
 import axios from "axios";
 import '../styles/style.css';
 import '../styles/header.css';
@@ -10,7 +10,9 @@ import '../styles/department.css';
 import '../styles/form.css';
 
 
+
 const AddDepartment = ({ fetchDepartments, departmentList }) => {
+    const [pageLoading, setPageLoading] = useState(true);
     const [modalConfig, setModalConfig] = useState({
         title: '',
         message: '',
@@ -49,14 +51,6 @@ const AddDepartment = ({ fetchDepartments, departmentList }) => {
         setModalConfig(prev => ({ ...prev, show: false }));
     };
 
-
-
-    useEffect(() => {
-      fetchDepartments();
-    }, [fetchDepartments]);
-
-
-
     // GET USER
     const fetchUserData = () => {
         if(!token) return;
@@ -74,7 +68,9 @@ const AddDepartment = ({ fetchDepartments, departmentList }) => {
 
     
     useEffect(() => {
-        fetchUserData();
+        Promise.all([fetchUserData(), fetchDepartments()]).finally(() => {
+            setPageLoading(false);
+        });
     }, []);
 
 
@@ -189,15 +185,14 @@ const AddDepartment = ({ fetchDepartments, departmentList }) => {
     return (
       <>
       <div>
-        <h1 style={{textAlign: 'center'}}>Departments</h1>
-        <div className="line"></div>
         <div className="department-cas-container">
             <div className="department-cas-header">
-                 <div className="department-buttons-container">
+                <div className="department-buttons-container">
                     {addDepartment ? (
                         <button onClick={() => setAddDepartment(false)} type="button">Close Form</button>
                     ) : (
-                        <button onClick={() => setAddDepartment(true)} type="button">Add Department</button>
+                        pageLoading ? <ShimmerButton size="lg" />
+                        :   <button onClick={() => setAddDepartment(true)} type="button">Add Department</button>
                     )}
                 </div> 
             </div>
@@ -212,101 +207,110 @@ const AddDepartment = ({ fetchDepartments, departmentList }) => {
                                 <input name="dept-abb" type="text" value={departmentAbb} onChange={(e) => setDepartmentAbb(e.target.value)} />
                                 <label htmlFor="dept-abb">Department Abbreviation</label>
                             </div>
-                            <button type="submit">Submit</button>
+                            <div className="form-button-container">
+                                <button type="submit">Submit</button>
+                            </div>
                         </form>
                     </div>
                 </>
-            <div className="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Department ID</th>
-                        <th>Department Name</th>
-                        <th>Department Abbreviation</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {departmentList.length > 0 ? (
-                    departmentList.map((dept, index) => (
-                        <tr key={dept.department_id}>
-                        <td>{dept.department_id}</td>
-                        <td>
-                            {editingIndex === index ? (
-                            <input
-                                value={editedDepartment.department_name || ""}
-                                onChange={(e) =>
-                                setEditedDepartment({
-                                    ...editedDepartment,
-                                    department_name: e.target.value,
-                                })
-                                }
-                            />
-                            ) : (
-                            dept.department_name
-                            )}
-                        </td>
-                        <td>
-                            {editingIndex === index ? (
-                            <input
-                                value={editedDepartment.department_abb || ""}
-                                onChange={(e) =>
-                                setEditedDepartment({
-                                    ...editedDepartment,
-                                    department_abb: e.target.value,
-                                })
-                                }
-                            />
-                            ) : (
-                            dept.department_abb
-                            )}
-                        </td>
-                        <td>
-                            {editingIndex === index ? (
-                            <>
-                                <button onClick={() => handleSave(dept.department_id)}>
-                                    <span className="material-symbols-outlined save-icon">save</span>
-                                    <span className="tooltip">Save Edit</span>
-                                </button>
-                                <button onClick={() => setEditingIndex(null)}>
-                                    <span className="material-symbols-outlined cancel-icon">cancel</span>
-                              <span className="tooltip">Cancel Edit</span>
-                                </button>
-                            </>
-                            ) : (
-                            <>
-                                <button onClick={() => navigate(`/user/department/${dept.department_id}`)}>
-                                    <span className="material-symbols-outlined view-icon">visibility</span>
-                                    <span className="tooltip">View Department</span>
-                                </button>
-                                {!addDepartment && (
+
+            <div className="line"></div>
+
+            {pageLoading ? <ShimmerTable row={5} col={4} />
+            : <>
+                <div className="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Department ID</th>
+                                <th>Department Name</th>
+                                <th>Department Abbreviation</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {departmentList.length > 0 ? (
+                            departmentList.map((dept, index) => (
+                                <tr key={dept.department_id}>
+                                <td>{dept.department_id}</td>
+                                <td>
+                                    {editingIndex === index ? (
+                                    <input
+                                        value={editedDepartment.department_name || ""}
+                                        onChange={(e) =>
+                                        setEditedDepartment({
+                                            ...editedDepartment,
+                                            department_name: e.target.value,
+                                        })
+                                        }
+                                    />
+                                    ) : (
+                                    dept.department_name
+                                    )}
+                                </td>
+                                <td>
+                                    {editingIndex === index ? (
+                                    <input
+                                        value={editedDepartment.department_abb || ""}
+                                        onChange={(e) =>
+                                        setEditedDepartment({
+                                            ...editedDepartment,
+                                            department_abb: e.target.value,
+                                        })
+                                        }
+                                    />
+                                    ) : (
+                                    dept.department_abb
+                                    )}
+                                </td>
+                                <td>
+                                    {editingIndex === index ? (
                                     <>
-                                        <button onClick={() => {
-                                            setEditingIndex(index);
-                                            setEditedDepartment(dept);
-                                            }}>
-                                            <span className="material-symbols-outlined edit-icon">edit</span>
-                                            <span className="tooltip">Edit Department</span>
+                                        <button onClick={() => handleSave(dept.department_id)}>
+                                            <span className="material-symbols-outlined save-icon">save</span>
+                                            <span className="tooltip">Save Edit</span>
+                                        </button>
+                                        <button onClick={() => setEditingIndex(null)}>
+                                            <span className="material-symbols-outlined cancel-icon">cancel</span>
+                                    <span className="tooltip">Cancel Edit</span>
                                         </button>
                                     </>
-                                )}
-                                <button onClick={() => handleDelete(dept.department_id, dept.department_name)}>
-                                    <span className="material-symbols-outlined delete-icon">delete</span>
-                                <span className="tooltip">Delete Department</span>
-                                </button>
-                            </>
+                                    ) : (
+                                    <>
+                                        <button onClick={() => navigate(`/user/department/${dept.department_id}`)}>
+                                            <span className="material-symbols-outlined view-icon">visibility</span>
+                                            <span className="tooltip">View Department</span>
+                                        </button>
+                                        {!addDepartment && (
+                                            <>
+                                                <button onClick={() => {
+                                                    setEditingIndex(index);
+                                                    setEditedDepartment(dept);
+                                                    }}>
+                                                    <span className="material-symbols-outlined edit-icon">edit</span>
+                                                    <span className="tooltip">Edit Department</span>
+                                                </button>
+                                            </>
+                                        )}
+                                        <button onClick={() => handleDelete(dept.department_id, dept.department_name)}>
+                                            <span className="material-symbols-outlined delete-icon">delete</span>
+                                        <span className="tooltip">Delete Department</span>
+                                        </button>
+                                    </>
+                                    )}
+                                </td>
+                                </tr>
+                            ))
+                            ) : (
+                            <tr>
+                                <td colSpan="4">No departments available.</td>
+                            </tr>
                             )}
-                        </td>
-                        </tr>
-                    ))
-                    ) : (
-                    <tr>
-                        <td colSpan="4">No departments available.</td>
-                    </tr>
-                    )}
-                </tbody>
-                </table>
-            </div>
+                        </tbody>
+                    </table>
+                </div>
+            </>}
+            
         </div>
       </div>
         

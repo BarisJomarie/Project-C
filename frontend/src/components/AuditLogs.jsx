@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { showToast } from "../utils/toast";
+import { ShimmerTable, ShimmerButton, ShimmerTitle } from "react-shimmer-effects";
 import axios from "axios";
 import ConfirmModal from "../utils/ConfirmModal";
 import '../styles/style.css';
@@ -8,6 +9,7 @@ import '../styles/auditLogs.css';
 
 
 const AuditLogs = () => {
+  const [pageLoading, setPageLoading] = useState(false);
   const [modalConfig, setModalConfig] = useState({
     show: false,
     title: '',
@@ -53,7 +55,8 @@ const AuditLogs = () => {
       setTotalRows(res.data.totalRows);
       setSelectedLogs([]); // reset selection
     })
-    .catch(err => console.error(err));
+    .catch(err => console.error(err))
+    .finally(() => setPageLoading(false));
   };
 
 
@@ -87,8 +90,10 @@ const AuditLogs = () => {
 
 
   useEffect(() => {
+    setPageLoading(true);
     getAuditLogs();
   }, [currentPage, rowsPerPage]);
+
 
 
 
@@ -121,28 +126,46 @@ const AuditLogs = () => {
 
   return (
     <>
-      <h1 style={{textAlign: 'center'}}>Audit Logs</h1>
-      <div className='line'></div>
       <div className="selection-container">
         <div className="selection">
-          <input type="checkbox" checked={selectionToggle} onChange={() => setSelectionToggle(!selectionToggle)} id="selection-toggle" disabled={selectedLogs.length > 0}/>
-          <label htmlFor="selection-toggle">Delete Multiple Logs</label>
+          {pageLoading ? <>
+            <ShimmerButton size="sm"/>
+            <ShimmerTitle line={1} gap={10} variant="primary"/>
+          </>
+          : <>
+            <input type="checkbox" checked={selectionToggle} onChange={() => setSelectionToggle(!selectionToggle)} id="selection-toggle" disabled={selectedLogs.length > 0}/>
+            <label htmlFor="selection-toggle">Delete Multiple Logs</label>
+          </>}
+          
         </div>
         <div className="selection">
-          <select id="table-rows" name="table-rows" onChange={handleRowsChange} value={rowsPerPage}>
-            <option>25</option>
-            <option>50</option>
-            <option>100</option>
-            <option>250</option>
-            <option>500</option>
-          </select>
-          <label htmlFor="table-rows">Table Rows</label>
+          {pageLoading ? <>
+            <ShimmerButton size="sm"/>
+            <ShimmerTitle line={1} gap={10} variant="primary"/>
+          </>
+          : <>
+            <select id="table-rows" name="table-rows" onChange={handleRowsChange} value={rowsPerPage}>
+              <option>25</option>
+              <option>50</option>
+              <option>100</option>
+              <option>250</option>
+              <option>500</option>
+            </select>
+            <label htmlFor="table-rows">Table Rows</label>
+          </>}
         </div>
         <div className="selection">
           <div className="pagination">
-            <button type="button" onClick={() => setCurrentPage(p => Math.max(p-1, 1))} disabled={currentPage === 1}>Previous</button>
-            <span>Page {currentPage} of {totalPages}</span>
-            <button type="button" onClick={() => setCurrentPage(p => Math.min(p+1, totalPages))} disabled={currentPage === totalPages}>Next</button>
+            {pageLoading ? <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '10px'}}>
+              <ShimmerButton size="sm"/>
+              <ShimmerTitle line={1} gap={10} variant="primary"/>
+              <ShimmerButton size="sm"/>
+            </div>
+            : <>
+              <button type="button" onClick={() => setCurrentPage(p => Math.max(p-1, 1))} disabled={currentPage === 1}>Previous</button>
+              <span>Page {currentPage} of {totalPages}</span>
+              <button type="button" onClick={() => setCurrentPage(p => Math.min(p+1, totalPages))} disabled={currentPage === totalPages}>Next</button>
+            </>}
           </div>
         </div>
       </div>
@@ -155,50 +178,56 @@ const AuditLogs = () => {
         </div>
       )}
 
-      <div className="table-container">
-        <table>
-          <thead>
-            <tr>
-              {selectionToggle && <th>Select</th>}
-              <th>ID</th>
-              <th>User Code</th>
-              <th>User Role</th>
-              <th>Action</th>
-              <th>Actor Type</th>
-              <th>Timestamp</th>
-            </tr>
-          </thead>
-          <tbody>
-            {audit.length > 0 ? (
-              audit.map((a) => (
-                <tr key={a.id} className={selectedLogs.includes(a.id) ? 'selected' : ''}>
-                  {selectionToggle && (
-                    <td>
-                      <input
-                        type="checkbox"
-                        checked={selectedLogs.includes(a.id)}
-                        onChange={() => toggleRowSelection(a.id)}
-                      />
-                    </td>
-                  )}
-                  <td>{a.id}</td>
-                  <td>{a.user_code}</td>
-                  <td>{a.user_role}</td>
-                  <td>{a.action}</td>
-                  <td>{a.actor_type.charAt(0).toUpperCase() + a.actor_type.slice(1)}</td>
-                  <td>{new Date(a.timestamp).toLocaleString('en-US', { 
-                    year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' 
-                  })}</td>
-                </tr>
-              ))
-            ) : (
+      <div className='line'></div>
+
+      {pageLoading ? <ShimmerTable row={6} col={6} />
+      : <>
+        <div className="table-container">
+          <table>
+            <thead>
               <tr>
-                <td colSpan={7}>No logs at the moment...</td>
+                {selectionToggle && <th>Select</th>}
+                <th>ID</th>
+                <th>User Code</th>
+                <th>User Role</th>
+                <th>Action</th>
+                <th>Actor Type</th>
+                <th>Timestamp</th>
               </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {audit.length > 0 ? (
+                audit.map((a) => (
+                  <tr key={a.id} className={selectedLogs.includes(a.id) ? 'selected' : ''}>
+                    {selectionToggle && (
+                      <td>
+                        <input
+                          type="checkbox"
+                          checked={selectedLogs.includes(a.id)}
+                          onChange={() => toggleRowSelection(a.id)}
+                        />
+                      </td>
+                    )}
+                    <td>{a.id}</td>
+                    <td>{a.user_code}</td>
+                    <td>{a.user_role}</td>
+                    <td>{a.action}</td>
+                    <td>{a.actor_type.charAt(0).toUpperCase() + a.actor_type.slice(1)}</td>
+                    <td>{new Date(a.timestamp).toLocaleString('en-US', { 
+                      year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' 
+                    })}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={7}>No logs at the moment...</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </>}
+      
 
       <ConfirmModal
         show={modalConfig.show}

@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { showToast } from "../utils/toast";
+import { ShimmerButton, ShimmerTable } from "react-shimmer-effects";
 import ConfirmModal from "../utils/ConfirmModal";
 import axios from "axios";
 import '../styles/addPage.css';
@@ -15,10 +16,18 @@ const AddCourse = () => {;
     message: "",
     onConfirm: null,
   });
+  const [courses, setCourses] = useState([]);
+  const [openCourseForm, setOpenCourseForm] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
   const [selectedDepartment, setSelectedDepartment] = useState("");
   const [courseName, setCourseName] = useState("");
   const [courseAbbreviation, setCourseAbbreviation] = useState("");
   const [department, setDepartment] = useState([]);
+  const [editingIndex, setEditingIndex] = useState(null);
+  const [editCourse, setEditCourses] = useState({
+    course_name: '',
+    course_abb: ''
+  })
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
 
@@ -59,10 +68,27 @@ const AddCourse = () => {;
     });
   };
 
-
+  const fetchCourses = () => {
+    axios.get(`${API_URL}/api/users/all-course`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).then(res => {
+      if (Array.isArray(res.data) && res.data.length > 0) {
+        console.log(`Courses fetched`);
+      } else {
+        console.log(`No courses fetched`);
+      }
+      setCourses(res.data);
+    }).catch(err => {console.error('Error fetching courses:', err);
+      setCourses([]);
+    });
+  };
+  
 
   useEffect(() => {
-    fetchDepartment();
+    setPageLoading(true);
+    Promise.all([fetchDepartment(), fetchCourses()]).finally(() => {
+      setPageLoading(false);
+    })
   }, []);
 
 
@@ -102,6 +128,7 @@ const AddCourse = () => {;
           if (res.status === 201) {
             showToast('success', 'Course Added', 'Course added successfully');
             clearField();
+            fetchCourses();
           }
         } catch (err) {
           console.error(err);
@@ -112,6 +139,62 @@ const AddCourse = () => {;
     );
   };
 
+
+  //HANDLE UPDATE COURSE
+  const handleSave = (courseId) => {
+    showModal(
+      "Confirm Update",
+      "Are you sure you want to save changes to this Course?",
+      async () => {
+        closeModal();
+        try {
+          const res = await axios.put(
+              `${API_URL}/api/users/course-edit/${courseId}`,
+              editCourse,
+              { headers: { Authorization: `Bearer ${token}` } }
+          );
+
+          if (res.status === 200) {
+              showToast("success", "Update", "Course updated successfully.");
+              setEditingIndex(null);
+              fetchCourses();
+          }
+        } catch (error) {
+          console.error("Error updating course:", error);
+          showToast("error", "Error", "Error updating course");
+        }
+      }
+    );
+  };
+
+
+  // DELETE COURSE
+  const handleDeleteCourse = (courseId) => {
+    showModal(
+      'Deleting Course',
+      <>
+        Are you sure you want to delete this course?
+        <br/><br/>
+        Course: <strong>{courseId.course_name}</strong>
+      </>,
+      async () => {
+        try {
+          await axios.delete(`${API_URL}/api/users/course/delete/${courseId}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+            showToast('success', 'Course Deleted', 'Course deleted successfully.');
+            fetchCourses();
+        } catch(err) {
+              console.error('Delete failed:', err);
+              showToast('error', 'Delete Failed', 'Could not delete course.');
+        } finally {
+          closeModal();
+        };
+      },
+      'Delete Course'
+    );
+  }
+
   const clearField = () => {
     setCourseName("");
     setCourseAbbreviation("");
@@ -121,9 +204,15 @@ const AddCourse = () => {;
   return (
     <>
       <div>
-        <h1 style={{textAlign: 'center'}}>Add Course to a Department</h1>
-        <div className="line"></div>
-        <div className="form-container default">
+        <div className="department-buttons-container">
+            {openCourseForm ? (
+                <button onClick={() => setOpenCourseForm(false)} type="button">Close Form</button>
+            ) : (
+                pageLoading ? <ShimmerButton size="lg" />
+                :   <button onClick={() => setOpenCourseForm(true)} type="button">Add Course</button>
+            )}
+        </div>
+        <div className={`form-container ${openCourseForm ? 'slide-down' : 'slide-up'}`}>
           <form onSubmit={addCourse}>
             <div className="form-input">
               <select value={selectedDepartment} onChange={(e) => setSelectedDepartment(e.target.value)} name="dep" required>
@@ -146,12 +235,90 @@ const AddCourse = () => {;
               <label htmlFor="course-abb">Course Abbreviation</label>
             </div>
             <div className="form-button-container">
-              <button type="button" onClick={() => navigate(-1)}>Cancel</button>
               <button type="submit">Add Course</button>
             </div>
           </form>
         </div>
       </div>
+      
+      <div className="line"></div>
+
+      {pageLoading ? <ShimmerTable row={5} col={4} />
+      : <>
+        <div className="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Course Department</th>
+                <th>Course Name</th>
+                <th>Course Abbreviation</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {courses.length > 0 ? (
+                courses.map((c, index) => (
+                  <tr key={c.course_id}>
+                    <td>{c.department_name}</td>
+                    <td>
+                      {editingIndex === index ? (
+                        <input
+                          value={editCourse.course_name || ''}
+                          onChange={(e) => setEditCourses({...editCourse, course_name: e.target.value})} 
+                         />
+                      ) : (
+                        c.course_name
+                      )}
+                    </td>
+                    <td>
+                      {editingIndex === index ? (
+                        <input
+                          value={editCourse.course_abb || ''}
+                          onChange={(e) => setEditCourses({...editCourse, course_abb: e.target.value})} 
+                         />
+                      ) : (
+                        c.course_abb
+                      )}
+                    </td>
+                    <td>
+                      {editingIndex === index ? (
+                        <>
+                          <button onClick={() => handleSave(c.course_id)}>
+                            <span className="material-symbols-outlined save-icon">save</span>
+                            <span className="tooltip">Save Edit</span>
+                          </button>
+                          <button onClick={() => setEditingIndex(null)}>
+                            <span className="material-symbols-outlined cancel-icon">cancel</span>
+                            <span className="tooltip">Cancel Edit</span>
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button onClick={() => {
+                            setEditingIndex(index);
+                            setEditCourses(c);
+                            }}>
+                            <span className="material-symbols-outlined edit-icon">edit</span>
+                            <span className="tooltip">Edit Course</span>
+                          </button>
+                          <button onClick={() => handleDeleteCourse(c.course_id)}>
+                            <span className="material-symbols-outlined delete-icon">delete</span>
+                            <span className="tooltip">Delete Course</span>
+                          </button>
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={4}> No fetched courses... </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </>}
 
       <ConfirmModal
         show={modalConfig.show}
