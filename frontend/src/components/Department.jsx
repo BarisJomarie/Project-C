@@ -309,61 +309,6 @@ const updatePubCoAuthor = (value, index) => {
     };
   };
 
-  // ADD PRESENTATION PAPERS
-  const handleAddPresentation = async (e) => {
-    e.preventDefault();
-
-    try {
-      // Map frontend fields to backend names
-      const payload = {
-        department_id: dep_id,
-        author,
-        co_authors: coAuthors,
-        research_title: researchTitle,
-        sdg_alignment: JSON.stringify(sdgAlignment),
-        conference_title: conferenceTitle,
-        organizer,
-        venue,
-        conference_category: conferenceType,
-        date_presented: startDate,
-        end_date_presented: endDate ? endDate : null,
-        special_order_no: specialOrder,
-        status_engage: status,
-        funding_source_engage: funding
-      };
-
-      await axios.post(
-        `${API_URL}/api/research-presentation/add`,
-        payload,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      showToast("success", "Added Successfully", "Research presentation added.");
-
-      // Reset form
-      setAuthor("");
-      setCoAuthors([""]);
-      setResearchTitle("");
-      setSdgAlignment([]);
-      setConferenceTitle("");
-      setOrganizer("");
-      setVenue("");
-      setStartDate("");
-      setEndDate("");
-      setConferenceType("");
-      setSpecialOrder("");
-      setStatus("");
-      setFunding("");
-
-      fetchResearchPresentation();
-      setShowAddForm(false);
-
-    } catch (err) {
-      console.error(err);
-      showToast("error", "Failed to Add", err.response?.data?.message || "Something went wrong.");
-    }
-  };
-
   // GET DEPARTMENT RESEARCH PUBLICATIONS
   const fetchResearchPublications = () => {
     setTableLoading(true);
@@ -454,6 +399,7 @@ const updatePubCoAuthor = (value, index) => {
     if (!dep_id) return;
 
     setPageLoading(true);
+    setActiveTable('users');
 
     Promise.all([
       getUserData(),
@@ -467,16 +413,25 @@ const updatePubCoAuthor = (value, index) => {
 
 
   useEffect(() => {
-  const activeRef = activeTable === 'users' ? userRef : activeTable === 'student-paper' ? studentPaperRef : activeTable === 'faculty-paper' ? facultyPaperRef : activeTable === 'research-presentation' ? researchPresentationRef : activeTable === 'research-publications' ? researchPublicationRef: courseRef;
+    const updateIndicator = () => {
+      const activeRef = activeTable === 'users' ? userRef : activeTable === 'student-paper' ? studentPaperRef : activeTable === 'faculty-paper' ? facultyPaperRef : activeTable === 'research-presentation' ? researchPresentationRef : activeTable === 'research-publications' ? researchPublicationRef: courseRef;
 
-    if (activeRef.current) {
-      const { offsetLeft, offsetWidth } = activeRef.current;
-      setIndicatorStyle({
-        left: `${offsetLeft}px`,
-        width: `${offsetWidth}px`
-      });
-    }
-  }, [activeTable]);
+      if (activeRef && activeRef.current) {
+        const { offsetLeft, offsetWidth } = activeRef.current;
+        setIndicatorStyle({
+          left: `${offsetLeft}px`,
+          width: `${offsetWidth}px`
+        });
+      }
+    };
+
+    // run once when dependencies change (including when page finishes loading)
+    updateIndicator();
+
+    // update on window resize to keep indicator aligned
+    window.addEventListener('resize', updateIndicator);
+    return () => window.removeEventListener('resize', updateIndicator);
+  }, [activeTable, pageLoading]);
 
   // DELETE PAPER
   const handleDeletePaper = (id) => {
@@ -1383,7 +1338,8 @@ function formatDateRange(startDate, endDate) {
             {activeTable === 'research-presentation' && userData?.role !== 'faculty' ? (<>
               <button
                 type="button"
-                onClick={() => setShowAddForm(!showAddForm)}
+                // onClick={() => setShowAddForm(!showAddForm)}
+                onClick={() => navigate(`/user/department/${dep_id}/research-presentation-add`)}
               >
                 {showAddForm ? "Close Form" : "Add Research Presentation"}
               </button>
@@ -1698,218 +1654,6 @@ function formatDateRange(startDate, endDate) {
         {activeTable === 'research-presentation' && (
           tableLoading ? <ShimmerTable row={5} col={13}/> : <>
             <div>
-              <div className={`form-container ${showAddForm ? 'slide-down' : 'slide-up'}`}>
-                <div className="add-form-container">
-                  <h3>Add Research Paper Presentation</h3>
-
-                  <form onSubmit={handleAddPresentation} className="form">
-                    <div className="grouped-inputs">
-                      <div className="form-input">
-                        <input 
-                          name="author" 
-                          type="text" 
-                          placeholder="Author Name" 
-                          value={author} 
-                          onChange={(e) => setAuthor(e.target.value)} 
-                          required/>
-                        <label htmlFor="user-code">Author</label>
-                      </div>
-                    </div>
-
-                    <div className="form-input">
-                      <button type="button" onClick={addCoAuthor} className="add-coauthor-btn">
-                        +
-                      </button>
-                      {coAuthors.map((co, index) => (
-                        <div key={index} className="coauthor-row">
-                          <input
-                            type="text"
-                            value={co}
-                            onChange={(e) => updateCoAuthor(e.target.value, index)}
-                            placeholder={`Co-author ${index + 1}`}
-                            style={{
-                              width: '80%', margin: '5px 0'
-                            }}
-                          />
-                          {index > 0 && (
-                            <button
-                              type="button"
-                              onClick={() => removeCoAuthor(index)}
-                              style={{
-                                height: '25px', padding: '0', margin: 'auto 0'
-                              }}
-                            >
-                              <span className="material-symbols-outlined"
-                                style={{
-                                  margin: 'auto 0' 
-                                }}
-                                >
-                              remove
-                              </span>
-                            </button>
-                          )}
-                        </div>
-                      ))}
-                      <label htmlFor="username">Co-Authors</label>
-                    </div>
-
-                    <div className="form-input">
-                      <input 
-                        name="title" 
-                        type="text" 
-                        placeholder="Enter Research Title" 
-                        value={researchTitle} 
-                        onChange={(e) => setResearchTitle(e.target.value)}
-                        required/>
-                      <label htmlFor="user-code">Title of Research Paper</label>
-                    </div>
-
-                    <div className="form-input">
-                      <div className="sdg-checkboxes" name="sdg">
-                        {sdgOptions.map((sdg, idx) => (
-                          <label key={idx} className="checkbox-option">
-                            <input
-                              type="checkbox"
-                              value={sdg}
-                              checked={sdgAlignment.includes(sdg)}
-                              onChange={(e) => {
-                                const value = e.target.value;
-                                if (sdgAlignment.includes(value)) {
-                                  setSdgAlignment(sdgAlignment.filter(item => item !== value));
-                                } else {
-                                  setSdgAlignment([...sdgAlignment, value]);
-                                }
-                              }}
-                            />
-                            {sdg}     
-                          </label>
-                        ))}
-                      </div>
-                      <label htmlFor="sdg">SDG Alignment</label>
-                    </div>
-
-                    <div className="form-input">
-                      <input 
-                        name="conference" 
-                        type="text" 
-                        placeholder="Enter Conference" 
-                        value={conferenceTitle}
-                        onChange={(e) => setConferenceTitle(e.target.value)}
-                        required/>
-                      <label htmlFor="conference">Conference Title</label>
-                    </div>
-
-                    <div className="form-input">
-                      <input 
-                        name="organizer" 
-                        type="text" 
-                        placeholder="Enter Organizer" 
-                        value={organizer}
-                        onChange={(e) => setOrganizer(e.target.value)}
-                        required/>
-                      <label htmlFor="organizer">Organizer</label>
-                    </div>
-
-                    <div className="form-input">
-                      <input 
-                        name="venue" 
-                        type="text" 
-                        placeholder="Enter Venue" 
-                        value={venue}
-                        onChange={(e) => setVenue(e.target.value)}
-                        required/>
-                      <label htmlFor="venue">Venue</label>
-                    </div>
-
-                    <div className="form-input">
-                      <input 
-                        name="s-date" 
-                        type="date" 
-                        value={startDate}
-                        onChange={(e) => setStartDate(e.target.value)}
-                        required/>
-                      <label htmlFor="s-date">Start Date</label>
-                    </div>
-
-                    <div className="form-input">
-                      <input 
-                        name="e-date" 
-                        type="date" 
-                        value={endDate}
-                        onChange={(e) => setEndDate(e.target.value)}
-                        required/>
-                      <label htmlFor="e-date">End Date</label>
-                    </div>
-
-                    <div className="form-input">
-                      <select 
-                        value={conferenceType}
-                        onChange={(e) => setConferenceType(e.target.value)}
-                        required
-                        >
-                        <option value="">Select Type</option>
-                        {conferenceOptions.map((option, index) => (
-                          <option key={index} value={option}>
-                            {option}
-                          </option>
-                        ))}
-                      </select>
-                      <label>Type of Conference</label>
-                    </div>
-
-                    <div className="form-input">
-                      <input 
-                        name="so_no" 
-                        type="text" 
-                        placeholder="Special Order No." 
-                        value={specialOrder}
-                        onChange={(e) => setSpecialOrder(e.target.value)}
-                        required
-                        />
-                      <label htmlFor="so_no">Special Order No:</label>
-                    </div>
-
-                    <div className="form-input">
-                      <select 
-                        value={status}
-                        onChange={(e) => setStatus(e.target.value)}
-                        required
-                        >
-                        <option value="">Select Type</option>
-                        {statusOptions.map((option) => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </select>
-                      <label>Status</label>
-                    </div>
-                    
-                    <div className="form-input">
-                      <select 
-                        value={funding}
-                        onChange={(e) => setFunding(e.target.value)}
-                        required
-                        >
-                        <option value="">Select Type</option>
-                        {fundingOptions.map((option) => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </select>
-                      <label>Funding Source</label>
-                    </div>
-                    
-
-                    <div className="form-group">
-                      <button type="submit" className="submit-btn">Submit</button>
-                    </div>
-
-                  </form>
-                </div>
-              </div>
-
               <div className="table-container" id="printable-table"
                 style={{
                   overflowX: 'auto'

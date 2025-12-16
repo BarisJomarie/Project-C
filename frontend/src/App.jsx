@@ -21,6 +21,7 @@ import Users from './components/Users'
 import AuditLogs from './components/AuditLogs'
 import UserPage from './components/UserPage'
 import ResearchPaperPage from './components/ResearchPaperPage'
+import AddPresentation from './components/AddPresentation'
 
 
 
@@ -87,6 +88,7 @@ function App() {
         <Route path='/view-profile' element={<ProtectedRoute allowedRoles={['admin', 'rph', 'faculty']}><ViewProfile /></ProtectedRoute>} />
 
         <Route path='/user/department/:dep_id/ai_report' element={<ProtectedRoute allowedRoles={['admin', 'rph']}> <AIReport/> </ProtectedRoute>}/>
+        <Route path='/user/department/:dep_id/research-presentation-add' element={<ProtectedRoute allowedRoles={['admin', 'rph']}><AddPresentation /></ProtectedRoute>} />
 
         <Route path='/user/course_add' element={<ProtectedRoute allowedRoles={['admin']}> <AddCourse/> </ProtectedRoute>}/>
         <Route path='/user/users' element={<ProtectedRoute allowedRoles={['admin']}> <Users/> </ProtectedRoute>}/>

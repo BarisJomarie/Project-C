@@ -165,7 +165,7 @@ const Homepage = () => {
   const getCurrentUploadedResearchPapers = () => {
     if (!userData?.id) return; // safeguard
 
-    axios.get(`${API_URL}/api/users/current-uploaded/research-papers`, {
+    return axios.get(`${API_URL}/api/users/current-uploaded/research-papers`, {
       headers: { Authorization: `Bearer ${token}`},
       params: { uId: userData.id }
     }).then(response => {
@@ -227,7 +227,7 @@ const Homepage = () => {
   useEffect(() => {
     if ((role === 'admin' || role === 'faculty' || role === 'rph') && userData?.id) {
       setCupLoading(true);
-      Promise.all(getCurrentUploadedResearchPapers()).finally(() => {
+      getCurrentUploadedResearchPapers().finally(() => {
         setCupLoading(false);
       });
     }
