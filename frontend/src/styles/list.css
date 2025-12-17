@@ -78,9 +78,11 @@
 
 .list-right {
   display: flex;
-  align-items: flex-start;
+  align-items: flex-end;
+  flex-direction: column;
   flex-shrink: 0;
   text-align: right;
+  gap: 5px;
   padding-top: 2px;
 }
 

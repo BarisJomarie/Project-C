@@ -1,14 +1,22 @@
 import React from "react";
 import { useState, useEffect, useRef } from "react";
-import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+import { showToast } from "../utils/toast";
+import axios from "axios";
+import { ShimmerTable, ShimmerText, ShimmerThumbnail, ShimmerTitle } from "react-shimmer-effects";
+
 
 const AddPresentation = () => {
   const {dep_id} = useParams();
   const [pageLoading, setPageLoading] = useState(true);
   const [userData, setUserData] = useState(null);
   const [department, setDepartment] = useState(null);
+  const [currentUploadedPresentation, setCurrentUploadedPresentation] = useState([]);
   const inputRefs = useRef([]);
+  const navigate = useNavigate();
+  const token = localStorage.getItem('token');
+  const userId = localStorage.getItem('userId');
+  const API_URL = import.meta.env.VITE_API_URL;
 
   //SDG ALIGNMENT OPTIONS
   const sdgOptions = [
@@ -67,12 +75,8 @@ const AddPresentation = () => {
     end_date_presented: '',
     special_order_no: '',
     status_engage: '',
-    funding_source_engage: '',
+    funding_source_engage: ''
   });
-  const navigate = useNavigate();
-  const token = localStorage.getItem('token');
-  const userId = localStorage.getItem('userId');
-  const API_URL = import.meta.env.VITE_API_URL;
 
   // GET USER DATA
   const getUserData = () => {
@@ -112,11 +116,26 @@ const AddPresentation = () => {
     });
   }
 
+  // GET USER CURRENT ADDED PRESENTATION
+  const getCurrentUploadedPresentation = () => {
+    return axios.get(`${API_URL}/api/research-presentation/user`, {
+      headers: {Authorization: `Bearer ${token}`}
+    })
+    .then(res => {
+      setCurrentUploadedPresentation(res.data);
+      // console.log(res.data);
+    })
+    .catch(err => {
+      console.error('Error fetching presentations', err);
+    });
+  };
+
   useEffect(() => {
     setPageLoading(true);
     Promise.all([
       getUserData(), 
-      getDepartment()
+      getDepartment(),
+      getCurrentUploadedPresentation()  
     ]).finally(() => {
       setPageLoading(false);
     });
@@ -147,292 +166,362 @@ const AddPresentation = () => {
   const addPresentations = async (e) => {
     e.preventDefault();
 
+    if (!formData.sdg_alignment || formData.sdg_alignment.length === 0) {
+      showToast('warning', 'Missing SDG', 'Select at least one (1) SDG');
+      return
+    }
+
     try {
       // Map frontend fields to backend names
       const payload = {
         ...formData
       };
 
-      await axios.post(
+      const res = await axios.post(
         `${API_URL}/api/research-presentation/add`,
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
+
+      // console.log('Response: ', res.data);
+      showToast('success', 'Paper Uploaded', 'Research Presentation Added Successfully');
       clearFields();
+      getCurrentUploadedPresentation();
     } catch (err) {
       console.error(err);
+      console.log('Response: ', err.response?.data);
+      showToast('error', 'Paper Error', 'Something went wrong uploading the presentation');
     }
   };
 
   return (
     <>
       <div className='hyperlink' onClick={() => navigate(-1)}><p>Go Back</p></div>
-      <h1 style={{textAlign: 'center'}}>Add Research Presentation for Department of <br/>
+      {pageLoading ? <>
+        <ShimmerTitle line={1} gap={10} variant="primary"/>
+        <ShimmerTitle line={1} gap={10} variant="primary"/>
+      </> : <>
+        <h1 style={{textAlign: 'center'}}>Add Research Presentation for Department of <br/>
         <span style={{color: '#C83F12'}}>{department?.department_name}</span>
       </h1>
+      </>}
       <div className="line"></div>
-
+      
       <div className="form-container default">
-        <form onSubmit={addPresentations}>
-          {/* DEPARTMENT */}
-          <div className="form-input">
-            <input 
-              name="department" 
-              type="text" 
-              value={department?.department_name || 'Department ?'} 
-              disabled 
-              />
-            <label htmlFor="department">Department</label>
-          </div>
-
-          {/* AUTHOR */}
-          <div className="form-input">
-            <input 
-              name="author" 
-              type="text" 
-              value={formData.author}
-              onChange={(e) => setFormData(prev => ({...prev, author: e.target.value}))}
-              placeholder={`Author Lastname, Firstname MI.`}
-              />
-            <label htmlFor="author">Author</label>
-          </div>
-
-          {/* CO-AUTHORS */}
-          <div className="form-input multi-index">
-            <label htmlFor="coa">Researchers</label>
-            {formData.co_authors.map((res, index) => (
+        {pageLoading ? <ShimmerThumbnail height={250} width={300} rounded /> : <>
+          <form onSubmit={addPresentations}>
+            {/* DEPARTMENT */}
+            <div className="form-input">
               <input 
-                key={index}
-                ref={el => inputRefs.current[index] = el}
-                type="text"
-                name={`co_author_${index}`}
-                value={res}
-                onChange={(e) => {
-                  const newCoAuthor = [...formData.co_authors];
-                  newCoAuthor[index] = e.target.value;
-                  setFormData(prev => ({...prev, co_authors: newCoAuthor}));
-                }}
-                onKeyDown={(e) => {
-                  //ADD
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
+                name="department" 
+                type="text" 
+                value={department?.department_name || 'Department ?'} 
+                disabled 
+                />
+              <label htmlFor="department">Department</label>
+            </div>
 
-                    //IF NEXT INPUT IS EMPTY
-                    if (formData.co_authors[index + 1] !== undefined && formData.co_authors[index + 1].trim() === "") {
-                      setTimeout(() => {
-                        inputRefs.current[index + 1]?.focus();
-                      }, 0);
-                    } 
-                    //CREATES NEW IF CURRENT FOCUS IS LAST INDEX
-                    else if (formData.co_authors.length < 6 && res.trim() !== '') {
-                      setFormData(prev => {
-                        const updated = [...prev.co_authors, ''];
-                        return {...prev, co_authors: updated};
-                      });
+            {/* AUTHOR */}
+            <div className="form-input">
+              <input 
+                name="author" 
+                type="text" 
+                value={formData.author}
+                onChange={(e) => setFormData(prev => ({...prev, author: e.target.value}))}
+                placeholder={`Author Lastname, Firstname MI.`}
+                required
+                />
+              <label htmlFor="author">Author</label>
+            </div>
+
+            {/* CO-AUTHORS */}
+            <div className="form-input multi-index">
+              <label htmlFor="coa">Researchers</label>
+              {formData.co_authors.map((res, index) => (
+                <input 
+                  key={index}
+                  ref={el => inputRefs.current[index] = el}
+                  type="text"
+                  name={`co_author_${index}`}
+                  value={res}
+                  onChange={(e) => {
+                    const newCoAuthor = [...formData.co_authors];
+                    newCoAuthor[index] = e.target.value;
+                    setFormData(prev => ({...prev, co_authors: newCoAuthor}));
+                  }}
+                  onKeyDown={(e) => {
+                    //ADD
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+
+                      //IF NEXT INPUT IS EMPTY
+                      if (formData.co_authors[index + 1] !== undefined && formData.co_authors[index + 1].trim() === "") {
+                        setTimeout(() => {
+                          inputRefs.current[index + 1]?.focus();
+                        }, 0);
+                      } 
+                      //CREATES NEW IF CURRENT FOCUS IS LAST INDEX
+                      else if (formData.co_authors.length < 6 && res.trim() !== '') {
+                        setFormData(prev => {
+                          const updated = [...prev.co_authors, ''];
+                          return {...prev, co_authors: updated};
+                        });
+
+                        setTimeout(() => {
+                          const lastIndex = formData.co_authors.length;
+                          inputRefs.current[lastIndex]?.focus();
+                        }, 0);
+                      }
+                    }
+
+                    //DELETE
+                    if (e.key === 'Backspace' && res === '' && formData.co_authors.length > 1) {
+                      e.preventDefault();
+                      const newCoAuthor = formData.co_authors.filter((_, i) => i !== index);
+                      setFormData(prev => ({...prev, co_authors: newCoAuthor}));
 
                       setTimeout(() => {
-                        const lastIndex = formData.co_authors.length;
-                        inputRefs.current[lastIndex]?.focus();
+                        const prevIndex = index - 1;
+                        if (prevIndex >= 0) {
+                          const prevInput = document.querySelector(`input[name="co_author_${prevIndex}"]`);
+                          prevInput?.focus();
+                        }
                       }, 0);
                     }
-                  }
+                  }}
+                  placeholder={`Co-Author ${index + 1}: Lastname, Firstname MI.`}
+                  required
+                  style={{ display: "block", marginBottom: "10px" }}/>
+              ))}
+              <div className="form-button-container" style={{ justifyContent: 'center', gap: '10px'}}>
+                <button
+                  type="button"
+                  onClick={() => setFormData(prev => ({...prev, co_authors: [...prev.co_authors, '']}))}
+                  disabled={formData.co_authors.length === 6}>
+                    +
+                </button>
 
-                  //DELETE
-                  if (e.key === 'Backspace' && res === '' && formData.co_authors.length > 1) {
-                    e.preventDefault();
-                    const newCoAuthor = formData.co_authors.filter((_, i) => i !== index);
-                    setFormData(prev => ({...prev, co_authors: newCoAuthor}));
+                <button
+                  type="button"
+                  onClick={() => setFormData(prev => ({...prev, co_authors: prev.co_authors.slice(0, -1)}))}
+                  disabled={formData.co_authors.length === 1}>
+                    -
+                </button>
+              </div>
+            </div>
 
-                    setTimeout(() => {
-                      const prevIndex = index - 1;
-                      if (prevIndex >= 0) {
-                        const prevInput = document.querySelector(`input[name="co_author_${prevIndex}"]`);
-                        prevInput?.focus();
-                      }
-                    }, 0);
-                  }
-                }}
-                placeholder={`Co-Author ${index + 1}: Lastname, Firstname MI.`}
+            {/* RESEARCH TITLE */}
+            <div className="form-input">
+              <input 
+                name="r-title" 
+                type="text" 
+                value={formData.research_title}
+                onChange={(e) => setFormData(prev => ({...prev, research_title: e.target.value}))}
                 required
-                style={{ display: "block", marginBottom: "10px" }}/>
-            ))}
-            <div className="form-button-container" style={{ justifyContent: 'center', gap: '10px'}}>
-              <button
-                type="button"
-                onClick={() => setFormData(prev => ({...prev, co_authors: [...prev.co_authors, '']}))}
-                disabled={formData.co_authors.length === 6}>
-                  +
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setFormData(prev => ({...prev, co_authors: prev.co_authors.slice(0, -1)}))}
-                disabled={formData.co_authors.length === 1}>
-                  -
-              </button>
+                />
+              <label htmlFor="r-title">Research Title</label>
             </div>
-          </div>
 
-          {/* RESEARCH TITLE */}
-          <div className="form-input">
-            <input 
-              name="r-title" 
-              type="text" 
-              value={formData.research_title}
-              onChange={(e) => setFormData(prev => ({...prev, research_title: e.target.value}))}
-              />
-            <label htmlFor="r-title">Research Title</label>
-          </div>
-
-          {/* SDG ALIGNMENT */}
-          <div className="form-input">
-            <div className="sdg-checkboxes" name="sdg">
-              {sdgOptions.map((sdg, idx) => (
-                <label key={idx} className="checkbox-option">
-                  <input
-                    type="checkbox"
-                    value={sdg}
-                    checked={formData.sdg_alignment.includes(sdg)}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      if (formData.sdg_alignment.includes(value)) {
-                        //REMOVE
-                        setFormData(prev => ({...prev, sdg_alignment: prev.sdg_alignment.filter(item => item != value)}));
-                      } else {
-                        //SELECT
-                        setFormData(prev => ({...prev, sdg_alignment: [...prev.sdg_alignment, value]}));
-                      }
-                    }} />
-                    {sdg}
-                </label>
-              ))}
+            {/* SDG ALIGNMENT */}
+            <div className="form-input">
+              <div className="sdg-checkboxes" name="sdg">
+                {sdgOptions.map((sdg, idx) => (
+                  <label key={idx} className="checkbox-option">
+                    <input
+                      type="checkbox"
+                      value={sdg}
+                      checked={formData.sdg_alignment.includes(sdg)}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (formData.sdg_alignment.includes(value)) {
+                          //REMOVE
+                          setFormData(prev => ({...prev, sdg_alignment: prev.sdg_alignment.filter(item => item != value)}));
+                        } else {
+                          //SELECT
+                          setFormData(prev => ({...prev, sdg_alignment: [...prev.sdg_alignment, value]}));
+                        }
+                      }} />
+                      {sdg}
+                  </label>
+                ))}
+              </div>
+              <label htmlFor="sdg">SDG Alignment</label>
             </div>
-            <label htmlFor="sdg">SDG Alignment</label>
-          </div>
 
-          {/* CONFERRENCE TITLE */}
-          <div className="form-input">
-            <input 
-              name="c-title" 
-              type="text" 
-              value={formData.conference_title}
-              onChange={(e) => setFormData(prev => ({...prev, conference_title: e.target.value}))}
-              placeholder="Enter Conferece"
-              />
-            <label htmlFor="c-title">Conference Title</label>
-          </div>
+            {/* CONFERRENCE TITLE */}
+            <div className="form-input">
+              <input 
+                name="c-title" 
+                type="text" 
+                value={formData.conference_title}
+                onChange={(e) => setFormData(prev => ({...prev, conference_title: e.target.value}))}
+                placeholder="Enter Conferece"
+                required
+                />
+              <label htmlFor="c-title">Conference Title</label>
+            </div>
 
-          {/* ORGANIZER */}
-          <div className="form-input">
-            <input 
-              name="org" 
-              type="text" 
-              value={formData.organizer}
-              onChange={(e) => setFormData(prev => ({...prev, organizer: e.target.value}))}
-              placeholder="Enter Organizer"
-              />
-            <label htmlFor="org">Organizer</label>
-          </div>
+            {/* ORGANIZER */}
+            <div className="form-input">
+              <input 
+                name="org" 
+                type="text" 
+                value={formData.organizer}
+                onChange={(e) => setFormData(prev => ({...prev, organizer: e.target.value}))}
+                placeholder="Enter Organizer"
+                required
+                />
+              <label htmlFor="org">Organizer</label>
+            </div>
 
-          {/* VENUE */}
-          <div className="form-input">
-            <input 
-              name="venue" 
-              type="text" 
-              value={formData.venue}
-              onChange={(e) => setFormData(prev => ({...prev, venue: e.target.value}))}
-              placeholder="Enter Venue"
-              />
-            <label htmlFor="venue">Venue</label>
-          </div>
+            {/* VENUE */}
+            <div className="form-input">
+              <input 
+                name="venue" 
+                type="text" 
+                value={formData.venue}
+                onChange={(e) => setFormData(prev => ({...prev, venue: e.target.value}))}
+                placeholder="Enter Venue"
+                required
+                />
+              <label htmlFor="venue">Venue</label>
+            </div>
 
-          {/* START DATE */}
-          <div className="form-input">
-            <input 
-              name="s-date" 
-              type="date" 
-              value={formData.date_presented}
-              onChange={(e) => setFormData(prev => ({...prev, date_presented: e.target.value}))}
-              />
-            <label htmlFor="s-date">Start Date</label>
-          </div>
+            {/* START DATE */}
+            <div className="form-input">
+              <input 
+                name="s-date" 
+                type="date" 
+                value={formData.date_presented}
+                onChange={(e) => setFormData(prev => ({...prev, date_presented: e.target.value}))}
+                required
+                />
+              <label htmlFor="s-date">Start Date</label>
+            </div>
 
-          {/* END DATE */}
-          <div className="form-input">
-            <input 
-              name="e-date" 
-              type="date" 
-              value={formData.end_date_presented}
-              onChange={(e) => setFormData(prev => ({...prev, end_date_presented: e.target.value}))}
-              />
-            <label htmlFor="e-date">End Date</label>
-          </div>
+            {/* END DATE */}
+            <div className="form-input">
+              <input 
+                name="e-date" 
+                type="date" 
+                value={formData.end_date_presented}
+                onChange={(e) => setFormData(prev => ({...prev, end_date_presented: e.target.value}))}
+                required
+                />
+              <label htmlFor="e-date">End Date</label>
+            </div>
 
-          {/* CONFERENCE CATEGORY */}
-          <div className="form-input">
-            <select
-              name="conference_category"
-              value={formData.conference_category}
-              onChange={(e) => setFormData(prev => ({...prev, conference_category: e.target.value }))}>
-              <option value={''}>-- Select a Category --</option>
-              {conferenceCategory.map((type, idx) => (
-                <option key={idx} value={type}>
-                  {type}
-                </option>
-              ))}
-            </select>
-            <label htmlFor="conference_category">Conference Category</label>
-          </div>
+            {/* CONFERENCE CATEGORY */}
+            <div className="form-input">
+              <select
+                name="conference_category"
+                value={formData.conference_category}
+                onChange={(e) => setFormData(prev => ({...prev, conference_category: e.target.value }))}
+                required>
+                <option value={''}>-- Select a Category --</option>
+                {conferenceCategory.map((type, idx) => (
+                  <option key={idx} value={type}>
+                    {type}
+                  </option>
+                ))}
+              </select>
+              <label htmlFor="conference_category">Conference Category</label>
+            </div>
 
-          {/* SPECIAL ORDER NO. */}
-          <div className="form-input">
-            <input 
-              name="orderno" 
-              type="text" 
-              value={formData.special_order_no}
-              onChange={(e) => setFormData(prev => ({...prev, special_order_no: e.target.value}))}
-              placeholder="Enter Special Order No."
-              />
-            <label htmlFor="orderno">Special Order No.</label>
-          </div>
+            {/* SPECIAL ORDER NO. */}
+            <div className="form-input">
+              <input 
+                name="orderno" 
+                type="text" 
+                value={formData.special_order_no}
+                onChange={(e) => setFormData(prev => ({...prev, special_order_no: e.target.value}))}
+                placeholder="Enter Special Order No."
+                />
+              <label htmlFor="orderno">Special Order No.</label>
+            </div>
 
-          {/* STATUS */}
-          <div className="form-input">
-            <select
-              name="status"
-              value={formData.status_engage}
-              onChange={(e) => setFormData(prev => ({...prev, status_engage: e.target.value }))}>
-              <option value={''}>-- Select the Status --</option>
-              {status.map((stat, idx) => (
-                <option key={idx} value={stat}>
-                  {stat}
-                </option>
-              ))}
-            </select>
-            <label htmlFor="status">Status</label>
-          </div>
+            {/* STATUS */}
+            <div className="form-input">
+              <select
+                name="status"
+                value={formData.status_engage}
+                onChange={(e) => setFormData(prev => ({...prev, status_engage: e.target.value }))}
+                required>
+                <option value={''}>-- Select the Status --</option>
+                {status.map((stat, idx) => (
+                  <option key={idx} value={stat}>
+                    {stat}
+                  </option>
+                ))}
+              </select>
+              <label htmlFor="status">Status</label>
+            </div>
 
-          {/* FUNDING SOURCE */}
-          <div className="form-input">
-            <select
-              name="funding"
-              value={formData.funding_source_engage}
-              onChange={(e) => setFormData(prev => ({...prev, funding_source_engage: e.target.value }))}>
-              <option value={''}>-- Select the Funding Source --</option>
-              {fundingSource.map((fund, idx) => (
-                <option key={idx} value={fund}>
-                  {fund}
-                </option>
-              ))}
-            </select>
-            <label htmlFor="funding">Funding Source</label>
-          </div>
-          <div className="form-button-container">
-            <button type="button" onClick={() => clearFields()}>Clear</button>
-            <button type="submit">Add Research Presentation</button>
-          </div>
-        </form>
+            {/* FUNDING SOURCE */}
+            <div className="form-input">
+              <select
+                name="funding"
+                value={formData.funding_source_engage}
+                onChange={(e) => setFormData(prev => ({...prev, funding_source_engage: e.target.value }))}
+                required>
+                <option value={''}>-- Select the Funding Source --</option>
+                {fundingSource.map((fund, idx) => (
+                  <option key={idx} value={fund}>
+                    {fund}
+                  </option>
+                ))}
+              </select>
+              <label htmlFor="funding">Funding Source</label>
+            </div>
+            <div className="form-button-container">
+              <button type="button" onClick={() => clearFields()}>Clear</button>
+              <button type="submit">Add Research Presentation</button>
+            </div>
+          </form>
+        </>}
       </div>
+
+      <div className="line"></div>
+
+      {pageLoading ? <ShimmerTable row={4} col={2}/> : <>
+        {currentUploadedPresentation.length > 0 && (
+          <div className="summary-container">
+            <div className="summary-cards">
+              <div className="card-table">
+                <h4>Recently Added Presentation Papers</h4>
+                <div className="list-container">
+                  <ul className="custom-list">
+                    {currentUploadedPresentation.length > 0 ? (
+                      currentUploadedPresentation.map((paper) => (
+                        <li key={paper.id} className="list-item">
+                          <div className="list-left">
+                            <strong className={`actor-`}>{paper.research_title}</strong>
+                            <span className="action-text">{Array.isArray(paper.sdg_alignment) ? 
+                              paper.sdg_alignment.map((sdg, idx) => (
+                                <React.Fragment key={idx}>
+                                  {sdg}<br />
+                                </React.Fragment>
+                              )) :
+                              paper.sdg_alignment}</span>
+                          </div>
+                          <div className="list-right">
+                            <strong>{paper.department_name}</strong>
+                            <span>{new Date(paper.created_at).toLocaleString()}</span>
+                          </div>
+                        </li>
+                      ))
+                    ) : (
+                      <li className="no-items">No recently added publication</li>
+                    )}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </>}
+
+      <div className="toast-box" id="toast-box"></div>
     </>
     );
 };

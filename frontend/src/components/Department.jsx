@@ -1320,7 +1320,7 @@ function formatDateRange(startDate, endDate) {
             <ShimmerButton size="lg"/>
             <ShimmerButton size="lg"/>
           </> : <>
-            {activeTable === 'users' && userData?.role === 'admin' && (
+            {activeTable === 'users' && (
               <button onClick={() => navigate('/user/users')} type="button">
                 Add A User
               </button>
@@ -1350,7 +1350,8 @@ function formatDateRange(startDate, endDate) {
             {activeTable === 'research-publications' && userData?.role !== 'faculty' ? (<>
               <button
                 type="button"
-                onClick={() => setShowAddPublicationForm(!showAddPublicationForm)}
+                onClick={() => navigate(`/user/department/${dep_id}/research-publication-add`)}
+                // onClick={() => setShowAddPublicationForm(!showAddPublicationForm)}
               >
                 {showAddPublicationForm ? "Close Form" : "Add Research Publication"}
               </button>

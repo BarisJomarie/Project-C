@@ -391,6 +391,35 @@ const Homepage = () => {
           </>
         )}
         <div className="summary-container">
+          <div className="summary-cards">
+            {cupLoading ? <ShimmerThumbnail height={100} width={width} />
+            : <>
+                <div className="card-table">
+                  <h4>Recently Added Papers</h4>
+                  <div className="list-container">
+                    <ul className="custom-list">
+                      {currentUploadedPapers.length > 0 ? (
+                        currentUploadedPapers.map((paper) => (
+                          <li key={paper.research_id} className="list-item">
+                            <div className="list-left">
+                              <strong className={`actor-`}>{paper.research_id}</strong>
+                              <span className="action-text">{paper.research_title}</span>
+                            </div>
+                            <div className="list-right">
+                              <small>{new Date(paper.created_at).toLocaleString()}</small>
+                            </div>
+                          </li>
+                        ))
+                      ) : (
+                        <li className="no-items">No recently added papers</li>
+                      )}
+                    </ul>
+                  </div>
+                </div>
+              </>} 
+          </div>
+        </div>
+        <div className="summary-container">
           <label htmlFor="select-department">Select Department: </label>
           <select 
             className='select-department' 
@@ -500,36 +529,6 @@ const Homepage = () => {
                 )}
               </div>
             </>}
-          </div>
-        </div>
-        <div className="summary-container">
-          <div className="summary-cards">
-            {cupLoading ? <ShimmerThumbnail height={100} width={width} />
-            : <>
-                <div className="card-table">
-                  <h4>Recently Added Papers</h4>
-                  <div className="list-container">
-                    <ul className="custom-list">
-                      {currentUploadedPapers.length > 0 ? (
-                        currentUploadedPapers.map((paper) => (
-                          <li key={paper.research_id} className="list-item">
-                            <div className="list-left">
-                              <strong className={`actor-`}>{paper.research_id}</strong>
-                              <span className="action-text">{paper.research_title}</span>
-                            </div>
-                            <div className="list-right">
-                              <small>{new Date(paper.created_at).toLocaleString()}</small>
-                            </div>
-                          </li>
-                        ))
-                      ) : (
-                        <li className="no-items">No recently added papers</li>
-                      )}
-                    </ul>
-                  </div>
-                </div>
-              </>} 
-           
           </div>
         </div>
       </div>

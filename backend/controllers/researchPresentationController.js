@@ -20,13 +20,15 @@ exports.addResearchPresentation = (req, res) => {
     funding_source_engage
   } = req.body;
 
+  const uploaded_by = req.user.id;
+
   const sql = `
     INSERT INTO research_presentations (
       department_id, author, co_authors, research_title, 
       sdg_alignment, conference_title, organizer, venue, 
       conference_category, date_presented, end_date_presented, special_order_no, 
-      status_engage, funding_source_engage
-    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+      status_engage, funding_source_engage, uploaded_by
+    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
   `;
 
   db.query(
@@ -45,7 +47,8 @@ exports.addResearchPresentation = (req, res) => {
       end_date_presented,
       special_order_no,
       status_engage,
-      funding_source_engage
+      funding_source_engage,
+      uploaded_by
     ],
     (err, result) => {
       if (err) return res.status(500).json({ message: err });
@@ -55,7 +58,7 @@ exports.addResearchPresentation = (req, res) => {
 };
 
 
-
+// GET ALL PRESENTATION IN A DEPARTMENT
 exports.getResearchPresentationsByDepartment = (req, res) => {
   const { department_id } = req.query;
 
@@ -87,6 +90,34 @@ exports.getResearchPresentationsByDepartment = (req, res) => {
     });
 
     res.status(200).json(data);
+  });
+};
+
+// GET CURRENTLY UPLOADED OF THE USER
+exports.getCurrentUploadedPresentationUser = (req, res) => {
+  const user_id = req.user.id;
+
+  if (!user_id) return res.status(400).json({message: 'Missing User ID'});
+
+  const query = `
+    SELECT rp.*, d.department_name
+    FROM research_presentations rp
+    JOIN department d ON d.department_id = rp.department_id
+    WHERE rp.uploaded_by = ?
+    AND rp.created_at >= DATE_SUB(CURDATE(), INTERVAL 8 HOUR)
+    ORDER BY rp.created_at DESC;
+  `;
+
+  db.query(query, [user_id], (err, result) => {
+    if (err) return res.status(500).json({message: err.message});
+
+    const cleanData = result.map(row => ({
+      ...row,
+      co_authors: JSON.parse(row.co_authors || '[]'),
+      sdg_alignment: JSON.parse(row.sdg_alignment || '[]'),
+    }));
+
+    res.status(200).json(cleanData);
   });
 };
 

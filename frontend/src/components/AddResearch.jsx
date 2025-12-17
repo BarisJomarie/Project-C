@@ -422,7 +422,9 @@ const AddResearch = () => {
     <>
       {loading && <Loading text="Predicting the SDG, please wait..." />}
       <div className='hyperlink' onClick={() => navigate(-1)}><p>Go Back</p></div>
-      <h1 style={{textAlign: 'center'}}>Add Research for Department of <span style={{color: '#C83F12'}}>{depData?.department_name}</span></h1>
+      <h1 style={{textAlign: 'center'}}>Add Research for Department of <br />
+        <span style={{color: '#C83F12'}}>{depData?.department_name}</span>
+      </h1>
       <div className="line"></div>
       <div className="form-container default">
         <form onSubmit={handleAddResearch}>
