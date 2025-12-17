@@ -1,6 +1,25 @@
 const e = require('express');
 const db = require('../db');
 
+exports.presentationTitleChecker = (req, res) => {
+  const {title} = req.query;
+  if (!title) return res.status(400).json({error: 'Title Required'});
+
+  const query = 'SELECT COUNT(*) AS count FROM research_presentations WHERE research_title = ?'
+
+  db.query(query, [title], (err, result) => {
+    if (err) return res.status(500).json({message: err});
+
+    const exists = result[0].count > 0;
+
+    if (exists) {
+      return res.status(200).json({ exists: true, message: "Research Presentation Title already exists!" });
+    } else {
+      return res.status(200).json({ exists: false, message: "Title is available!" });
+    }
+  })
+}
+
 // ADD RESEARCH PRESENTATION
 exports.addResearchPresentation = (req, res) => {
   const {

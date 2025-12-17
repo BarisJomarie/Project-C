@@ -12,6 +12,7 @@ const AddPresentation = () => {
   const [userData, setUserData] = useState(null);
   const [department, setDepartment] = useState(null);
   const [currentUploadedPresentation, setCurrentUploadedPresentation] = useState([]);
+  const [titleCheck, setTitleCheck] = useState(null);
   const inputRefs = useRef([]);
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
@@ -130,6 +131,27 @@ const AddPresentation = () => {
     });
   };
 
+  // TITLE CHECKER
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      if (formData.research_title.trim() !== '') {
+        axios.get(`${API_URL}/api/research-presentation/title-checker`, {
+          params: {title: formData.research_title},
+          headers: {Authorization: `Bearer ${token}`},
+        })
+        .then((res) => {
+          setTitleCheck(res.data);
+        })
+        .catch((err) => {
+          console.error(err);
+          setTitleCheck({exists: null, message: 'Error checking title'});
+        });
+      }
+    }, 500);
+
+    return () => clearTimeout(handler);
+  }, [formData.research_title, API_URL, token]);
+
   useEffect(() => {
     setPageLoading(true);
     Promise.all([
@@ -167,7 +189,12 @@ const AddPresentation = () => {
     e.preventDefault();
 
     if (!formData.sdg_alignment || formData.sdg_alignment.length === 0) {
-      showToast('warning', 'Missing SDG', 'Select at least one (1) SDG');
+      showToast('warning', 'Missing SDG', 'Select at least one (1) SDG!');
+      return
+    }
+
+    if (titleCheck?.exists === true) {
+      showToast('warning', 'Title Exist', 'Title already exist!');
       return
     }
 
@@ -228,7 +255,7 @@ const AddPresentation = () => {
                 type="text" 
                 value={formData.author}
                 onChange={(e) => setFormData(prev => ({...prev, author: e.target.value}))}
-                placeholder={`Author Lastname, Firstname MI.`}
+                placeholder={`Author: Firstname M.I. Lastname`}
                 required
                 />
               <label htmlFor="author">Author</label>
@@ -289,7 +316,7 @@ const AddPresentation = () => {
                       }, 0);
                     }
                   }}
-                  placeholder={`Co-Author ${index + 1}: Lastname, Firstname MI.`}
+                  placeholder={`Co-Author ${index + 1}: Firstname M.I. Lastname`}
                   required
                   style={{ display: "block", marginBottom: "10px" }}/>
               ))}
@@ -312,11 +339,23 @@ const AddPresentation = () => {
 
             {/* RESEARCH TITLE */}
             <div className="form-input">
+              {/* Only show feedback if there's text */}
+              {formData.research_title.trim() !== "" && (
+                <>
+                  {titleCheck?.exists === true && (
+                    <p style={{ color: "red", fontSize: "0.6em" }}>{titleCheck.message}</p>
+                  )}
+                  {titleCheck?.exists === false && (
+                    <p style={{ color: "green", fontSize: "0.6em" }}>{titleCheck.message}</p>
+                  )}
+                </>
+              )}
               <input 
                 name="r-title" 
                 type="text" 
                 value={formData.research_title}
                 onChange={(e) => setFormData(prev => ({...prev, research_title: e.target.value}))}
+                placeholder="Enter Research Presentation Title"
                 required
                 />
               <label htmlFor="r-title">Research Title</label>
