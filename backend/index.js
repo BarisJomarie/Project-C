@@ -11,8 +11,6 @@ const authRoutes = require('./routes/authRoutes');
 const nlpRoutes = require('./routes/nlpRoutes');
 const aiRoutes = require('./routes/aiRoutes');
 const downloadRoutes = require('./routes/downloadRoutes');
-const researchPresentationRoutes = require('./routes/researchPresentationRoutes');
-const publicationRoutes = require("./routes/publicationRoutes");
 
 
 
@@ -41,8 +39,6 @@ app.use('/api/auth', authRoutes);
 app.use('/api/nlp', nlpRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/download', downloadRoutes);
-app.use("/api/research-presentation", researchPresentationRoutes);
-app.use("/api/publication", publicationRoutes);
 
 
 

@@ -304,7 +304,10 @@ const AddResearch = () => {
 
       const res = await fetch(`${API_URL}/api/nlp/analyze-text`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}` 
+        },
         body: JSON.stringify({
           text: `${rtitle} ${abstract} ${conclusion}`
         }),

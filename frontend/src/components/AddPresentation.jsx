@@ -119,7 +119,7 @@ const AddPresentation = () => {
 
   // GET USER CURRENT ADDED PRESENTATION
   const getCurrentUploadedPresentation = () => {
-    return axios.get(`${API_URL}/api/research-presentation/user`, {
+    return axios.get(`${API_URL}/api/users/presentation/user-current-upload`, {
       headers: {Authorization: `Bearer ${token}`}
     })
     .then(res => {
@@ -135,7 +135,7 @@ const AddPresentation = () => {
   useEffect(() => {
     const handler = setTimeout(() => {
       if (formData.research_title.trim() !== '') {
-        axios.get(`${API_URL}/api/research-presentation/title-checker`, {
+        axios.get(`${API_URL}/api/users/presentation/title-checker`, {
           params: {title: formData.research_title},
           headers: {Authorization: `Bearer ${token}`},
         })
@@ -205,7 +205,7 @@ const AddPresentation = () => {
       };
 
       const res = await axios.post(
-        `${API_URL}/api/research-presentation/add`,
+        `${API_URL}/api/users/presentation/add`,
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );

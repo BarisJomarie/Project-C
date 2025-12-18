@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const nlpController = require("../controllers/nlpController");
+const {analyzeText} = require("../controllers/nlpController");
+const verifyToken = require('../middleware/authMiddleware');
 
-router.post("/analyze-text", nlpController.analyzeText);
+router.post("/analyze-text", verifyToken, analyzeText);
 
 module.exports = router;

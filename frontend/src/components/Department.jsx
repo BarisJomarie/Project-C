@@ -44,104 +44,25 @@ const Department = () => {
   const [departmentResearchPublications, setDepartmentResearchPublications] = useState([]);
   const [showAddForm, setShowAddForm] = useState(false);
 
-  // ADD FORM PRESENTATION STATES
-  const [author, setAuthor] = useState("");
-  const [coAuthors, setCoAuthors] = useState([""]);
-  const [researchTitle, setResearchTitle] = useState("");
-  const [sdgAlignment, setSdgAlignment] = useState([]);
-  const [conferenceTitle, setConferenceTitle] = useState("");
-  const [organizer, setOrganizer] = useState("");
-  const [venue, setVenue] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [conferenceType, setConferenceType] = useState("");
-  const [specialOrder, setSpecialOrder] = useState("");
-  const [status, setStatus] = useState("");
-  const [funding, setFunding] = useState("");
- const sdgOptions = [
-  "SDG 1: No Poverty",
-  "SDG 2: Zero Hunger",
-  "SDG 3: Good Health and Well-being",
-  "SDG 4: Quality Education",
-  "SDG 5: Gender Equality",
-  "SDG 6: Clean Water and Sanitation",
-  "SDG 7: Affordable and Clean Energy",
-  "SDG 8: Decent Work and Economic Growth",
-  "SDG 9: Industry, Innovation and Infrastructure",
-  "SDG 10: Reduced Inequalities",
-  "SDG 11: Sustainable Cities and Communities",
-  "SDG 12: Responsible Consumption and Production",
-  "SDG 13: Climate Action",
-  "SDG 14: Life Below Water",
-  "SDG 15: Life on Land",
-  "SDG 16: Peace, Justice and Strong Institutions",
-  "SDG 17: Partnerships for the Goals"
-];
+  // ADD FORM PUBLICATION STATES
+  const [showAddPublicationForm, setShowAddPublicationForm] = useState(false);
 
-// ADD FORM PUBLICATION STATES
-const [showAddPublicationForm, setShowAddPublicationForm] = useState(false);
+  const [published_title, setPubTitle] = useState("");
+  const [pub_author, setPubAuthor] = useState("");
+  const [pub_co_authors, setPubCoAuthors] = useState([""]);
+  const [journal_title, setPubJournal] = useState("");
+  const [conference_or_proceedings, setPubConference] = useState("");
+  const [publisher, setPubPublisher] = useState("");
+  const [pubDatePresented, setPubDatePresented] = useState("");
+  const [pubEndDatePresented, setPubEndDatePresented] = useState("");
+  const [doi, setPubDOI] = useState("");
+  const [issn_isbn, setPubISSN] = useState("");
+  const [volume_issue, setPubVolumeIssue] = useState("");
+  const [index_type, setPubIndex] = useState("");
 
-const [published_title, setPubTitle] = useState("");
-const [pub_author, setPubAuthor] = useState("");
-const [pub_co_authors, setPubCoAuthors] = useState([""]);
-const [journal_title, setPubJournal] = useState("");
-const [conference_or_proceedings, setPubConference] = useState("");
-const [publisher, setPubPublisher] = useState("");
-const [pubDatePresented, setPubDatePresented] = useState("");
-const [pubEndDatePresented, setPubEndDatePresented] = useState("");
-const [doi, setPubDOI] = useState("");
-const [issn_isbn, setPubISSN] = useState("");
-const [volume_issue, setPubVolumeIssue] = useState("");
-const [index_type, setPubIndex] = useState("");
+  const API_URL = import.meta.env.VITE_API_URL;
 
-const API_URL = import.meta.env.VITE_API_URL;
-
-const now = new Date();
-
-const formattedDate = now.toLocaleString('en-US', {
-  month: 'long',
-  day: 'numeric',
-  year: 'numeric',
-});
-
-const formattedTime = now.toLocaleString('en-US', {
-  hour: 'numeric',
-  minute: '2-digit',
-  hour12: true
-});
-
-
-const conferenceOptions = [
-  "Local Conference (International)",
-  "Local Conference (National)",
-  "International Conference (Outside ASEAN)",
-  "Local Conference (Regional)",
-  "International Conference (Within ASEAN)"
-];
-
-const statusOptions = [
-  { value: "Completed", label: "Completed" },
-  { value: "Ongoing", label: "Ongoing" },
-  { value: "Proposed", label: "Proposed" },
-];
-
-const fundingOptions = [
-  { value: "Self Funded", label: "Self Funded" },
-  { value: "EARIST Funded", label: "EARIST Funded" },
-];
-
-  // CO-AUTHOR HANDLERS PRESENTATION
-  const addCoAuthor = () => setCoAuthors([...coAuthors, ""]);
-  const removeCoAuthor = (index) => {
-    const list = [...coAuthors];
-    list.splice(index, 1);
-    setCoAuthors(list);
-  };
-  const updateCoAuthor = (value, index) => {
-    const list = [...coAuthors];
-    list[index] = value;
-    setCoAuthors(list);
-  };
+  const now = new Date();
 
   const showModal = (title, message, onConfirm, confirmText) => {
     setModalConfig({
@@ -281,7 +202,7 @@ const updatePubCoAuthor = (value, index) => {
   const fetchResearchPresentation = async () => {
     setTableLoading(true);
     try {
-      const res = await axios.get(`${API_URL}/api/research-presentation`, {
+      const res = await axios.get(`${API_URL}/api/users/presentation/department`, {
         params: { department_id: dep_id },
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -312,7 +233,7 @@ const updatePubCoAuthor = (value, index) => {
   // GET DEPARTMENT RESEARCH PUBLICATIONS
   const fetchResearchPublications = () => {
     setTableLoading(true);
-    axios.get(`${API_URL}/api/publication`, {
+    axios.get(`${API_URL}/api/users/publication/department`, {
       params: { department_id: dep_id },
       headers: { Authorization: `Bearer ${token}` }
     })
@@ -349,7 +270,9 @@ const updatePubCoAuthor = (value, index) => {
     };
 
     try {
-      await axios.post(`${API_URL}/api/publication/add/pub`, data);
+      await axios.post(`${API_URL}/api/users/publication/add`, data, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
 
       showToast("success", "Success!", "Research publication added.");
 
@@ -480,7 +403,7 @@ const updatePubCoAuthor = (value, index) => {
       </>,
       async () => {
         try {
-          await axios.delete(`${API_URL}/api/research-presentation/delete/${id}`, {
+          await axios.delete(`${API_URL}/api/users/presentation/delete/${id}`, {
             headers: { Authorization: `Bearer ${token}` }
           });
           showToast('success', 'Deleted', 'Presentation deleted successfully.');
@@ -509,7 +432,7 @@ const updatePubCoAuthor = (value, index) => {
       </>,
       async () => {
         try {
-          await axios.delete(`${API_URL}/api/publication/delete/${id}`, {
+          await axios.delete(`${API_URL}/api/users/publication/delete/${id}`, {
             headers: { Authorization: `Bearer ${token}` }
           });
 
@@ -556,15 +479,6 @@ const updatePubCoAuthor = (value, index) => {
       'Delete Course'
     );
   }
-
-  // RE-FETCH ALL DATA
-  // const reFetch = () => {
-  //   fetchDepartmentCourses();
-  //   fetchFacultyPapers();
-  //   fetchStudentPapers();
-  //   fetchDepartmentUsers();
-  //   fetchDepartment();
-  // }
   
   // GET SDG COLOR
   function getSdgColor(numbers) {
@@ -1338,7 +1252,6 @@ function formatDateRange(startDate, endDate) {
             {activeTable === 'research-presentation' && userData?.role !== 'faculty' ? (<>
               <button
                 type="button"
-                // onClick={() => setShowAddForm(!showAddForm)}
                 onClick={() => navigate(`/user/department/${dep_id}/research-presentation-add`)}
               >
                 {showAddForm ? "Close Form" : "Add Research Presentation"}
@@ -1350,8 +1263,8 @@ function formatDateRange(startDate, endDate) {
             {activeTable === 'research-publications' && userData?.role !== 'faculty' ? (<>
               <button
                 type="button"
-                onClick={() => navigate(`/user/department/${dep_id}/research-publication-add`)}
-                // onClick={() => setShowAddPublicationForm(!showAddPublicationForm)}
+                // onClick={() => navigate(`/user/department/${dep_id}/research-publication-add`)}
+                onClick={() => setShowAddPublicationForm(!showAddPublicationForm)}
               >
                 {showAddPublicationForm ? "Close Form" : "Add Research Publication"}
               </button>
