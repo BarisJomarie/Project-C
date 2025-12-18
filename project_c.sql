@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 09, 2025 at 03:22 PM
+-- Generation Time: Dec 18, 2025 at 11:37 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -1202,95 +1202,100 @@ INSERT INTO `audit_log` (`id`, `user_code`, `user_role`, `action`, `actor_type`,
 (1433, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-11-24 13:46:24'),
 (1434, '224-08807M', 'admin', 'Logged In', 'user', '2025-11-25 01:06:32'),
 (1435, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-11-25 14:39:28'),
-(1436, '224-08807M', 'admin', 'Logged In', 'user', '2025-11-26 12:29:45'),
-(1437, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-11-26 13:55:53'),
-(1438, '224-08807M', 'admin', 'Logged In', 'user', '2025-11-26 15:18:56'),
-(1439, '224-08807M', 'admin', 'Logged In', 'user', '2025-11-26 16:43:41'),
-(1440, '224-08807M', 'admin', 'Generated AI Report', 'user', '2025-11-26 16:49:40'),
-(1441, '12312', 'faculty', 'Account Created as faculty', 'user', '2025-11-26 19:08:51'),
-(1442, '224-08807M', 'admin', 'Deleted user code: 12312', 'user', '2025-11-26 19:09:16'),
-(1443, '224-08807M', 'admin', 'Added a new department: sadaa', 'user', '2025-11-26 19:09:24'),
-(1444, '224-08807M', 'admin', 'Deleted department name: sadaaasdsa', 'user', '2025-11-26 19:10:12'),
-(1445, '224-08807M', 'admin', 'Research Paper has been added. title: asdasas dasd asd asd a', 'user', '2025-11-26 19:11:33'),
-(1446, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-11-26 19:43:10'),
-(1447, '224-08807M', 'admin', 'Logged In', 'user', '2025-11-27 03:45:55'),
-(1448, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-11-27 04:35:51'),
-(1449, '1111', 'faculty', 'Logged In', 'user', '2025-11-27 04:37:20'),
-(1450, '1111', 'faculty', 'Logged In', 'user', '2025-11-27 04:42:57'),
-(1451, '1111', 'faculty', 'User Logged Out', 'user', '2025-11-27 04:44:30'),
-(1452, '4445', 'admin', 'Logged In', 'user', '2025-11-27 04:46:17'),
-(1453, '4445', 'admin', 'Generated AI Report', 'user', '2025-11-27 05:36:02'),
-(1454, '4445', 'admin', 'Printed AI Report', 'user', '2025-11-27 05:36:39'),
-(1455, '4445', 'admin', 'Printed AI Report', 'user', '2025-11-27 05:36:48'),
-(1456, '4445', 'admin', 'Generated AI Report', 'user', '2025-11-27 07:39:50'),
-(1457, '4445', 'admin', 'Generated AI Report', 'user', '2025-11-27 07:43:34'),
-(1458, '4445', 'admin', 'Printed AI Report', 'user', '2025-11-27 07:44:14'),
-(1459, '4445', 'admin', 'Generated AI Report', 'user', '2025-11-27 07:53:42'),
-(1460, '4445', 'admin', 'Generated AI Report', 'user', '2025-11-27 08:08:12'),
-(1461, '4445', 'admin', 'Added a new department: ada', 'user', '2025-11-27 12:27:43'),
-(1462, '4445', 'admin', 'Deleted department name: ada', 'user', '2025-11-27 12:27:50'),
-(1463, '4445', 'admin', 'Generated AI Report', 'user', '2025-11-27 12:38:06'),
-(1464, '4445', 'admin', 'Printed AI Report', 'user', '2025-11-27 12:38:52'),
-(1465, '4445', 'admin', 'Session Ended - Token Expired', 'user', '2025-11-28 08:30:25'),
-(1466, '224-08807M', 'admin', 'Logged In', 'user', '2025-11-28 08:31:01'),
-(1467, '224-08807M', 'admin', 'Generated AI Report', 'user', '2025-11-28 09:24:27'),
-(1468, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-11-28 09:30:57'),
-(1469, '224-08807M', 'admin', 'Logged In', 'user', '2025-11-30 16:44:29'),
-(1470, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-11-30 16:52:58'),
-(1471, '224-08807M', 'admin', 'Logged In', 'user', '2025-11-30 17:16:34'),
-(1472, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-11-30 17:16:55'),
-(1473, '224-08807M', 'admin', 'Logged In', 'user', '2025-11-30 17:19:42'),
-(1474, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-11-30 17:19:53'),
-(1475, '224-08807M', 'admin', 'Logged In', 'user', '2025-11-30 17:20:20'),
-(1476, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-11-30 17:20:22'),
-(1477, '224-08807M', 'admin', 'Logged In', 'user', '2025-11-30 17:22:08'),
-(1478, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-11-30 17:22:11'),
-(1479, '224-08807M', 'admin', 'Logged In', 'user', '2025-11-30 17:22:22'),
-(1480, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-11-30 17:30:16'),
-(1481, '224-08807M', 'admin', 'Logged In', 'user', '2025-11-30 17:40:28'),
-(1482, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-11-30 17:40:42'),
-(1483, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-11-30 17:40:49'),
-(1484, '224-08807M', 'admin', 'Logged In', 'user', '2025-11-30 17:41:40'),
-(1485, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-11-30 17:41:50'),
-(1486, '1111', 'faculty', 'Logged In', 'user', '2025-11-30 17:42:41'),
-(1487, '1111', 'faculty', 'User Logged Out', 'user', '2025-11-30 17:43:20'),
-(1488, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-11-30 17:44:02'),
-(1489, '2222', 'rph', 'Account Created as rph', 'user', '2025-11-30 17:46:01'),
-(1490, '1111', 'faculty', 'User Logged Out', 'user', '2025-11-30 17:46:56'),
-(1491, '2222', 'rph', 'Logged In', 'user', '2025-11-30 17:47:16'),
-(1492, '1111', 'faculty', 'Logged In', 'user', '2025-11-30 17:47:47'),
-(1493, '1111', 'faculty', 'User Logged Out', 'user', '2025-11-30 17:48:03'),
-(1494, '1111', 'faculty', 'User Logged Out', 'user', '2025-11-30 18:02:33'),
-(1495, '224-08807M', 'admin', 'Logged In', 'user', '2025-12-01 17:38:03'),
-(1496, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-12-01 17:40:57'),
-(1497, '2222', 'rph', 'Logged In', 'user', '2025-12-01 17:41:30'),
-(1498, '2222', 'rph', 'User Logged Out', 'user', '2025-12-01 17:41:33'),
-(1499, '224-08807M', 'admin', 'Logged In', 'user', '2025-12-01 17:41:51'),
-(1500, '224-08807M', 'admin', 'Deleted user code: 2222', 'user', '2025-12-01 17:44:54'),
-(1501, '224-08807M', 'admin', 'Generated AI Report', 'user', '2025-12-01 18:05:47'),
-(1502, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-12-01 18:11:39'),
-(1503, '224-08807M', 'admin', 'Logged In', 'user', '2025-12-02 04:49:14'),
-(1504, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-12-02 06:11:40'),
-(1505, '224-08807M', 'admin', 'Logged In', 'user', '2025-12-02 06:42:20'),
-(1506, '224-08807M', 'admin', 'Logged In', 'user', '2025-12-03 02:21:11'),
-(1507, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-12-03 02:22:43'),
-(1508, '224-08807M', 'admin', 'Logged In', 'user', '2025-12-03 06:32:58'),
-(1509, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-12-03 06:34:00'),
-(1510, '224-08807M', 'admin', 'Logged In', 'user', '2025-12-03 20:41:32'),
-(1511, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-12-03 20:41:55'),
-(1512, '224-08807M', 'admin', 'Logged In', 'user', '2025-12-04 02:49:32'),
-(1513, '224-08807M', 'admin', 'Generated AI Report', 'user', '2025-12-04 03:00:44'),
-(1514, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-12-04 03:01:16'),
-(1515, '224-08807M', 'admin', 'Logged In', 'user', '2025-12-04 03:01:57'),
-(1516, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-12-04 03:18:58'),
-(1517, '224-08807M', 'admin', 'Logged In', 'user', '2025-12-04 03:35:06'),
-(1518, '224-08807M', 'admin', 'Added a new department: Infotech', 'user', '2025-12-04 03:37:38'),
-(1519, '12345', 'rph', 'Account Created as rph', 'user', '2025-12-04 03:40:26'),
-(1520, '224-08807M', 'admin', 'User Logged Out', 'user', '2025-12-04 03:41:39'),
-(1521, '12345', 'rph', 'Logged In', 'user', '2025-12-04 03:42:58'),
-(1522, '12345', 'rph', 'Research Paper has been added. title: Development of an AI-Based System for SDG Classification and Analytics at EARIST - Manila', 'user', '2025-12-04 03:50:40'),
-(1523, '12345', 'rph', 'Generated AI Report', 'user', '2025-12-04 03:53:14'),
-(1524, '12345', 'rph', 'Printed AI Report', 'user', '2025-12-04 03:55:03');
+(1436, '4445', 'admin', 'Logged In', 'user', '2025-11-30 05:53:12'),
+(1437, '4445', 'admin', 'Session Ended - Token Expired', 'user', '2025-12-01 10:14:42'),
+(1438, '4445', 'admin', 'Logged In', 'user', '2025-12-01 10:15:49'),
+(1439, '4445', 'admin', 'Generated AI Report', 'user', '2025-12-01 10:17:11'),
+(1440, '4445', 'admin', 'Printed AI Report', 'user', '2025-12-01 10:17:55'),
+(1441, '4445', 'admin', 'User Logged Out', 'user', '2025-12-01 14:21:49'),
+(1442, '4445', 'admin', 'Logged In', 'user', '2025-12-01 15:46:35'),
+(1443, 'Something', 'admin', 'Account Created as admin', 'user', '2025-12-01 15:58:56'),
+(1444, '4445', 'admin', 'Deleted user code: Something', 'user', '2025-12-01 15:59:44'),
+(1445, 'qwewqe', 'rph', 'Account Created as rph', 'user', '2025-12-01 16:00:08'),
+(1446, '4445', 'admin', 'Deleted user code: qwewqe', 'user', '2025-12-01 16:00:26'),
+(1447, '4445', 'admin', 'Added a new department: lolo', 'user', '2025-12-01 16:01:39'),
+(1448, '4445', 'admin', 'Deleted department name: lolo', 'user', '2025-12-01 16:07:35'),
+(1449, '4445', 'admin', 'Added a new department: qweqw', 'user', '2025-12-01 16:09:30'),
+(1450, '4445', 'admin', 'Deleted department name: qweqw', 'user', '2025-12-01 16:09:53'),
+(1451, '4445', 'admin', 'Research Paper has been added. title: AI-Driven SDG Classification for Academic Research Papers Using BERT and Gemini Models', 'user', '2025-12-01 16:34:44'),
+(1452, '4445', 'admin', 'Generated AI Report', 'user', '2025-12-01 16:40:11'),
+(1453, '4445', 'admin', 'Printed AI Report', 'user', '2025-12-01 16:42:15'),
+(1454, '4445', 'admin', 'Logged In', 'user', '2025-12-02 05:42:07'),
+(1455, '4445', 'admin', 'User Logged Out', 'user', '2025-12-02 11:01:07'),
+(1456, '4445', 'admin', 'Logged In', 'user', '2025-12-02 11:13:43'),
+(1457, '4445', 'admin', 'Added a new department: qwe', 'user', '2025-12-02 11:29:42'),
+(1458, '4445', 'admin', 'Deleted department name: qweqwewqeqwe', 'user', '2025-12-02 11:29:51'),
+(1461, '4445', 'admin', 'Research Paper has been added. title: qwe', 'user', '2025-12-02 11:51:14'),
+(1462, '4445', 'admin', 'Generated AI Report', 'user', '2025-12-02 11:54:27'),
+(1463, '4445', 'admin', 'Printed AI Report', 'user', '2025-12-02 11:54:37'),
+(1464, '4445', 'admin', 'User Logged Out', 'user', '2025-12-02 16:29:37'),
+(1465, '4445', 'admin', 'Logged In', 'user', '2025-12-02 23:46:56'),
+(1466, '4445', 'admin', 'User Logged Out', 'user', '2025-12-03 00:17:29'),
+(1467, '4445', 'admin', 'Logged In', 'user', '2025-12-03 00:40:07'),
+(1468, '4445', 'admin', 'User Logged Out', 'user', '2025-12-03 00:40:25'),
+(1469, '4445', 'admin', 'Logged In', 'user', '2025-12-11 03:39:25'),
+(1470, '4445', 'admin', 'User Logged Out', 'user', '2025-12-11 03:39:50'),
+(1471, '4445', 'admin', 'Logged In', 'user', '2025-12-11 03:40:41'),
+(1472, '4445', 'admin', 'User Logged Out', 'user', '2025-12-11 03:41:08'),
+(1473, '4445', 'admin', 'Logged In', 'user', '2025-12-11 04:08:07'),
+(1474, '4445', 'admin', 'User Logged Out', 'user', '2025-12-11 05:28:44'),
+(1475, '224-08804M', 'rph', 'Logged In', 'user', '2025-12-11 05:30:26'),
+(1476, '224-08804M', 'rph', 'User Logged Out', 'user', '2025-12-11 05:46:37'),
+(1477, '4445', 'admin', 'Logged In', 'user', '2025-12-11 07:51:04'),
+(1478, '4445', 'admin', 'Added a new department: qweqwe', 'user', '2025-12-11 09:33:54'),
+(1479, '4445', 'admin', 'Deleted department name: qweqwe', 'user', '2025-12-11 09:34:20'),
+(1480, '4445', 'admin', 'Research Paper has been added. title: qweqweqweqweqweq  qweqwe qeqw eqwe qwe qwe qwe', 'user', '2025-12-11 09:36:22'),
+(1481, '4445', 'admin', 'User Logged Out', 'user', '2025-12-11 13:25:27'),
+(1482, '4445', 'admin', 'Logged In', 'user', '2025-12-12 01:32:23'),
+(1483, '4445', 'admin', 'Added a new department: qweqwe', 'user', '2025-12-12 01:39:11'),
+(1484, '4445', 'admin', 'Deleted department name: qweqwe', 'user', '2025-12-12 01:39:22'),
+(1485, '4445', 'admin', 'Added a new department: wq', 'user', '2025-12-12 01:46:01'),
+(1486, '4445', 'admin', 'Deleted department name: wq', 'user', '2025-12-12 01:46:03'),
+(1487, '4445', 'admin', 'Logged In', 'user', '2025-12-12 02:44:52'),
+(1488, '4445', 'admin', 'Logged In', 'user', '2025-12-16 06:32:27'),
+(1489, '4445', 'admin', 'Research Paper has been added. title: qwe', 'user', '2025-12-16 08:17:38'),
+(1490, '4445', 'admin', 'Logged In', 'user', '2025-12-16 13:53:45'),
+(1491, '4445', 'admin', 'Logged In', 'user', '2025-12-17 03:28:23'),
+(1492, '4445', 'admin', 'Logged In', 'user', '2025-12-17 16:44:19'),
+(1493, '4445', 'admin', 'Logged In', 'user', '2025-12-18 03:03:33'),
+(1494, '4445', 'admin', 'Added a new department: qwe', 'user', '2025-12-18 03:05:54'),
+(1495, '4445', 'admin', 'Deleted department name: qwe', 'user', '2025-12-18 03:05:56'),
+(1496, '4445', 'admin', 'Research Paper has been added. title: weq qweqwe qwe qweqw eqweqw e', 'user', '2025-12-18 04:00:19'),
+(1497, '4445', 'admin', 'Generated AI Report', 'user', '2025-12-18 04:35:48'),
+(1498, '4445', 'admin', 'Research Paper has been added. title: qwe qweqwe qwe qweqew qeqwe', 'user', '2025-12-18 04:42:06'),
+(1499, '4445', 'admin', 'Generated AI Report', 'user', '2025-12-18 04:59:43'),
+(1500, '4445', 'admin', 'Analyze an SDG. Model used: models/gemini-2.5-pro', 'user', '2025-12-18 05:02:48'),
+(1501, '4445', 'admin', 'Analyze an SDG. Model used: models/gemini-2.5-pro', 'user', '2025-12-18 05:04:12'),
+(1502, '4445', 'admin', 'Analyze an SDG. Model used: models/gemini-2.5-pro', 'user', '2025-12-18 05:05:34'),
+(1503, 'qweqwe', 'rph', 'User Registered', 'user', '2025-12-18 05:13:45'),
+(1504, '4445', 'admin', 'Deleted user code: qweqwe', 'user', '2025-12-18 05:15:03'),
+(1505, 'qweqwe', 'admin', 'User Registered', 'user', '2025-12-18 05:15:20'),
+(1506, '4445', 'admin', 'Deleted user code: qweqwe', 'user', '2025-12-18 05:15:39'),
+(1507, 'qweqwe', 'admin', 'User Registered', 'user', '2025-12-18 05:16:20'),
+(1508, '4445', 'admin', 'User Logged Out', 'user', '2025-12-18 05:19:16'),
+(1509, '16', '', 'User Logged In', 'user', '2025-12-18 05:19:49'),
+(1510, '4445', 'admin', 'User Logged Out', 'user', '2025-12-18 05:21:11'),
+(1511, '4445', 'admin', 'User Logged In', 'user', '2025-12-18 05:21:40'),
+(1512, '4445', 'admin', 'User Logged Out', 'user', '2025-12-18 08:49:18'),
+(1513, '4445', 'admin', 'User Logged In', 'user', '2025-12-18 08:49:51'),
+(1514, '4445', 'admin', 'User Logged Out', 'user', '2025-12-18 08:50:02'),
+(1515, '4445', 'admin', 'User Logged In', 'user', '2025-12-18 08:51:02'),
+(1516, '4445', 'admin', 'User Logged Out', 'user', '2025-12-18 08:51:09'),
+(1517, '4445', 'admin', 'User Logged In', 'user', '2025-12-18 08:51:32'),
+(1518, '4445', 'admin', 'Added course qweq (wqeqweqwe)', 'user', '2025-12-18 09:00:44'),
+(1519, '4445', 'admin', 'Updated course qweq (wqeqweqwe) -> Something (SM)', 'user', '2025-12-18 09:11:20'),
+(1520, '4445', 'admin', 'Course Something (undefined) deleted', 'user', '2025-12-18 09:19:02'),
+(1521, '4445', 'admin', 'Added course: bakit ba nagkaganto (BBN)', 'user', '2025-12-18 09:20:11'),
+(1522, '4445', 'admin', 'Updated course: bakit ba nagkaganto (BBN) -> ang daming gusto (ADG)', 'user', '2025-12-18 09:20:24'),
+(1523, '4445', 'admin', 'Course: ang daming gusto (ADG) deleted', 'user', '2025-12-18 09:20:27'),
+(1524, '4445', 'admin', 'User Logged Out', 'user', '2025-12-18 09:43:25'),
+(1525, '4445', 'admin', 'Password reset for jomarie.baris@gmail.com', 'user', '2025-12-18 09:44:40'),
+(1526, '4445', 'admin', 'User Logged In', 'user', '2025-12-18 09:45:30'),
+(1527, '4445', 'admin', 'Department qwe (qweqwewqe) added', 'user', '2025-12-18 10:04:57'),
+(1528, '4445', 'admin', 'Updated department: qwezdd (qweqwewqe) -> qwezddzzzzzz (qweqwewqe)', 'user', '2025-12-18 10:12:07'),
+(1529, '4445', 'admin', 'Updated department: qwezddzzzzzz (qweqwewqe) -> qwezddzzzzzzwe (qweqwewqewe)', 'user', '2025-12-18 10:19:37'),
+(1530, '4445', 'admin', 'Department qwezddzzzzzzwe (qweqwewqewe) deleted', 'user', '2025-12-18 10:19:45'),
+(1531, '4445', 'admin', 'User Logged Out', 'user', '2025-12-18 10:26:47');
 
 -- --------------------------------------------------------
 
@@ -1338,8 +1343,7 @@ CREATE TABLE `department` (
 
 INSERT INTO `department` (`department_id`, `department_abb`, `department_name`, `created_at`, `updated_at`) VALUES
 (1, 'CAS', 'College of Arts and Science', '2025-07-18 11:32:34', NULL),
-(2, 'CCS', 'College of Computing Studies', '2025-07-18 11:32:48', NULL),
-(32, 'IT', 'Infotech', '2025-12-04 03:37:38', NULL);
+(2, 'CCS', 'College of Computing Studies', '2025-07-18 11:32:48', NULL);
 
 -- --------------------------------------------------------
 
@@ -1438,7 +1442,6 @@ INSERT INTO `research_paper` (`research_id`, `research_type`, `semester`, `fundi
 (160, 'faculty', '1st', 'earist', 'Optimizing Export - Import Strategies for Economic Growth in the Philippines', 'Trade plays a pivotal role in driving economic growth, and optimizing export-import strategies is essential for national development. This study examines current trade practices in the Philippines and identifies key strategies to enhance export performance while efficiently managing imports. Using data analysis, policy evaluation, and forecasting models, the research provides insights into trade balance optimization, sector prioritization, and supply chain improvements. Findings highlight the potential for increased revenue, competitive advantage, and sustainable economic growth through strategic trade management.', 'Optimizing export-import strategies can significantly contribute to the Philippines’ economic growth by improving trade efficiency, increasing competitiveness, and maximizing revenue from key sectors. Strategic recommendations include diversification of export products, strengthening trade partnerships, and implementing data-driven policy decisions to manage imports effectively. Future research may focus on integrating technological innovations, trade automation, and global market trend analysis to further enhance trade outcomes. Overall, this study supports sustainable economic development and improved global trade positioning for the Philippines.', '', '[\"Jefferson A. Costales\",\"Marlene M. Monterona\"]', 2, 23, '[8,12]', '[\"Decent Work and Economic Growth\",\"Responsible Consumption and Production\"]', '{\"0\":0,\"1\":0,\"2\":0,\"3\":0,\"4\":0,\"5\":0,\"6\":0,\"7\":1,\"8\":0,\"9\":0,\"10\":0,\"11\":1,\"12\":0,\"13\":0,\"14\":0,\"15\":0,\"16\":0}', 'on-going', '2025-11-11 06:17:15', 44, 2024),
 (161, 'faculty', '1st', 'earist', 'Empowering Barangay Residents with Mobile Apps for Fire Response', 'Rapid response during fire emergencies is critical to minimizing damage and saving lives. This study presents a mobile application designed to empower barangay residents by providing real-time fire alerts, safety instructions, and emergency reporting tools. The app integrates location tracking, direct communication with fire response units, and educational resources to enhance preparedness and community engagement. Initial testing shows that residents are better informed, response times improve, and community coordination during fire incidents is strengthened.', 'The mobile application effectively empowers barangay residents to respond promptly and safely during fire emergencies. By providing real-time alerts, educational resources, and direct communication with authorities, the system enhances community preparedness and reduces potential losses. Future improvements may include AI-based risk assessment, integration with municipal emergency systems, and multilingual support for broader accessibility. Overall, this project contributes to community resilience, public safety, and disaster preparedness at the local level.', '', '[\"Arlene P. Evangelista\",\"Ernanie M. Carlos Jr.\",\"Jefferson A. Costales\",\"Marlene M. Monterona\"]', 2, 23, '[11,9]', '[\"Sustainable Cities and Communities\",\"Industry, Innovation and Infrastructure\"]', '{\"0\":0,\"1\":0,\"2\":0,\"3\":0,\"4\":0,\"5\":0,\"6\":0,\"7\":0,\"8\":1,\"9\":0,\"10\":1,\"11\":0,\"12\":0,\"13\":0,\"14\":0,\"15\":0,\"16\":0}', 'on-going', '2025-11-11 06:26:56', 44, 2024),
 (162, 'faculty', '1st', 'earist', 'AI -Driven Contextual Analysis of Scientific Articles for Literature Review', 'Conducting literature reviews is a time-consuming yet essential process in scientific research. This study presents an AI-driven system for contextual analysis of scientific articles, designed to assist researchers in efficiently reviewing related studies. By leveraging natural language processing (NLP) and machine learning algorithms, the system automatically identifies key themes, relationships, and trends across multiple research papers. Initial testing demonstrates that the AI system can significantly reduce review time, enhance comprehension of scientific contexts, and support informed decision-making in research projects.', 'The AI-driven contextual analysis system streamlines the literature review process, enabling researchers to extract relevant insights quickly and accurately. By identifying patterns and relationships among scientific articles, the system supports comprehensive understanding and informed research design. Future developments may include multilingual support, integration with academic databases, and adaptive learning to improve recommendation accuracy. Overall, this project contributes to accelerating scientific research, improving efficiency in knowledge synthesis, and enhancing research quality.', '', '[\"Justine Rei Lorena\",\"Jefferson A. Costales\",\"Sheila Marie M. Matias\"]', 2, 24, '[4,9]', '[\"Quality Education\",\"Industry, Innovation and Infrastructure\"]', '{\"0\":0,\"1\":0,\"2\":0,\"3\":1,\"4\":0,\"5\":0,\"6\":0,\"7\":0,\"8\":1,\"9\":0,\"10\":0,\"11\":0,\"12\":0,\"13\":0,\"14\":0,\"15\":0,\"16\":0}', 'on-going', '2025-11-11 06:29:48', 44, 2024),
-(163, 'student', '1st', '', 'qw', '', '', 'ehehee', '[\"ehehehe\"]', 1, 8, '[12]', '[\"Responsible Consumption and Production\"]', '{\"0\":0,\"1\":0,\"2\":0,\"3\":0,\"4\":0,\"5\":0,\"6\":0,\"7\":0,\"8\":0,\"9\":0,\"10\":0,\"11\":1,\"12\":0,\"13\":0,\"14\":0,\"15\":0,\"16\":0}', 'on-going', '2025-11-13 14:57:52', 16, 2023),
 (164, 'student', '1st', '', 'qweqweqweqweqwe', '', '', 'ahuhuhu', '[\"qweqwe\"]', 2, 24, '[11]', '[\"Sustainable Cities and Communities\"]', '{\"0\":0,\"1\":0,\"2\":0,\"3\":0,\"4\":0,\"5\":0,\"6\":0,\"7\":0,\"8\":0,\"9\":0,\"10\":1,\"11\":0,\"12\":0,\"13\":0,\"14\":0,\"15\":0,\"16\":0}', 'on-going', '2025-11-13 14:58:27', 16, 2023),
 (165, 'student', '1st', '', 'weqweqweqweqe', '', '', 'qweqweq', '[\"weqweqweq\"]', 2, 24, '[3]', '[\"Good Health and Well-being\"]', '{\"0\":0,\"1\":0,\"2\":1,\"3\":0,\"4\":0,\"5\":0,\"6\":0,\"7\":0,\"8\":0,\"9\":0,\"10\":0,\"11\":0,\"12\":0,\"13\":0,\"14\":0,\"15\":0,\"16\":0}', 'on-going', '2025-11-13 14:59:02', 16, 2023),
 (166, 'student', '1st', '', 'See ya', 'qwe', 'qweqwe', 'qweqwe', '[\"qweqweqwe\",\"qweqwe\",\"qweqwe\"]', 2, 24, '9', '\"Industry, Innovation and Infrastructure\"', '{\"0\":0.0005009526503272355,\"1\":0.01926380768418312,\"2\":0.06631024181842804,\"3\":0.0000397333424189128,\"4\":0.00004702181104221381,\"5\":0.0005221111350692809,\"6\":0.0003102148184552789,\"7\":0.0013587092980742455,\"8\":0.4876479506492615,\"9\":0.0006647426635026932,\"10\":0.00013424975622911006,\"11\":0.0001833796559367329,\"12\":0.00022643696865998209,\"13\":0.00009230511932400987,\"14\":0.0007827433873899281,\"15\":0.419022798538208,\"16\":0.002892580581828952}', 'on-going', '2025-11-14 15:03:03', 40, 2023),
@@ -1476,7 +1479,8 @@ INSERT INTO `research_paper` (`research_id`, `research_type`, `semester`, `fundi
 (196, 'student', '2nd', '', 'A Application Pronunciation Exam Using Voice Recognition with Score Data Analytics On Grade 6 Of Dona Susana Madrigal Elementary School', 'This study presents a voice recognition-based pronunciation exam application designed for Grade 6 students at Dona Susana Madrigal Elementary School, incorporating score data analytics to monitor student performance. Traditional pronunciation assessments are often subjective, time-consuming, and limited in providing immediate feedback. The proposed system allows students to complete pronunciation tests via voice input, automatically evaluates their responses using speech recognition technology, and records scores for detailed analytics. Educators can track student progress, identify common errors, and adjust instruction accordingly. Developed using modern web and mobile technologies, the system emphasizes usability, accuracy, and real-time performance monitoring. Evaluation through testing with students demonstrates improved assessment efficiency, objective scoring, and actionable insights into learning outcomes. This study highlights the effectiveness of technology-enhanced language assessment in elementary education.', 'The development of the Pronunciation Exam Application with Voice Recognition and Score Analytics effectively addresses the limitations of traditional pronunciation assessments. By automating evaluation and providing immediate, data-driven feedback, the system ensures more objective, efficient, and informative assessment for both students and teachers. User testing indicates enhanced assessment accuracy, improved student engagement, and the ability to monitor performance trends over time.\n\nFuture improvements may include integrating adaptive learning algorithms to personalize practice exercises, multi-language support, advanced analytics dashboards for teachers, and gamification features to increase student motivation. Overall, this study demonstrates that voice recognition and data analytics can significantly enhance pronunciation learning and assessment in elementary education.', 'Jovel Advincula', '[\"Sediaco, Ryan Jay F. \",\"Reymundo, Mico Jay\",\"Cenido, Russel P.\",\"Barata, Antonio R.\"]', 2, 23, '[4]', '[\"Quality Education\"]', '{\"0\":0,\"1\":0,\"2\":0,\"3\":1,\"4\":0,\"5\":0,\"6\":0,\"7\":0,\"8\":0,\"9\":0,\"10\":0,\"11\":0,\"12\":0,\"13\":0,\"14\":0,\"15\":0,\"16\":0}', 'completed', '2025-11-18 04:41:48', 16, 2024),
 (197, 'faculty', '1st', 'earist', 'The Development of Mobile-Based Symptom Analysis for Early Detection of Diseases Using Hyper-Tuned C-Support Vector Classification Algorithm', 'This study presents a mobile-based symptom analysis system designed for the early detection of diseases by leveraging a hyper-tuned C-Support Vector Classification (C-SVC) algorithm. Traditional diagnostic approaches often require direct clinical assessment, which can be time-consuming and inaccessible in remote areas. The proposed system allows users to input their symptoms via a mobile application, which are then analyzed using a machine learning model optimized with hyperparameter tuning to improve classification accuracy. The system predicts potential diseases and provides recommendations for seeking medical attention. Developed using mobile technologies and secure data handling protocols, the application emphasizes usability, accuracy, and real-time response. Evaluation through testing on a dataset of medical records demonstrates improved detection accuracy, efficiency, and reliability, highlighting the potential of AI-driven mobile solutions in preventive healthcare.', 'The development of the mobile-based symptom analysis system using a hyper-tuned C-SVC algorithm effectively addresses the need for accessible and early disease detection. By analyzing user-reported symptoms and providing predictive insights, the system aids in timely medical consultation and decision-making. Evaluation results indicate enhanced prediction accuracy, faster response time, and usability for non-specialist users.\n\nFuture improvements may include integrating real-time data from wearable health devices, expanding the disease dataset for broader coverage, incorporating explainable AI for better transparency, and adding multilingual support to increase accessibility. Overall, this study demonstrates that combining mobile technology with hyper-tuned machine learning algorithms can significantly enhance early disease detection, preventive healthcare, and patient empowerment.', '', '[\"Tricia Anne M. Borcelis\",\"Ma. Maila A. Martinez\",\"Nelson V. Nolia\",\"Aivan Carlos B. Tuquero\",\"Jefferson A. Costales\"]', 2, 23, '[3,9]', '[\"Good Health and Well-being\",\"Industry, Innovation and Infrastructure\"]', '{\"0\":0,\"1\":0,\"2\":1,\"3\":0,\"4\":0,\"5\":0,\"6\":0,\"7\":0,\"8\":1,\"9\":0,\"10\":0,\"11\":0,\"12\":0,\"13\":0,\"14\":0,\"15\":0,\"16\":0}', 'completed', '2025-11-18 04:45:10', 16, 2024),
 (198, 'faculty', '1st', 'self-funded', 'Abundance Mapping of Commercial Fisheries Production using K-Means and Forecasting Algorithm in Manila Bay, Philippines', 'This study presents an approach to map and forecast commercial fisheries production in Manila Bay, Philippines using a combination of K-Means clustering and forecasting algorithms. Traditional methods of fisheries monitoring often rely on manual surveys and historical reports, which can be time-consuming and may not provide timely insights for resource management. The proposed system clusters fisheries production data using K-Means to identify high-yield and low-yield zones and applies forecasting techniques to predict future production trends. Developed using modern data analytics tools, the system provides visualizations and reports to support decision-making for fisheries management, policymakers, and local stakeholders. Evaluation using historical production data demonstrates accurate identification of fisheries hotspots and reliable production forecasts. This study highlights the potential of data-driven approaches in sustainable fisheries management and resource planning.', 'The development of the Abundance Mapping of Commercial Fisheries Production system effectively addresses the challenges of monitoring and predicting fisheries output in Manila Bay. By combining K-Means clustering for spatial analysis and forecasting algorithms for trend prediction, the system provides actionable insights for resource management, conservation planning, and policy formulation. Evaluation results indicate accurate identification of production clusters and reliable short-term production forecasts.\n\nFuture improvements may include integration of real-time sensor data, environmental factors such as water temperature and salinity, advanced machine learning models for improved prediction accuracy, and interactive dashboards for stakeholders. Overall, this study demonstrates that combining clustering and forecasting techniques can enhance sustainable fisheries management, optimize resource utilization, and support informed decision-making in coastal regions.', '', '[\"Jomel S. Limbago\",\"Arnel C. Fajardo\",\"Jefferson A. Costales\",\"Sherrlyn M. Rasdas\"]', 2, 23, '[14]', '[\"Life Below Water\"]', '{\"0\":0,\"1\":0,\"2\":0,\"3\":0,\"4\":0,\"5\":0,\"6\":0,\"7\":0,\"8\":0,\"9\":0,\"10\":0,\"11\":0,\"12\":0,\"13\":1,\"14\":0,\"15\":0,\"16\":0}', 'completed', '2025-11-18 04:48:30', 16, 2024),
-(208, 'student', '1st', '', 'Development of an AI-Based System for SDG Classification and Analytics at EARIST - Manila', 'This study presents the Development of an AI-Based System for Sustainable Development Goal (SDG) Classification and Analytics specifically designed for the Eulogio “Amang” Rodriguez Institute of Science and Technology (EARIST) – Manila, designed to address the challenges of manually monitoring and analyzing research outputs aligned with the United Nations’ 17 SDGs. The project ensures consistency and efficiency in institutional reporting by automating the classification process.\nThe system employs a fine-tuned BERT model to classify research papers based on titles and abstracts, providing accurate and context-aware SDG tagging. An analytics dashboard complements this by offering visual insights into research trends and alignment, while evaluation using ISO/IEC 25010:2011 standards confirmed strong performance in functionality, usability, and reliability.\nBy integrating artificial intelligence into research management, the project strengthens institutional contributions to sustainable development. Future enhancements may include multilingual support, repository integration, and broader adoption across academic institutions. In line with SDG 4 (Quality Education) and SDG 9 (Industry, Innovation, and Infrastructure), the system promotes equitable access to knowledge and fosters innovation in academic research.\n', 'artificial intelligence, BERT, SDG classification, analytics, ISO 25010:2011, sustainable development.', 'Joevey Fajardo', '[\"Baris Jomarie \",\"Bautista, Jannelle L.\"]', 1, 9, '9', '\"Industry, Innovation and Infrastructure\"', '{\"0\":0.0007137213833630085,\"1\":0.0002919368271250278,\"2\":0.0009411441860720515,\"3\":0.008990731090307236,\"4\":0.00016795053670648485,\"5\":0.00018543205806054175,\"6\":0.00014715682482346892,\"7\":0.005307663697749376,\"8\":0.979838490486145,\"9\":0.000472137558972463,\"10\":0.001481157261878252,\"11\":0.00015437205729540437,\"12\":0.00016789785877335817,\"13\":0.0004545200790744275,\"14\":0.0001614922657608986,\"15\":0.000046937584556872025,\"16\":0.00047733428073115647}', 'completed', '2025-12-04 03:50:40', 58, 2025);
+(207, 'student', '1st', '', 'AI-Driven SDG Classification for Academic Research Papers Using BERT and Gemini Models', 'This study presents a hybrid AI framework for classifying academic research papers according to the United Nations Sustainable Development Goals (SDGs). The system integrates a fine-tuned Bidirectional Encoder Representations from Transformers (BERT) model for natural language classification and Gemini 2.5 Pro for multimodal analysis and recommendation generation. Research inputs such as titles, abstracts, and keywords are processed to identify SDG alignment and highlight underrepresented goals. The framework supports automated reporting, confidence scoring, and manual override, enabling institutions to strategically assess and enhance their research contributions toward global sustainability targets.', 'Sustainable Development Goals, BERT, Gemini AI, NLP Classification, Academic Research, AI Recommendation System, SDG Analysis, Automated Reporting, Research Metadata, Machine Learning in Education', 'Something', '[\"Something plsss\"]', 2, 24, '9', '\"Industry, Innovation and Infrastructure\"', '{\"0\":0.003448126371949911,\"1\":0.002256968291476369,\"2\":0.00035830691922456026,\"3\":0.05704132094979286,\"4\":0.0006523890770040452,\"5\":0.0004735105612780899,\"6\":0.0004034623852930963,\"7\":0.01034032553434372,\"8\":0.9141411185264587,\"9\":0.0012978656450286508,\"10\":0.005320279859006405,\"11\":0.0004528259742073715,\"12\":0.0007341635646298528,\"13\":0.0013484132941812277,\"14\":0.00025276641827076674,\"15\":0.0003233094757888466,\"16\":0.0011546715395525098}', 'on-going', '2025-12-01 16:34:44', 16, 2025),
+(210, 'student', '1st', '', 'qwe', 'qweqwe', 'qweqwe', 'qwe', '[\"qweqwe\"]', 2, 24, '[10]', '[\"Reduced Inequalities\"]', '{\"0\":0,\"1\":0,\"2\":0,\"3\":0,\"4\":0,\"5\":0,\"6\":0,\"7\":0,\"8\":0,\"9\":1,\"10\":0,\"11\":0,\"12\":0,\"13\":0,\"14\":0,\"15\":0,\"16\":0}', 'on-going', '2025-12-16 08:17:38', 16, 2025);
 
 -- --------------------------------------------------------
 
@@ -1502,23 +1506,24 @@ CREATE TABLE `research_presentations` (
   `funding_source_engage` enum('Self Funded','EARIST Funded') NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `sdg_labels` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`sdg_labels`))
+  `uploaded_by` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `research_presentations`
 --
 
-INSERT INTO `research_presentations` (`id`, `department_id`, `author`, `co_authors`, `research_title`, `sdg_alignment`, `conference_title`, `organizer`, `venue`, `conference_category`, `date_presented`, `end_date_presented`, `special_order_no`, `status_engage`, `funding_source_engage`, `created_at`, `updated_at`, `sdg_labels`) VALUES
-(21, 2, 'Dr. Jesus S. Paguigan', '[\"\"]', 'Unlocking the Power of Student Feedback: A DataDriven Approach to Teacher Assessment for Eulogio \"Amang\" Rodriguez Institute of Science and Technology', '\"[\\\"SDG 4: Quality Education\\\"]\"', '5th International Symposium on Computer Technology and Information Science (ISCTIS 2025)', 'Eurasia University', 'Xi\'an, China (Presented via Online)', 'International Conference (Outside ASEAN)', '2025-05-16', '2025-05-18', 'Staff Development Order No. 040-2025', 'completed', 'EARIST Funded', '2025-11-25 09:57:47', '2025-11-25 09:57:47', NULL),
-(22, 2, 'Ma. Jasmine Rose D. Macasil', '[\"Melody L. Gabas\"]', 'Integrating Image Processing Techniques into a Mobile-based Tire Service Locator in Barangay Malanday, Marikina City', '\"[\\\"SDG 9: Industry, Innovation and Infrastructure\\\"]\"', '6th International Virtual Conference on Interdisciplinary Higher Education ', 'International Association of Scholarly Publishers, Editors, and Reviewers Inc. (IASPER)', 'Via Zoom', 'Local Conference (International)', '2025-05-21', '2025-05-23', 'Staff Development Order No. 071-2025', 'completed', 'EARIST Funded', '2025-11-25 10:01:27', '2025-11-25 10:01:27', NULL),
-(23, 2, 'Dr. Sheila Marie M. Matias', '[\"\"]', 'Human-Machine Interfaces A Dual Perspective on Innovation and Complexity', '\"[\\\"SDG 9: Industry, Innovation and Infrastructure\\\"]\"', '9th International Conference on Robotics and Automation Sciences: AIPowered Robotics Advancements (ICRAS 2025)', 'ICRAS', 'Osaka, Japan (Presented via Online) ', 'International Conference (Outside ASEAN)', '2025-06-27', '2025-06-29', 'Staff Development Order No. 114-2025', 'completed', 'EARIST Funded', '2025-11-25 10:03:39', '2025-11-25 10:03:39', NULL),
-(24, 2, 'Al F. Santiago', '[\"Dr. Sheila Marie M. Matias\",\"Alessandra Yvonne C. Barrios (Student)\",\"Piolo C. Macayan (Student)\"]', 'Classif-AI: Distinguishing AIGenerated and Human-Made Painting via CNN-Based Classification ', '\"[\\\"SDG 4: Quality Education\\\",\\\"SDG 9: Industry, Innovation and Infrastructure\\\"]\"', '4th International Conference on Artificial Intelligence and Software Engineering (ICAISE 2025)', 'Keio University, Japan', 'Yokohama, Japan (Presented via Online)', 'International Conference (Outside ASEAN)', '2025-08-06', '2025-08-08', 'Staff Development Order No. 122-2025', 'completed', 'EARIST Funded', '2025-11-25 10:05:20', '2025-11-25 10:05:20', NULL),
-(25, 2, 'Dr. Jesus S. Paguigan', '[\"Dr. Rogelio T. Mamaradlo\"]', 'Analyzing the Relationship Between Teacher Performance and Student Feedback Using a Mixed-Methods Approach', '\"[\\\"SDG 4: Quality Education\\\"]\"', '15th International Conference on Advanced Computer Information Technologies (ICACIT 2025)', 'Sibenik University, Croatia ', 'Via Online', 'International Conference (Outside ASEAN)', '2025-09-17', '2025-08-19', '', 'completed', 'EARIST Funded', '2025-11-25 10:09:00', '2025-11-25 10:09:00', NULL),
-(26, 2, 'Dr. Kathleen Dimaano', '[\"\"]', 'Automated Essay Evaluator using BERT Algorithm and Semantic Analysis', '\"[\\\"SDG 4: Quality Education\\\",\\\"SDG 9: Industry, Innovation and Infrastructure\\\",\\\"SDG 10: Reduced Inequalities\\\"]\"', '7th International Conference on Automation , Mechatronics, and Robotics (ICAMEROB)', 'Mechatronics, and Robotics Society of the Philippines (MRSP)', 'Paradise Garden Hotel, Boracay, Malay Aklan', 'Local Conference (International)', '2025-09-24', '2025-08-26', 'Staff Development Order No. 172-2025', 'completed', 'Self Funded', '2025-11-25 10:11:40', '2025-11-25 10:11:40', NULL),
-(31, 2, 'sample', '[\"s1\",\"s2\"]', 'sample', '\"[\\\"SDG 4: Quality Education\\\",\\\"SDG 5: Gender Equality\\\"]\"', 'sample', 'sample', 'earist', 'International Conference (Outside ASEAN)', '2025-11-27', '2025-11-28', 'sample', 'completed', 'EARIST Funded', '2025-11-27 06:35:10', '2025-11-27 06:35:10', NULL),
-(32, 2, 'sample2', '[\"s3\",\"s4\"]', 'sample2', '\"[\\\"SDG 1: No Poverty\\\",\\\"SDG 2: Zero Hunger\\\"]\"', 'sample2', 'sample2', 'earist', 'Local Conference (International)', '2025-11-29', '2025-11-30', 'sample2', 'completed', 'Self Funded', '2025-11-27 06:37:36', '2025-11-27 06:37:36', NULL),
-(33, 2, 'sample 3', '[\"s6\",\"s7\"]', 'sample3', '\"[\\\"SDG 1: No Poverty\\\",\\\"SDG 2: Zero Hunger\\\"]\"', 'sample3', 'sample3', 'sample3', 'Local Conference (International)', '2025-11-27', '2025-11-28', 'sample3', 'completed', 'EARIST Funded', '2025-11-27 12:22:12', '2025-11-27 12:22:12', NULL);
+INSERT INTO `research_presentations` (`id`, `department_id`, `author`, `co_authors`, `research_title`, `sdg_alignment`, `conference_title`, `organizer`, `venue`, `conference_category`, `date_presented`, `end_date_presented`, `special_order_no`, `status_engage`, `funding_source_engage`, `created_at`, `updated_at`, `uploaded_by`) VALUES
+(21, 2, 'Dr. Jesus S. Paguigan', '[\"\"]', 'Unlocking the Power of Student Feedback: A DataDriven Approach to Teacher Assessment for Eulogio \"Amang\" Rodriguez Institute of Science and Technology', '\"[\\\"SDG 4: Quality Education\\\"]\"', '5th International Symposium on Computer Technology and Information Science (ISCTIS 2025)', 'Eurasia University', 'Xi\'an, China (Presented via Online)', 'International Conference (Outside ASEAN)', '2025-05-16', '2025-05-18', 'Staff Development Order No. 040-2025', 'completed', 'EARIST Funded', '2025-11-25 09:57:47', '2025-12-17 03:50:48', 16),
+(22, 2, 'Ma. Jasmine Rose D. Macasil', '[\"Melody L. Gabas\"]', 'Integrating Image Processing Techniques into a Mobile-based Tire Service Locator in Barangay Malanday, Marikina City', '\"[\\\"SDG 9: Industry, Innovation and Infrastructure\\\"]\"', '6th International Virtual Conference on Interdisciplinary Higher Education ', 'International Association of Scholarly Publishers, Editors, and Reviewers Inc. (IASPER)', 'Via Zoom', 'Local Conference (International)', '2025-05-21', '2025-05-23', 'Staff Development Order No. 071-2025', 'completed', 'EARIST Funded', '2025-11-25 10:01:27', '2025-12-17 03:50:48', 16),
+(23, 2, 'Dr. Sheila Marie M. Matias', '[\"\"]', 'Human-Machine Interfaces A Dual Perspective on Innovation and Complexity', '\"[\\\"SDG 9: Industry, Innovation and Infrastructure\\\"]\"', '9th International Conference on Robotics and Automation Sciences: AIPowered Robotics Advancements (ICRAS 2025)', 'ICRAS', 'Osaka, Japan (Presented via Online) ', 'International Conference (Outside ASEAN)', '2025-06-27', '2025-06-29', 'Staff Development Order No. 114-2025', 'completed', 'EARIST Funded', '2025-11-25 10:03:39', '2025-12-17 03:50:48', 16),
+(24, 2, 'Al F. Santiago', '[\"Dr. Sheila Marie M. Matias\",\"Alessandra Yvonne C. Barrios (Student)\",\"Piolo C. Macayan (Student)\"]', 'Classif-AI: Distinguishing AIGenerated and Human-Made Painting via CNN-Based Classification ', '\"[\\\"SDG 4: Quality Education\\\",\\\"SDG 9: Industry, Innovation and Infrastructure\\\"]\"', '4th International Conference on Artificial Intelligence and Software Engineering (ICAISE 2025)', 'Keio University, Japan', 'Yokohama, Japan (Presented via Online)', 'International Conference (Outside ASEAN)', '2025-08-06', '2025-08-08', 'Staff Development Order No. 122-2025', 'completed', 'EARIST Funded', '2025-11-25 10:05:20', '2025-12-17 03:50:48', 16),
+(25, 2, 'Dr. Jesus S. Paguigan', '[\"Dr. Rogelio T. Mamaradlo\"]', 'Analyzing the Relationship Between Teacher Performance and Student Feedback Using a Mixed-Methods Approach', '\"[\\\"SDG 4: Quality Education\\\"]\"', '15th International Conference on Advanced Computer Information Technologies (ICACIT 2025)', 'Sibenik University, Croatia ', 'Via Online', 'International Conference (Outside ASEAN)', '2025-09-17', '2025-08-19', '', 'completed', 'EARIST Funded', '2025-11-25 10:09:00', '2025-12-17 03:50:48', 16),
+(26, 2, 'Dr. Kathleen Dimaano', '[\"\"]', 'Automated Essay Evaluator using BERT Algorithm and Semantic Analysis', '\"[\\\"SDG 4: Quality Education\\\",\\\"SDG 9: Industry, Innovation and Infrastructure\\\",\\\"SDG 10: Reduced Inequalities\\\"]\"', '7th International Conference on Automation , Mechatronics, and Robotics (ICAMEROB)', 'Mechatronics, and Robotics Society of the Philippines (MRSP)', 'Paradise Garden Hotel, Boracay, Malay Aklan', 'Local Conference (International)', '2025-09-24', '2025-08-26', 'Staff Development Order No. 172-2025', 'completed', 'Self Funded', '2025-11-25 10:11:40', '2025-12-17 03:50:48', 16),
+(34, 2, 'qwe', '[\"wqeqweqwe\"]', 'qweqw', '[\"SDG 6: Clean Water and Sanitation\"]', 'qwe', 'qweqwe', 'qweqwe', 'Local Conference (National)', '2025-12-17', '2025-12-19', 'qwe', 'completed', 'Self Funded', '2025-12-17 04:33:12', '2025-12-17 04:33:12', 16),
+(35, 2, 'qw', '[\"eqweqweqwe\"]', 'wqeqwe', '[\"SDG 9: Industry, Innovation and Infrastructure\"]', 'wqe', 'qweqwe', 'ewq', 'International Conference (Outside ASEAN)', '2025-12-11', '2025-12-25', 'qwe', 'proposed', 'EARIST Funded', '2025-12-17 04:37:42', '2025-12-17 04:37:42', 16),
+(36, 2, 'qweqw', '[\"eqweqwe\"]', 'qwe', '[\"SDG 1: No Poverty\"]', 'qwe', 'qwe', 'wqeqwe', 'International Conference (Within ASEAN)', '2025-12-17', '2025-12-18', 'qweqwe', 'ongoing', 'EARIST Funded', '2025-12-17 04:51:03', '2025-12-17 04:51:03', 16),
+(37, 2, 'wdqw', '[\"dqwdqw\"]', 'qwdqwd', '[\"SDG 4: Quality Education\"]', 'qwd', 'qwdq', 'wdqwd', 'International Conference (Outside ASEAN)', '2025-12-17', '2025-12-25', 'qwdqwd', 'ongoing', 'EARIST Funded', '2025-12-17 05:19:16', '2025-12-17 05:19:16', 16);
 
 -- --------------------------------------------------------
 
@@ -1549,10 +1554,7 @@ CREATE TABLE `research_publications` (
 
 INSERT INTO `research_publications` (`id`, `department_id`, `published_title`, `pub_author`, `pub_co_authors`, `journal_title`, `conference_or_proceedings`, `publisher`, `pub_date_presented`, `pub_end_date_presented`, `doi`, `issn_isbn`, `volume_issue`, `index_type`) VALUES
 (6, 2, 'An Integrated Intranet-Based Simulation System for College of Hospitality and Tourism Management of EARIST Manila', 'DR. JEFFERSON A. COSTALES', '[\"DR. MARIA RHODA D. DINAGA\"]', 'Proceedings of the 2024 3rd International Conference on Computer Applications Technology (CCAT)', '2024 3rd International Conference on Computer Applications Technology (CCAT)', 'IEEE', '2025-02-25', '2025-02-25', 'https://doi.org/10. 1109/CCAT64370. 2024.00019', 'ISBN: 979-8-3315- 3979-5', '', 'Scopus-indexed Conference Proceedings (IEEE Xplore Digital Library)'),
-(7, 2, 'Climbing the Ladder as Junior and Senior High School Teachers Struggle and Triumph in Achieving Promotion', 'DR. JESUS S. PAGUIGAN', '[\"\"]', 'International Journal for Multidisciplinary Research (IJFMR)', '', 'Sky Research Publication and Journals', '2025-05-25', '2025-06-25', 'https://doi.org/10. 36948/ijfmr.2025. v07i03.49845', 'E-ISSN: 2582-2160', 'Vol. 7, Issue 3', 'Open Access PeerReviewed'),
-(10, 2, 'sample1', 'sample1', '[\"s1\",\"s2\"]', 'sample1', 'sample1', 'sample1', '2025-11-27', '2025-11-27', 'sample1', 'sample1', 'sample1', 'sample'),
-(11, 2, 'sample 3', 'sample3', '[\"s6\",\"s7\"]', 'sample3', 'sample3', 'sample3', '2025-11-27', '2025-11-28', 'sample3', 'sample3', 'sample3', 'sample3'),
-(12, 2, 'sad', 'sad', '[\"\"]', 'asd', 'asda', 'asd', '2025-11-13', '2025-11-20', 'da', '', 'dada', 'da');
+(7, 2, 'Climbing the Ladder as Junior and Senior High School Teachers Struggle and Triumph in Achieving Promotion', 'DR. JESUS S. PAGUIGAN', '[\"\"]', 'International Journal for Multidisciplinary Research (IJFMR)', '', 'Sky Research Publication and Journals', '2025-05-25', '2025-06-25', 'https://doi.org/10. 36948/ijfmr.2025. v07i03.49845', 'E-ISSN: 2582-2160', 'Vol. 7, Issue 3', 'Open Access PeerReviewed');
 
 -- --------------------------------------------------------
 
@@ -1590,13 +1592,13 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `user_code`, `username`, `lastname`, `firstname`, `middlename`, `extension`, `email`, `password`, `profile_img`, `created_at`, `updated_at`, `failed_attempts`, `lock_until`, `role`, `isActive`, `security_question`, `security_answer`, `reset_token`, `reset_token_expiry`, `department`, `course`) VALUES
-(16, '4445', 'Klasiko', 'Baris', 'Jomarie', 'Lanosa', '', 'jomarie.baris@gmail.com', '$2b$10$ixDO3tLRsQdReEvBV1ufdOb6pOJ/gA6VIeHiHeoRrPq3kEQUQ2Qh.', '1762576950653-710508151.png', '2025-10-10 12:26:16', '2025-11-14 14:55:51', 0, NULL, 'admin', 0, 'What is your favorite book/movie?', 'Chronicle', NULL, NULL, NULL, NULL),
+(16, '4445', 'Klasiko', 'Baris', 'Jomarie', 'Lanosa', '', 'jomarie.baris@gmail.com', '$2b$10$xQhTEjxclxWTgRd4NHGEkOeheEFdxP154BWPfj2cjsXbdfHyfVf8C', '1765430403850-832980391.jpg', '2025-10-10 12:26:16', '2025-12-11 05:20:03', 0, NULL, 'admin', 0, 'What is your favorite book/movie?', 'Chronicle', NULL, NULL, NULL, NULL),
 (40, '224-08804M', 'Jomarie', 'Baris', 'Jomarie', 'Lanosa', '', 'baris.j.bsinfotech@gmail.com', '$2b$10$mnaFK0IoNKMTFgEgEr29hu8PJ4Zv/.TQhVrbiA26FaF7ovzColkTK', '1763132627917-176494050.jpg', '2025-10-22 05:14:13', '2025-11-14 15:03:55', 0, NULL, 'rph', 0, 'What was your childhood nickname?', 'Jom', NULL, NULL, 2, 23),
-(42, '224-08806M', 'JA', 'Bautista', 'Janelle', 'Leynes', '', 'ajhay1730@gmail.com', '$2b$10$hATedq4b1mboUrbq1s8MguGmBwb9FnGIw26OEAm9/qSqtaLpzDcoe', 'default_profile.jpg', '2025-10-22 05:22:28', NULL, 0, NULL, 'faculty', 0, 'What is the name of your first pet?', 'N/A', NULL, NULL, 2, 23),
+(42, '224-08806M', 'JA', 'Bautista', 'Janelle', 'Leynes', '', 'ajhay1730@gmail.com', '$2b$10$hATedq4b1mboUrbq1s8MguGmBwb9FnGIw26OEAm9/qSqtaLpzDcoe', 'default_profile.jpg', '2025-10-22 05:22:28', NULL, 0, NULL, 'rph', 0, 'What is the name of your first pet?', 'N/A', NULL, NULL, 2, 24),
 (43, '224-08805M', 'Tal', 'Cabantog', 'Taliza', '', '', 'cabantog.t.bsinfotech@gmail.com', '$2b$10$ReH.wvqtW9GtyuyKjnaVW.K6TMuiRRnEkdRWPcOdwXftagBxHlOZ2', 'default_profile.jpg', '2025-10-22 05:24:33', NULL, 0, NULL, 'faculty', 0, 'What is the name of your first pet?', 'N/A', NULL, NULL, 2, 23),
-(44, '224-08807M', 'Igy Luis', 'Fuentiblanca', 'Igyluis', 'Veloso', '', 'fuentiblanca.il.bsinfotech@gmail.com', '$2b$10$ND7xUj13mLOQEe804Z0CDuqscDkpKcZT6wGpzX.Cz5knXBGyGdj0a', '1763298221130-412905604.jpg', '2025-10-22 05:25:28', '2025-11-24 13:46:16', 0, NULL, 'admin', 0, 'What is the name of your first pet?', 'Oggy', NULL, NULL, NULL, NULL),
-(55, '1111', 'Igy Luis', 'fuentiblanca', 'igy', 'VEloso', '', 'fuentiblancaigyluisv@gmail.com', '$2b$10$4pBq9JxtCMECMm/gax180OcxzdXZzvCMh95YNmBPlW4RXR1DdhLYW', 'default_profile.jpg', '2025-11-24 13:40:12', NULL, 5, '2025-12-02 15:04:42', 'faculty', 0, 'What is the name of your first pet?', 'Oggy', 'c00e1090975a0d92e41534cbb28147e85a6386e903b927049610be408cc7f8a2', '2025-12-02 15:16:32', 2, 23),
-(58, '12345', 'Jeff', 'Costales', 'Jefferson', 'A', '', 'jeffcostales@gmail.com', '$2b$10$pzG5VmY58..OzE8QYzWh5Ouh08viyVXzBLisT5GDyZAjLVJ5CFHWu', 'default_profile.jpg', '2025-12-04 03:40:23', NULL, 0, NULL, 'rph', 1, 'What is the name of your first pet?', 'N/A', NULL, NULL, 1, 8);
+(44, '224-08807M', 'Igy Luis', 'Fuentiblanca', 'Igyluis', 'Veloso', '', 'fuentiblanca.il.bsinfotech@gmail.com', '$2b$10$1qSlX43fqyMAnwswE3JDQelwCGgjgi3vnOfgqEZ13e9ZeOzM97JCa', '1763298221130-412905604.jpg', '2025-10-22 05:25:28', '2025-11-24 13:46:16', 0, NULL, 'admin', 0, 'What is the name of your first pet?', 'Oggy', NULL, NULL, NULL, NULL),
+(55, '1111', 'Igy Luis', 'fuentiblanca', 'igy', 'VEloso', '', 'fuentiblancaigyluisv@gmail.com', '$2b$10$4pBq9JxtCMECMm/gax180OcxzdXZzvCMh95YNmBPlW4RXR1DdhLYW', 'default_profile.jpg', '2025-11-24 13:40:12', NULL, 0, NULL, 'faculty', 0, 'What is the name of your first pet?', 'Oggy', NULL, NULL, 2, 24),
+(61, 'qweqwe', 'qweqwe', 'qwe', 'qweqwe', 'qwe', 'qweqwe', 'qwe@gmail.com', '$2b$10$w.WBKFaxJSB9Yd7IBNVhI.O28zt2Trdq5c1TTXi8o8AJoctZTTPkG', 'default_profile.jpg', '2025-12-18 05:16:18', NULL, 0, NULL, 'admin', 0, 'What is your mother\'s maiden name?', 'qwe', NULL, NULL, NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -1640,7 +1642,8 @@ ALTER TABLE `research_paper`
 -- Indexes for table `research_presentations`
 --
 ALTER TABLE `research_presentations`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_research_presentation_uploaded_by` (`uploaded_by`);
 
 --
 -- Indexes for table `research_publications`
@@ -1664,19 +1667,19 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `audit_log`
 --
 ALTER TABLE `audit_log`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1525;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1532;
 
 --
 -- AUTO_INCREMENT for table `course`
 --
 ALTER TABLE `course`
-  MODIFY `course_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `course_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT for table `department`
 --
 ALTER TABLE `department`
-  MODIFY `department_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `department_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT for table `history_report`
@@ -1688,25 +1691,25 @@ ALTER TABLE `history_report`
 -- AUTO_INCREMENT for table `research_paper`
 --
 ALTER TABLE `research_paper`
-  MODIFY `research_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=209;
+  MODIFY `research_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=213;
 
 --
 -- AUTO_INCREMENT for table `research_presentations`
 --
 ALTER TABLE `research_presentations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT for table `research_publications`
 --
 ALTER TABLE `research_publications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
 
 --
 -- Constraints for dumped tables
@@ -1725,6 +1728,12 @@ ALTER TABLE `research_paper`
   ADD CONSTRAINT `fk_course` FOREIGN KEY (`course_id`) REFERENCES `course` (`course_id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_department` FOREIGN KEY (`department_id`) REFERENCES `department` (`department_id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_uploaded_by` FOREIGN KEY (`uploaded_by`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `research_presentations`
+--
+ALTER TABLE `research_presentations`
+  ADD CONSTRAINT `fk_research_presentation_uploaded_by` FOREIGN KEY (`uploaded_by`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `users`
