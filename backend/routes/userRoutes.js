@@ -8,7 +8,7 @@ const {addDepartment, getDepartments, getDepartmentInfo, getSingleDepartments, u
 
 const {getAllCourses, getCourses, getDepartmentCourses, addCourse, updateCourse, deleteCourse} = require('../controllers/coursesController');
 
-const {addAuditLog, getUserAuditLogs, getAuditLogs, getAllAuditLogs, deleteLogs} = require('../controllers/auditsController');
+const {getUserAuditLogs, getAuditLogs, getAllAuditLogs, deleteLogs} = require('../controllers/auditsController');
 
 const {addResearch, deleteResearchPaper, getDepartmentPapers, getDepartmentPapersFaculty, getDepartmentTotalSDGPaper, getHighestLowestSDG, getCurretUploadedResearchPapers, getSinglePaper, fetchPaperForAnalysis, getStudentTypePapers, getFacultyTypePapers, getMostCommonSDG, addHistoryReport, getUserPapers} = require('../controllers/researchPaperController');
 
@@ -31,8 +31,6 @@ router.put('/update-role', verifyToken, updateUserRole);
 router.delete('/user-delete/:id', verifyToken, deleteUser);
 
 //------------------------------------------------------------AUDITS-------------------------------------------------------------------------------------------------
-router.post('/audit-log', verifyToken, addAuditLog);
-
 router.get('/user-audit/:user_code', verifyToken, getUserAuditLogs);
 router.get('/audit-logs', verifyToken, getAuditLogs);
 router.get('/audit-logs-all', verifyToken, getAllAuditLogs);

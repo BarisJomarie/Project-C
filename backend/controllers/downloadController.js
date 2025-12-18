@@ -1,8 +1,5 @@
-const express = require('express');
-const app = express();
 const pool = require('../db');
-const fs = require('fs');
-const path = require('path');
+const { logAudit } = require('./auditsController');
 //------------------------------------------------------------FILE DOWNLOAD-------------------------------------------------------------------------------------------------
 
 exports.downloadJSONL = (req, res) => {
@@ -43,6 +40,10 @@ exports.downloadJSONL = (req, res) => {
     res.setHeader('Content-Disposition', 'attachment; filename=history_report.jsonl');
     res.setHeader('Content-Type', 'application/json');
     res.send(jsonlData);
+    
+    logAudit(req.user.user_code, req.user.role, "Downloaded JSONL report", "user")
+      .then(auditId => console.log(auditId))
+      .catch(err => console.error("Audit log error:", err));
   });
 };
 

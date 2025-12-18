@@ -1,5 +1,5 @@
 const db = require("../db");
-
+const {logAudit} = require('./auditsController');
 
 //------------------------------------------------------------AI INTEGRATION REPORT-------------------------------------------------------------------------------------------------
 exports.analyzeSdg = async (req, res) => {
@@ -24,7 +24,8 @@ exports.analyzeSdg = async (req, res) => {
 
     const result = await response.json();
     res.json({ analysis: result.analysis, model_used: result.model_used });
-
+    const audit = await logAudit( req.user.user_code, req.user.role, `Analyze an SDG. Model used: ${result.model_used}`, 'user');
+    console.log(audit);
   } catch (err) {
     console.error("AI analysis error:", err);
     res.status(500).json({ error: "AI analysis failed", details: err.message });
@@ -73,6 +74,10 @@ exports.saveAIReport = async (req, res) => {
     ], (err, result) => {
       if (err) return res.status(500).json({ message: 'Database error.', error: err });
       res.status(200).json({ message: 'AI report saved successfully.' });
+
+      logAudit(req.user.user_code, req.user.role, "Save the AI Report", "user")
+        .then(auditId => console.log(auditId))
+        .catch(err => console.error("Audit log error:", err));
       });
   } catch (err) {
     console.error('Error saving AI report:', err);

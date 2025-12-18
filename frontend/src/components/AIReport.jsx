@@ -187,9 +187,6 @@ const AIReport = () => {
     const handlePrint = () => {
       if (hasLoggedPrint) return; // prevent multiple logs
       if (!userData || !token) return;
-
-      addAuditLog({ userData, token, action: 'Printed AI Report', actor_type: 'user' });
-
       hasLoggedPrint = true;
     };
 
@@ -357,9 +354,6 @@ const AIReport = () => {
             lackSection: cleanText(lackSection),
             recommendationSection: cleanText(recommendationSection),
           });
-    
-          addAuditLog({ userData, token, action: 'Generated AI Report', actor_type: 'user' });
-          // console.log({lackSection, recommendationSection})
         }catch(err) {
           console.error('Failed to fetch or analyze papers:', err);
           showToast('error', 'AI', 'Something went wrong!');

@@ -1,7 +1,3 @@
-.html-box-fix {
-  /* helper selector to avoid accidental global overrides */
-}
-
 html { box-sizing: border-box; }
 *, *::before, *::after { box-sizing: inherit; }
 
@@ -43,6 +39,11 @@ html { box-sizing: border-box; }
 
 .table-container td {
   font-size: 0.8em;
+  max-width: 300px;
+  min-width: 100px;
+  word-wrap: break-word;
+  white-space: normal;
+  overflow-wrap: break-word;
 }
 
 .table-container th,
@@ -57,6 +58,10 @@ html { box-sizing: border-box; }
   white-space: normal;
   overflow-wrap: anywhere;
   word-break: break-word;
+}
+
+.table-container tbody tr {
+  border-bottom: 1px solid #ddd;
 }
 
 .table-container tbody tr.selected {

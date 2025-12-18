@@ -1,12 +1,12 @@
 const db = require('../db');
-const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { sendEmail } = require('../utils/mailer');
-const { updateUserProfile } = require('./usersController');
+const { logAudit } = require('./auditsController');
 
 let otpStore = {}; // temporary storage for email → OTP mapping
 const crypto = require('crypto');
+const { error } = require('console');
 
 
 
@@ -67,16 +67,9 @@ exports.signUp = (req, res) => {
           } catch (emailErr) {
             console.error('Failed to send email:', emailErr);
           }
-
-          // Log to audit
-          db.query(
-            `INSERT INTO audit_log (user_code, user_role, action, actor_type, timestamp)
-             VALUES (?, ?, ?, 'user', NOW())`,
-            [userCode, role, `Account Created as ${role}`],
-            (auditErr) => { if (auditErr) console.error('Failed to log audit:', auditErr); }
-          );
-
           res.status(200).send({ message: 'User Registered!', emailSent: true });
+          const audit = await logAudit( userCode, role, 'User Registered', 'user');
+          console.log(audit);
         }
       );
     } catch (hashErr) {
@@ -177,12 +170,6 @@ exports.verifyOtp = (req, res) => {
     db.query(updateActiveQuery, [email], (updateErr) => {
       if (updateErr) console.error('Failed to update isActive status:', updateErr);
 
-      // Audit
-      const addAuditQuery = `INSERT INTO audit_log (user_code, user_role, action, actor_type, timestamp) VALUES (?, ?, ?, 'user', NOW())`;
-      db.query(addAuditQuery, [user.user_code, user.role,  `Logged In`], (auditErr) => {
-        if (auditErr) console.error('Failed to log audit:', auditErr);
-      });
-
       // Generate JWT token
       try {
         const token = jwt.sign(
@@ -190,6 +177,16 @@ exports.verifyOtp = (req, res) => {
           process.env.JWT_SECRET,
           { expiresIn: '1d' }
         );
+
+        // Audit
+        logAudit(user.user_code, user.role, 'User Logged In', 'user')
+          .then(auditId => {
+            console.log(auditId);
+          })
+          .catch(err => {
+            console.error("Audit log error:", err);
+          });
+
 
         return res.status(200).json({
           message: 'Login verified successfully!',
@@ -271,13 +268,12 @@ exports.logout = (req, res) => {
         return res.status(500).send({ message: 'Failed to logout' });
       }
 
-      // Log the audit *after* successful logout
-      const addAuditQuery = `
-        INSERT INTO audit_log (user_code, user_role, action, actor_type, timestamp)
-        VALUES (?, ?, ?, 'user', NOW())
-      `;
-      db.query(addAuditQuery, [user_code, role, 'User Logged Out'], (auditErr) => {
-        if (auditErr) console.error('Failed to log audit:', auditErr);
+      logAudit( req.user.user_code, req.user.role, 'User Logged Out', 'user')
+      .then(auditId => {
+        console.log(auditId);
+      })
+      .catch(err => {
+        console.error("Audit log error: ", err);
       });
       return res.status(200).send({ message: 'User logged out successfully' });
     });
@@ -291,10 +287,13 @@ exports.tokenExpired = (req, res) => {
     return res.status(400).json({ error: 'Missing user_code or user_role' });
   }
 
-  const query = `
-    INSERT INTO audit_log (user_code, user_role, action, actor_type, timestamp)
-    VALUES (?, ?, 'Session Ended - Token Expired', 'user', NOW())
-  `;
+  logAudit( user_code, user_role, 'Session Ended - Token Expired', 'user')
+  .then(auditId => {
+    console.log(auditId);
+  })
+  .catch(err => {
+    console.error('Audit log error: ', err);
+  });
 
   db.query(query, [user_code, user_role], (err) => {
     if (err) {
@@ -394,15 +393,38 @@ exports.verifySecurityAnswer = (req, res) => {
 };
 
 // Step 4: Update password
-exports.resetPassword = async (req, res) => {
+exports.resetPassword = (req, res) => {
   const { email, newPassword } = req.body;
 
+  const beforeQuery = 'SELECT * FROM users WHERE email = ?';
 
-  const hashedPassword = await bcrypt.hash(newPassword, 10);
-  const query = 'UPDATE users SET password = ?, reset_token = NULL, reset_token_expiry = NULL WHERE email = ?';
-  db.query(query, [hashedPassword, email], (err) => {
-    if (err) return res.status(500).send(err);
-    res.status(200).send({ message: 'Password updated successfully!' });
+  db.query(beforeQuery, [email], (err, result) => {
+    if (err) return res.status(500).json({ message: 'Database error', error: err });
+    if (result.length === 0) return res.status(404).json({ message: 'No user found' });
+
+    const user_code = result[0].user_code;
+    const user_role = result[0].role;
+
+    bcrypt.hash(newPassword, 10)
+      .then(hashedPassword => {
+        const query = 'UPDATE users SET password = ?, reset_token = NULL, reset_token_expiry = NULL WHERE email = ?';
+        db.query(query, [hashedPassword, email], (err) => {
+          if (err) {
+            console.error('DB update error:', err);
+            return res.status(500).json({ message: 'Failed to update password' });
+          }
+
+          res.status(200).json({ message: 'Password updated successfully!' });
+
+          logAudit(user_code, user_role, `Password reset for ${email}`, 'user')
+            .then(auditId => console.log(auditId))
+            .catch(err => console.error('Audit log error:', err));
+        });
+      })
+      .catch(err => {
+        console.error('Password hashing failed:', err);
+        res.status(500).json({ message: 'Failed to hash password' });
+      });
   });
 };
 
@@ -410,7 +432,6 @@ exports.resetPassword = async (req, res) => {
 exports.getSecurityQuestion = (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(400).send({ message: "Email is required." });
-
 
   const query = "SELECT security_question FROM users WHERE email = ?";
   db.query(query, [email], (err, result) => {

@@ -1,25 +1,19 @@
 const db = require('../db');
+const { logAudit } = require('./auditsController');
 
 //ADD DEPARTMENT
 exports.addDepartment = (req, res) => {
-  const { department_name, department_abb, user_code, role } = req.body;
+  const { department_name, department_abb } = req.body;
 
   const query = `INSERT INTO department (department_name, department_abb) VALUES (?, ?)`;
   db.query(query, [department_name, department_abb], (err, result) => {
-    if (err) {
-      console.error('Failed to add department:', err);
-      return res.status(500).send({ message: 'Failed to add department' });
-    }
+    if (err) return res.status(500).send({ message: 'Failed to add department' });
 
-    const auditQuery = `INSERT INTO audit_log (user_code, user_role, action, actor_type, timestamp) VALUES (?, ?, ?, 'user', NOW())`;
-    db.query(auditQuery, [user_code, role, `Added a new department: ${department_name}`], (auditErr) => {
-      if (auditErr) {
-        console.error('Failed to log audit:', auditErr);
-        return res.status(500).send({ message: 'Department added but failed to log audit' });
-      }
+    res.status(201).send({ message: 'Department successfully added' });
 
-      res.status(201).send({ message: 'Department successfully added' });
-    });
+    logAudit( req.user.user_code, req.user.role, `Department ${department_name} (${department_abb}) added`, 'user' )
+    .then(auditId => console.log(auditId))
+    .catch(err => console.error('Audit log error: ', err));
   });
 };
 
@@ -77,38 +71,56 @@ exports.updateDepartment = (req, res) => {
     department_abb
   } = req.body;
   const { deptId } = req.params;
-  const query = `
-    UPDATE department SET 
-      department_name = ?,
-      department_abb = ?
-    WHERE department_id = ?
-  `;
-  const values = [department_name, department_abb, deptId];
 
-  db.query(query, values, (err, result) => {
-    if (err) return res.status(500).send(err);
-    res.status(200).send({ message: 'Department successfully updated' });
+  const beforeQuery = 'SELECT * FROM department WHERE department_id = ?'
+
+  db.query(beforeQuery, [deptId], (err, result) => {
+    if (err) return res.status(500).json({message: 'Database Error', error: err});
+    if (result.length === 0) return res.status(404).json({message: 'Department not found'});
+
+    const old_name = result[0].department_name;
+    const old_abb = result[0].department_abb;
+
+    const query = `
+      UPDATE department SET 
+        department_name = ?,
+        department_abb = ?
+      WHERE department_id = ?
+    `;
+    const values = [department_name, department_abb, deptId];
+
+    db.query(query, values, (err, result) => {
+      if (err) return res.status(500).send(err);
+      res.status(200).send({ message: 'Department successfully updated' });
+
+      logAudit( req.user.user_code, req.user.role, `Updated department: ${old_name} (${old_abb}) -> ${department_name} (${department_abb})`, 'user' )
+      .then(auditId => console.log(auditId))
+      .catch(err => console.error('Audit log error: ', err));
+    });
   });
 };
 
 //DELETE DEPARTMENT
 exports.deleteDepartment = (req, res) => {
   const { deptId } = req.params;
-  const { user_code, role, department_name } = req.body;
 
-  const query = `DELETE FROM department WHERE department_id = ?`;
-  db.query(query, [deptId], (err, result) => {
-    if (err) return res.status(500).send(err);
+  const beforeQuery = 'SELECT * FROM department WHERE department_id = ?';
+  db.query(beforeQuery, [deptId], (err, result) => {
+    if (err) return res.status(500).json({message: 'Database Error', error: err});
+    if (result.length === 0) return res.status(404).json({message: 'Department not found'});
 
-    const auditQuery = `
-      INSERT INTO audit_log (user_code, user_role, action, actor_type, timestamp)
-      VALUES (?, ?, ?, 'user', NOW())
-    `;
-    const action = `Deleted department name: ${department_name}`;
-    db.query(auditQuery, [user_code, role, action], (auditErr) => {
-      if (auditErr) console.error('Failed to log audit:', auditErr);
-      // Return success regardless of audit log failure
+    const old_name = result[0].department_name;
+    const old_abb = result[0].department_abb;
+
+    const query = `DELETE FROM department WHERE department_id = ?`;
+    db.query(query, [deptId], (err, result) => {
+      if (err) return res.status(500).send(err);
+
       res.status(200).send({ message: 'Department deleted successfully' });
+
+      logAudit( req.user.user_code, req.user.role, `Department ${old_name} (${old_abb}) deleted`, 'user')
+      .then(auditId => console.log(auditId))
+      .catch(err => console.error('Audit log error: ', err));
     });
   });
 };

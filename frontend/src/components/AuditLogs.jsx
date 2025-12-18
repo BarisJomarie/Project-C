@@ -211,7 +211,7 @@ const AuditLogs = () => {
                     <td>{a.id}</td>
                     <td>{a.user_code}</td>
                     <td>{a.user_role}</td>
-                    <td>{a.action}</td>
+                    <td style={{textAlign: 'left'}}>{a.action}</td>
                     <td>{a.actor_type.charAt(0).toUpperCase() + a.actor_type.slice(1)}</td>
                     <td>{new Date(a.timestamp).toLocaleString('en-US', { 
                       year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' 

@@ -1,17 +1,16 @@
 const db = require('../db');
 
-//ADD AUDIT LOGS (TINATAWAG TO SA IBANG BACKEND CONTROLLERS)
-exports.addAuditLog = (req, res) => {
-  const { user_code, user_role, action, actor_type } = req.body;
-
-  if (!user_code || !user_role || !action || !actor_type) {
-    return res.status(400).send({ message: 'Missing required body parameters.' });
-  }
-
-  const query = `INSERT INTO audit_log (user_code, user_role, action, actor_type, timestamp) VALUES (?, ?, ?, ?, NOW())`; 
-  db.query(query, [user_code, user_role, action, actor_type], (err) => {
-    if (err) return res.status(500).send(err);
-    res.status(201).send({ message: 'Audit successfully added' });
+//ADD AUDIT LOGS (TINATAWAG TO SA IBANG BACKEND CONTROLLERS) HELPER
+exports.logAudit = (user_code, user_role, action, actor_type) => {
+  return new Promise((resolve, reject) => {
+    const query = `INSERT INTO audit_log (user_code, user_role, action, actor_type, timestamp) VALUES (?, ?, ?, ?, NOW())`;
+    db.query(query, [user_code, user_role, action, actor_type], (err, result) => {
+      if (err) {
+        console.error("Audit log error:", err);
+        return reject(new Error("Failed to insert audit log"));
+      }
+      resolve(result.insertId);
+    });
   });
 };
 

@@ -1,4 +1,5 @@
 const db = require('../db');
+const { logAudit } = require('./auditsController');
 
 //ADD COURSE
 exports.addCourse = (req, res) => {
@@ -35,6 +36,13 @@ exports.addCourse = (req, res) => {
     db.query(query, values, (err, result) => {
       if (err) return res.status(500).send(err);
       res.status(201).send({ message: 'Course successfully added' });
+      logAudit( req.user.user_code, req.user.role, `Added course: ${course_name} (${course_abbreviation})`, 'user' )
+      .then(auditId => {
+        console.log(auditId);
+      })
+      .catch(err => {
+        console.log('Audit log error: ', err);
+      });
     });
   });
 };
@@ -73,35 +81,71 @@ exports.getCourses = (req, res) => {
   });
 };
 
-//UPDATE DEPARTMENT
+// UPDATE COURSE
 exports.updateCourse = (req, res) => {
-  const { 
-    course_name,
-    course_abb
-  } = req.body;
+  const { course_name, course_abb } = req.body;
   const { courseId } = req.params;
-  const query = `
-    UPDATE course SET 
-      course_name = ?,
-      course_abb = ?
-    WHERE course_id = ?
-  `;
-  const values = [course_name, course_abb, courseId];
 
-  db.query(query, values, (err, result) => {
-    if (err) return res.status(500).send(err);
-    res.status(200).send({ message: 'Course successfully updated' });
+  const beforeQuery = 'SELECT * FROM course WHERE course_id = ?';
+
+  db.query(beforeQuery, [courseId], (err, result) => {
+    if (err) return res.status(500).json({ message: 'Database error', error: err });
+    if (result.length === 0) return res.status(404).json({ message: 'Course not found' });
+
+    const old_course = result[0].course_name;
+    const old_abb = result[0].course_abb;
+
+    const updateQuery = `
+      UPDATE course SET 
+        course_name = ?,
+        course_abb = ?
+      WHERE course_id = ?
+    `;
+    const values = [course_name, course_abb, courseId];
+
+    db.query(updateQuery, values, (err, updateResult) => {
+      if (err) return res.status(500).send(err);
+
+      res.status(200).send({ message: 'Course successfully updated' });
+
+      // Audit log
+      logAudit( req.user.user_code, req.user.role, `Updated course: ${old_course} (${old_abb}) -> ${course_name} (${course_abb})`, 'user' )
+        .then(auditId => {
+          console.log(auditId);
+        })
+        .catch(err => {
+          console.error("Audit log error:", err);
+        });
+    });
   });
 };
+
 
 //DELETE COURSE
 exports.deleteCourse = (req, res) => {
   const { id } = req.params;
 
-  const query = `DELETE FROM course WHERE course_id = ?`;
-  db.query(query, [id], (err, result) => {
-    if (err) return res.status(500).send(err);
-    res.status(200).send({ message: 'Course deleted successfully' });
+  const beforeQuery = 'SELECT * FROM course WHERE course_id = ?'
+  db.query(beforeQuery, [id], (err, result) => {
+    if (err) return res.send.status(500).json({message: 'Database error', error: err});
+    if (result.length === 0) return res.send.status(404).json({message: 'Course not found'});
+
+    const course_name = result[0].course_name;
+    const course_abb = result[0].course_abb;
+
+    const query = `DELETE FROM course WHERE course_id = ?`;
+    db.query(query, [id], (err, result) => {
+      if (err) return res.status(500).send(err);
+      res.status(200).send({ message: 'Course deleted successfully' });
+
+      logAudit( req.user.user_code, req.user.role, `Course: ${course_name} (${course_abb}) deleted`, 'user' )
+      .then(auditId => {
+        console.log(auditId);
+      })
+      .catch(err => {
+        console.log('Audit log error: ', err);
+      });
+    });
   });
 };
 

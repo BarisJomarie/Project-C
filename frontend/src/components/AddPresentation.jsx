@@ -343,10 +343,10 @@ const AddPresentation = () => {
               {formData.research_title.trim() !== "" && (
                 <>
                   {titleCheck?.exists === true && (
-                    <p style={{ color: "red", fontSize: "0.6em" }}>{titleCheck.message}</p>
+                    <p style={{ color: "red" }} className="checker">{titleCheck.message}</p>
                   )}
                   {titleCheck?.exists === false && (
-                    <p style={{ color: "green", fontSize: "0.6em" }}>{titleCheck.message}</p>
+                    <p style={{ color: "green" }} className="checker">{titleCheck.message}</p>
                   )}
                 </>
               )}

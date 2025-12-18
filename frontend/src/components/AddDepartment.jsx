@@ -92,9 +92,7 @@ const AddDepartment = ({ fetchDepartments, departmentList }) => {
                 try {
                     const payload = {
                         department_name: departmentName,
-                        department_abb: departmentAbb,
-                        user_code: userData.user_code,
-                        role: userData.role,
+                        department_abb: departmentAbb
                     };
 
                     const res = await axios.post(
@@ -159,14 +157,8 @@ const AddDepartment = ({ fetchDepartments, departmentList }) => {
                     const res = await axios.delete(
                     `${API_URL}/api/users/departments/delete/${deptId}`,
                     {
-                        headers: { Authorization: `Bearer ${token}` },
-                        data: {
-                        user_code: userData.user_code,
-                        role: userData.role,
-                        department_name: deptName,
-                        },
-                    }
-                    );
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
 
                     if (res.status === 200) {
                         showToast("success", "Delete", "Department deleted successfully.");
