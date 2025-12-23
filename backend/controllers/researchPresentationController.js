@@ -1,4 +1,5 @@
 const db = require('../db');
+const { logAudit } = require('./auditsController');
 
 exports.presentationTitleChecker = (req, res) => {
   const {title} = req.query;
@@ -71,6 +72,10 @@ exports.addResearchPresentation = (req, res) => {
     (err, result) => {
       if (err) return res.status(500).json({ message: err });
       res.status(200).json({ message: "Presentation added successfully!" });
+
+      logAudit( req.user.user_code, req.user.role, `Added Research Presentation: ${research_title}`, 'user' )
+      .then(auditId => console.log(auditId))
+      .catch(err => console.error('Audit log error: ', err));
     }
   );
 };
@@ -145,14 +150,25 @@ exports.deleteResearchPresentation = (req, res) => {
 
   if (!id) return res.status(400).json({ message: "Missing presentation ID" });
 
-  const sql = "DELETE FROM research_presentations WHERE id = ?";
+  const beforeQuery = 'SELECT * FROM research_presentations WHERE id = ?';
 
-  db.query(sql, [id], (err, result) => {
-    if (err) return res.status(500).json({ message: err.message });
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "Presentation not found" });
-    }
-    res.status(200).json({ message: "Presentation deleted successfully" });
+  db.query(beforeQuery, [id], (err, result) => {
+    if (err) return res.status(500).json({message: 'Database Error', error: err});
+    if (result.length === 0) return res.status(404).json({message: 'Research Presentations not found'});
+
+    const title = result[0].research_title;
+
+    const query = "DELETE FROM research_presentations WHERE id = ?";
+
+    db.query(query, [id], (err, result) => {
+      if (err) return res.status(500).json({ message: err.message });
+      if (result.length === 0) return res.status(404).json({ message:"Research Presentation cannot be deleted"});
+
+      res.status(200).json({message: "Presentation deleted successfully"});
+      logAudit( req.user.user_code, req.user.role, `Deleted Research Presentation: ${title}`, 'user')
+      .then(auditId => console.log(auditId))
+      .catch(err => console.error('Audit log error: ', err));
+    });
   });
 };
 

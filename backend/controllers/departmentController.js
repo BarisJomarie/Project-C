@@ -38,16 +38,19 @@ exports.getDepartmentInfo = (req, res) => {
   const { department_id } = req.query;
 
   if (!department_id) {
-    return res.status(400).send({ message: 'Department ID is required.'});
+    return res.status(400).json({ message: 'Department ID is required.'});
   }
 
   const query = `SELECT * FROM department WHERE department_id = ?`;
 
   db.query(query, [department_id], (err, result) => {
-    if (err) return res.status(500).send(err);
-    if(result.length === 0) return res.status(200).send([]);
+    if (err) {
+      console.log('DB error: ', err);
+      return res.status(500).json({message: 'Database query failed.'});
+    }
+    if(result.length === 0) return res.status(404).json({message: 'Department not found.'});
 
-    res.status(200).send(result);
+    res.status(200).json(result[0]);
   });
 };
 
