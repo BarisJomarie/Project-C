@@ -14,7 +14,7 @@ const {addResearch, deleteResearchPaper, getDepartmentPapers, getDepartmentPaper
 
 const {addResearchPresentation, presentationTitleChecker, getResearchPresentationsByDepartment, getCurrentUploadedPresentationUser, deleteResearchPresentation} = require('../controllers/researchPresentationController');
 
-const {addResearchPublication, getResearchPublicationsByDepartment, deleteResearchPublication} = require('../controllers/researchPublicationController');
+const {addResearchPublication, publicationTitleChecker, getPublicationIndexes, getResearchPublicationsByDepartment, deleteResearchPublication} = require('../controllers/researchPublicationController');
 
 const upload = require('../middleware/uploadMiddleware');
 
@@ -92,6 +92,8 @@ router.delete("/presentation/delete/:id", verifyToken, deleteResearchPresentatio
 router.post("/publication/add", verifyToken, addResearchPublication);
 
 router.get("/publication/department", verifyToken, getResearchPublicationsByDepartment);
+router.get("/publication/title-checker", verifyToken, publicationTitleChecker);
+router.get("/publication/indexes", verifyToken, getPublicationIndexes);
 
 router.delete("/publication/delete/:id", verifyToken, deleteResearchPublication);
 

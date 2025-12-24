@@ -406,7 +406,7 @@ header .left {
   transform: translateY(-50%) scaleY(0);
   width: 3px;
   height: 0;
-  background: #f97316;
+  background: #C83F12;
   border-radius: 0 2px 2px 0;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -424,7 +424,7 @@ header .left {
 }
 
 .sidebar-link.active {
-  background: #f97316;
+  background: #C83F12;
   color: #ffffff;
   font-weight: 600;
   box-shadow: 0 2px 8px rgba(249, 115, 22, 0.25);
@@ -433,7 +433,7 @@ header .left {
 }
 
 .sidebar-link.active:hover {
-  background: #ea580c;
+  background: #C83F12;
 }
 
 .sidebar-link.active::before {

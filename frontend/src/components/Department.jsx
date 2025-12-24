@@ -125,12 +125,6 @@ const updatePubCoAuthor = (value, index) => {
       params: { department_id: dep_id },
       headers: { Authorization: `Bearer ${token}` }
     }).then(res => {
-      if (Array.isArray(res.data) && res.data.length > 0) {
-        // console.log(`Department fetched`);
-        // console.log(res.data);
-      } else {
-        console.log(`Department not found`);
-      }
       setDepartment(res.data);
     }).catch(err => {
       console.error('Error fetching department', err);
@@ -247,55 +241,6 @@ const updatePubCoAuthor = (value, index) => {
     .finally(() => {
       setTableLoading(false);
     });
-  };
-  
-  // ADD RESEARCH PUBLICATIONS
-  const handleAddPublication = async (e) => {
-    e.preventDefault();
-
-    const data = {
-      published_title,
-      pub_author,
-      pub_co_authors,
-      journal_title,
-      conference_or_proceedings,
-      publisher,
-      pub_date_presented: pubDatePresented,
-      pub_end_date_presented: pubEndDatePresented,
-      doi,
-      issn_isbn,
-      volume_issue,
-      index_type,
-      department_id: dep_id
-    };
-
-    try {
-      await axios.post(`${API_URL}/api/users/publication/add`, data, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      showToast("success", "Success!", "Research publication added.");
-
-      setShowAddPublicationForm(false);
-
-      // Clear inputs
-      setPubTitle("");
-      setPubAuthor("");
-      setPubCoAuthors([""]);
-      setPubJournal("");
-      setPubConference("");
-      setPubPublisher("");
-      setPubDatePresented("");   // <-- clear state
-      setPubEndDatePresented(""); // <-- clear state
-      setPubDOI("");
-      setPubISSN("");
-      setPubVolumeIssue("");
-      setPubIndex("");
-
-      fetchResearchPublications();
-    } catch (error) {
-      showToast("error", "Failed", "Something went wrong.");
-    }
   };
 
   // GET DEPARTMENT COURSES
@@ -1225,7 +1170,7 @@ function formatDateRange(startDate, endDate) {
   return (
     <>
       <div className="department-container">
-        {pageLoading ? <ShimmerTitle line={1} gap={10} variant="primary"/> : <h1>{department[0]?.department_name}</h1>}
+        {pageLoading ? <ShimmerTitle line={1} gap={10} variant="primary"/> : <h1>{department.department_name}</h1>}
         <div className='line'></div>
         <div className="department-buttons-container">
 
@@ -1263,8 +1208,8 @@ function formatDateRange(startDate, endDate) {
             {activeTable === 'research-publications' && userData?.role !== 'faculty' ? (<>
               <button
                 type="button"
-                // onClick={() => navigate(`/user/department/${dep_id}/research-publication-add`)}
-                onClick={() => setShowAddPublicationForm(!showAddPublicationForm)}
+                onClick={() => navigate(`/user/department/${dep_id}/research-publication-add`)}
+                // onClick={() => setShowAddPublicationForm(!showAddPublicationForm)}
               >
                 {showAddPublicationForm ? "Close Form" : "Add Research Publication"}
               </button>
@@ -1663,167 +1608,6 @@ function formatDateRange(startDate, endDate) {
         {activeTable === "research-publications" && (
           tableLoading ? <ShimmerTable row={5} col={13}/> : <>
             <div>
-              <div className={`form-container ${showAddPublicationForm ? "slide-down" : "slide-up"}`}>
-                <div className="add-form-container">
-                  <h3>Add Research Publication</h3>
-
-                  <form onSubmit={handleAddPublication} className="form">
-
-                    <div className="form-input">
-                      <input
-                        type="text"
-                        placeholder="Published Title"
-                        value={published_title}
-                        onChange={(e) => setPubTitle(e.target.value)}
-                        required
-                      />
-                      <label>Published Title</label>
-                    </div>
-
-                    <div className="grouped-inputs">
-                      <div className="form-input">
-                        <input
-                          type="text"
-                          placeholder="Author Name"
-                          value={pub_author}
-                          onChange={(e) => setPubAuthor(e.target.value)}
-                          required
-                        />
-                        <label>Author</label>
-                      </div>
-                    </div>
-
-                    <div className="form-input">
-                      <button type="button" onClick={addPubCoAuthor} className="add-coauthor-btn">+</button>
-
-                      {pub_co_authors.map((pub_co_authors, index) => (
-                        <div key={index} className="coauthor-row">
-                          <input
-                            type="text"
-                            value={pub_co_authors}
-                            onChange={(e) => updatePubCoAuthor(e.target.value, index)}
-                            placeholder={`Co-author ${index + 1}`}
-                            style={{ width: "80%", margin: "5px 0" }}
-                          />
-
-                          {index > 0 && (
-                            <button
-                              type="button"
-                              onClick={() => removePubCoAuthor(index)}
-                              style={{ height: "25px", padding: "0" }}
-                            >
-                              <span className="material-symbols-outlined">remove</span>
-                            </button>
-                          )}
-                        </div>
-                      ))}
-
-                      <label>Co-Authors</label>
-                    </div>
-                    
-
-                    <div className="form-input">
-                      <input
-                        type="text"
-                        placeholder="Journal / Publication Title"
-                        value={journal_title}
-                        onChange={(e) => setPubJournal(e.target.value)}
-                        required
-                      />
-                      <label>Title of Journal / Publication</label>
-                    </div>
-
-                    <div className="form-input">
-                      <input
-                        type="text"
-                        placeholder="Conference / Proceedings"
-                        value={ conference_or_proceedings}
-                        onChange={(e) => setPubConference(e.target.value)}
-                        required
-                      />
-                      <label>Conference / Proceedings</label>
-                    </div>
-
-                    <div className="form-input">
-                      <input
-                        type="text"
-                        placeholder="Publisher"
-                        value={ publisher}
-                        onChange={(e) => setPubPublisher(e.target.value)}
-                        required
-                      />
-                      <label>Publisher</label>
-                    </div>
-
-                    <div className="form-input">
-                      <input 
-                        name="s-date" 
-                        type="date" 
-                        value={pubDatePresented}
-                        onChange={(e) => setPubDatePresented(e.target.value)}
-                        required/>
-                      <label htmlFor="s-date">Start Date</label>
-                    </div>
-                    <div className="form-input">
-                      <input 
-                        name="e-date" 
-                        type="date" 
-                        value={pubEndDatePresented}
-                        onChange={(e) => setPubEndDatePresented(e.target.value)}
-                        required/>
-                      <label htmlFor="e-date">End Date</label>
-                    </div>
-
-                    <div className="form-input">
-                      <input
-                        type="text"
-                        placeholder="DOI"
-                        value={doi}
-                        onChange={(e) => setPubDOI(e.target.value)}
-                        required
-                      />
-                      <label>DOI</label>
-                    </div>
-
-                    <div className="form-input">
-                      <input
-                        type="text"
-                        placeholder="ISSN / ISBN"
-                        value={ issn_isbn}
-                        onChange={(e) => setPubISSN(e.target.value)}
-                      />
-                      <label>ISSN / ISBN</label>
-                    </div>
-
-                    <div className="form-input">
-                      <input
-                        type="text"
-                        placeholder="Volume & Issue No."
-                        value={volume_issue}
-                        onChange={(e) => setPubVolumeIssue(e.target.value)}
-                        required
-                      />
-                      <label>Volume & Issue No.</label>
-                    </div>
-
-                    <div className="form-input">
-                      <input
-                        type="text"
-                        placeholder="Index Type"
-                        value={index_type}
-                        onChange={(e) => setPubIndex(e.target.value)}
-                        required
-                      />
-                      <label>Index</label>
-                    </div>
-
-                    <div className="form-group">
-                      <button type="submit" className="submit-btn">Submit</button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-
               {/* TABLE BELOW FORM */}
               <div 
                 className="table-container"

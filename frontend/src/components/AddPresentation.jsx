@@ -115,7 +115,7 @@ const AddPresentation = () => {
     }).catch(err => {
       console.error('Error fetching department', err);
     });
-  }
+  };
 
   // GET USER CURRENT ADDED PRESENTATION
   const getCurrentUploadedPresentation = () => {
@@ -198,6 +198,12 @@ const AddPresentation = () => {
       return
     }
 
+    const allCoAuthorsFilled = formData.co_authors.every(author => author.trim() !== '');
+    if (!allCoAuthorsFilled) {
+      showToast('warning', 'Missing Co-Author', 'Please fill in all co-author fields!');
+      return;
+    }
+
     try {
       // Map frontend fields to backend names
       const payload = {
@@ -228,7 +234,7 @@ const AddPresentation = () => {
         <ShimmerTitle line={1} gap={10} variant="primary"/>
         <ShimmerTitle line={1} gap={10} variant="primary"/>
       </> : <>
-        <h1 style={{textAlign: 'center'}}>Add Research Presentation for Department of <br/>
+        <h1 style={{textAlign: 'center'}}>Add Research Presentation for<br/>
         <span style={{color: '#C83F12'}}>{department?.department_name}</span>
       </h1>
       </>}
@@ -339,7 +345,6 @@ const AddPresentation = () => {
 
             {/* RESEARCH TITLE */}
             <div className="form-input">
-              {/* Only show feedback if there's text */}
               {formData.research_title.trim() !== "" && (
                 <>
                   {titleCheck?.exists === true && (

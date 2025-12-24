@@ -16,6 +16,7 @@
     "react-dom": "^19.1.0",
     "react-markdown": "^10.1.0",
     "react-router-dom": "^7.6.3",
+    "react-select": "^5.10.2",
     "react-shimmer-effects": "^1.0.4",
     "react-toastify": "^11.0.5",
     "reactdom": "^2.0.0",

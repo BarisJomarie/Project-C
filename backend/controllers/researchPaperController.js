@@ -1,31 +1,32 @@
 const db = require('../db');
+const { logAudit } = require('./auditsController')
 
 //ADD PAPER
 exports.addResearch = (req, res) => {
   const { user_id, research_type, semester, sy, funding_source, title, abstract, conclusion, adviser, researchers, department, course, sdg_number, sdg_label, confidence_scores, status, user_code, role } = req.body;
 
-  // console.log(req.body);
-  const checker = `SELECT * FROM research_paper WHERE research_title = ?`;
-  db.query(checker, [title], (err, result) => {
-    if (err) return res.status(500).send({ message: 'Database error', err });
-    if (result.length > 0) {
-      return res.status(400).send({ message: 'Paper already exists' });
-    }
-
+  const beforeQuery = `SELECT * FROM research_paper WHERE research_title = ?`;
+  db.query(beforeQuery, [title], (err, result) => {
+    if (err) return res.status(500).send({ message: 'Database error: ', err });
+    if (result.length > 0) return res.status(400).send({ message: 'Paper already exists' });
+    
     const query = `
       INSERT INTO research_paper ( research_type, semester, academic_year, funding_source, research_title, research_abstract, research_conclusion, adviser, researchers, department_id, course_id, sdg_number, sdg_labels, confidence_scores, status, created_at, uploaded_by) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)`;
-
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)
+    `;
     const values = [ research_type, semester, sy, funding_source, title, abstract, conclusion, adviser, JSON.stringify(researchers), department, course, JSON.stringify(sdg_number), JSON.stringify(sdg_label), JSON.stringify(confidence_scores), status, user_id ];
+
+    let type = '';
+    if (research_type === 'student') type = 'Student Thesis';
+    else if (research_type === 'faculty') type = 'Faculty Research';
+
     db.query(query, values, (err, result) => {
       if (err) return res.status(500).send(err);
 
-      const auditQuery = `INSERT INTO audit_log (user_code, user_role, action, actor_type, timestamp) VALUES (?, ?, ?, 'user', NOW())`
-      db.query(auditQuery, [user_code, role, `Research Paper has been added. title: ${title}`], (err, result) => {
-        if (err) return res.status(500).send({ message: 'Database error', err });
-
-        res.status(201).send({ message: 'Paper added successfully' });
-      })
+      res.status(201).send({ message: 'Paper added successfully' });
+      logAudit( req.user.user_code, req.user.role, `Added Research Paper: ${type} - ${title}`, 'user' )
+      .then(auditId => console.log(auditId))
+      .catch(err => console.error('Audit log error: ', err));
     });
   });
 };
@@ -143,10 +144,28 @@ exports.getUserPapers = (req, res) => {
 exports.deleteResearchPaper = (req, res) => {
   const { id } = req.params;
 
-  const query = `DELETE FROM research_paper WHERE research_id = ?`;
-  db.query(query, [id], (err, result) => {
-    if (err) return res.status(500).send(err);
-    res.status(200).send({ message: 'Paper deleted successfully' });
+  const beforeQuery = 'SELECT * FROM research_paper WHERE research_id = ?';
+
+  db.query(beforeQuery, [id], (err, result) => {
+    if (err) return res.status(500).json({message: 'Database Error', err});
+    if (result.length === 0) return res.status(404).json({message: 'Research Paper not found'});
+
+    let type = '';
+    const research_type = result[0].research_type;
+    const title = result[0].research_title;
+    if (research_type === 'student') type = 'Student Thesis';
+    else if (research_type === 'faculty') type = 'Faculty Research';
+
+    const query = `DELETE FROM research_paper WHERE research_id = ?`;
+
+    db.query(query, [id], (err, result) => {
+      if (err) return res.status(500).send(err);
+      res.status(200).send({ message: 'Paper deleted successfully' });
+
+      logAudit( req.user.user_code, req.user.role, `Deleted Research Paper: ${type} - ${title}`, 'user' )
+      .then(auditId => console.log(auditId))
+      .catch(err => console.error('Audit log error: ', err)); 
+    });
   });
 };
 
@@ -436,6 +455,10 @@ exports.addHistoryReport = (req, res) => {
     db.query(query, values, (err, result) => {
       if (err) return res.status(500).send(err);
       res.status(201).send({ message: 'Report added successfully' });
+
+      logAudit( req.user.user_code, req.user.role, 'History Report Added', 'user')
+      .then(auditId => console.log(auditId))
+      .catch(err => console.error(err));
     })
   });
 };

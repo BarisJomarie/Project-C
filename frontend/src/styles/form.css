@@ -57,21 +57,76 @@
   margin-bottom: 0;
 }
 
+.input-container {
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #aaa;
+}
 
+.input-container.last {
+  border-bottom: none;
+}
 
-.grouped-inputs {
+.grouped-input-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 15px;
-  margin-bottom: 15px;
+}
+
+.grouped-input-container.flex {
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+}
+
+.grouped-inputs {
+  display: flex;
+  flex-direction: column-reverse;
+  position: relative;
+  overflow: visible;
+}
+
+.grouped-input-container.flex .form-input {
+  flex: 1;
 }
 
 .form-input {
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column;
   margin-bottom: 15px;
   position: relative;
   overflow: visible;
+}
+
+.co-author-input-wrapper {
+  position: relative;
+  margin-bottom: 5px;
+}
+
+.co-author-input-wrapper input {
+  margin: 0 !important;
+}
+
+.suggestions {
+  position: absolute;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  z-index: 10;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  top: 100%;
+}
+
+.suggestion-item { 
+  padding: 8px; 
+  cursor: pointer; 
+  border-bottom: 1px solid #ccc;
+  font-size: 0.9em;
+} 
+
+.suggestion-item:hover { 
+  background: #fff38781; 
 }
 
 .form-input .checker {
@@ -86,34 +141,120 @@
 .form-input.multi-index {
   flex-direction: column;
   margin-bottom: 0;
-  margin-top: 15px;
+  margin: 15px 0;
 }
+
+.form-input.row {
+  flex-direction: row-reverse;
+}
+
+.form-input.row span {
+  color: grey;
+  margin-right: 4px;
+  user-select: none;
+}
+
+.doi-input,
+.issn-isbn-container,
+.vi-input {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+}
+
+.doi-prefix,
+.issn-isbn-prefix,
+.vi-prefix {
+  color: grey;
+  margin-right: 4px;
+  user-select: none;
+  padding-left: 14px;
+  width: max-content;
+}
+
+
+.form-input.vi {
+  flex: initial !important;
+  width: min-content !important;
+}
+
+.form-input.vi input {
+  width: 50px !important;
+}
+
+.doi-input input,
+.issn-isbn-input {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.issn-isbn-input input {
+  text-align: start;
+  padding: 0 !important;
+  height: 40px;
+  width: 40px;
+  text-align: center;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.95em;
+  margin-right: 4px;
+  transition: all 0.2s ease;
+  background-color: white;
+  caret-color: transparent;
+}
+
+.issn-isbn-input span {
+  color: #333;
+}
+
+.digit-input {
+  width: 30px !important; 
+}
+
 
 .form-input.center {
   align-items: center;
 }
 
-.form-input label {
+.form-input label,
+.grouped-inputs label {
   padding-left: 4px;
   font-size: 0.85em;
   font-weight: 600;
-  color: #475569;
+  color: #C83F12;
   margin-bottom: 6px;
   transition: color 0.2s ease;
+}
+
+.grouped-input-container .form-input select {
+  font-size: 0.95em;
 }
 
 .form-input input[type='text'],
 .form-input input[type='number'],
 .form-input input[type='email'],
 .form-input input[type='date'],
+.co-author-input-wrapper input[type='text'],
 .form-input select {
   padding: 10px 16px;
   border: 1px solid #ddd;
   border-radius: 6px;
   font-size: 0.95em;
   transition: all 0.2s ease;
-  background-color: white;
+  background-color: #ffffff;
+  width: 100%;
 }
+
+.form-input input[name='date'] {
+  flex: 0 0 20px;
+  padding: 0;
+  height: 40px;
+  width: 50px;
+  text-align: center;
+}
+
 
 .form-input textarea {
   width: 100%;
@@ -145,19 +286,10 @@
 .form-input select:focus,
 .form-input textarea:focus {
   outline: none;
-  border-color: #1e293b;
-  box-shadow: 0 0 0 3px rgba(30, 41, 59, 0.1);
-  background-color: white;
+  border-color: #C83F12;
+  box-shadow: 0 0 0 3px rgba(200, 63, 18, 0.1);
 }
 
-.form-input input[type='text']:focus ~ label,
-.form-input input[type='number']:focus ~ label,
-.form-input input[type='email']:focus ~ label,
-form-input input[type='date']:focus ~ label,
-.form-input select:focus ~ label,
-.form-input textarea:focus ~ label {
-  color: #C83F12;
-}
 
 .form-input input[type='text']:disabled,
 .form-input input[type='text']:disabled::placeholder,
@@ -190,12 +322,6 @@ form-input input[type='date']:focus ~ label,
 
 .custom-file-upload input[type='file'] {
   display: none; /* hide the native input */
-}
-
-
-.form-input option {
-  background-color: #c83f122d;
-  padding: 5px;
 }
 
 .form-input .info {
@@ -325,9 +451,22 @@ form-input input[type='date']:focus ~ label,
   align-items: center;
 }
 
-.form-input option {
-  background-color: #3B060A;
-  color: #c4c7c5;
+.form-button-container.submit {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.form-button-container label {
+  display: flex;
+  align-content: center;
+  gap: 20px;
+}
+
+.form-button-container button:hover {
+  background-color: #C83F12;
+  color: white;
+  border-color: white;
 }
 
 td.editing-fullname {
@@ -372,13 +511,23 @@ td.editing-fullname input {
 
 .radio-group {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 equal columns */ 
-  align-items: left;                    /* vertically center items */
+  grid-template-columns: repeat(3, 1fr); 
+  align-items: left;                
   margin-bottom: 10px;
 }
 
+.radio-group.four{
+  display: grid;
+  grid-template-columns: repeat(4, 100px);
+  align-items: left;                 
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+
 .radio-group label {
   font-size: 0.9em;
+  color: #333;
   display: flex;
   align-items: center;
   gap: 5px;
