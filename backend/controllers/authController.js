@@ -7,7 +7,7 @@ const { logAudit } = require('./auditsController');
 let otpStore = {}; // temporary storage for email → OTP mapping
 const crypto = require('crypto');
 const { error } = require('console');
-
+const nodemailer = require('nodemailer');
 
 
 //------------------------------------------------------------SIGNIN-------------------------------------------------------------------------------------------------
@@ -333,11 +333,29 @@ exports.forgotPassword = (req, res) => {
       const resetLink = `${FRONTEND_URL}/reset-password/${token}`; // adjust if needed
 
 
-      await sendEmail(
-        email,
-        'Password Reset Request',
-        `You requested to reset your password.\n\nClick the link below to continue:\n${resetLink}\n\nThis link expires in 1 hour.`
-      );
+      const transporter = nodemailer.createTransport({
+        host: process.env.EMAIL_HOST,
+        port: Number(process.env.EMAIL_PORT),
+        secure: false, // true only for port 465
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS,
+        },
+      });
+
+
+      await transporter.sendMail({
+        from: process.env.EMAIL_FROM,
+        to: email,
+        subject: 'Password Reset Request',
+        text: `You requested to reset your password.
+
+      Click the link below to continue:
+      ${resetLink}
+
+      This link expires in 1 hour.`,
+      });
+
 
 
       res.status(200).send({ message: 'Password reset link sent to your email.' });
