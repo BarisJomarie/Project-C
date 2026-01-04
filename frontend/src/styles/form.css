@@ -93,7 +93,6 @@
 .form-input {
   display: flex;
   flex-direction: column;
-  margin-bottom: 15px;
   position: relative;
   overflow: visible;
 }
@@ -514,6 +513,7 @@ td.editing-fullname input {
   grid-template-columns: repeat(3, 1fr); 
   align-items: left;                
   margin-bottom: 10px;
+  margin-top: 10px;
 }
 
 .radio-group.four{
@@ -568,6 +568,7 @@ td.editing-fullname input {
   align-items: start;
   flex-direction: column;
   gap: 10px;
+
 }
 
 .checkbox-option {
@@ -576,6 +577,7 @@ td.editing-fullname input {
   gap: 8px;
   font-size: 0.9em;
   cursor: pointer;
+  color: #333 !important;
 }
 
 .checkbox-option input[type="checkbox"] {

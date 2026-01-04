@@ -191,14 +191,20 @@ const AddDepartment = ({ fetchDepartments, departmentList }) => {
                 <>
                     <div className={`form-container ${addDepartment ? 'slide-down' : 'slide-up'}`}>
                         <form onSubmit={handleAddDepartment}>
-                            <div className="form-input">
-                                <input name="dept-name" type="text" value={departmentName} onChange={(e) => setDepartmentName(e.target.value)}/>
-                                <label htmlFor="dept-name">Department Name</label>
+                            <div className="input-container">
+                                <div className="form-input">
+                                    <label htmlFor="dept-name">Department Name</label>
+                                    <input name="dept-name" type="text" value={departmentName} onChange={(e) => setDepartmentName(e.target.value)}/>
+                                </div>
                             </div>
-                            <div className="form-input">
-                                <input name="dept-abb" type="text" value={departmentAbb} onChange={(e) => setDepartmentAbb(e.target.value)} />
-                                <label htmlFor="dept-abb">Department Abbreviation</label>
+                            
+                            <div className="input-container last">
+                                <div className="form-input">
+                                    <label htmlFor="dept-abb">Department Abbreviation</label>
+                                    <input name="dept-abb" type="text" value={departmentAbb} onChange={(e) => setDepartmentAbb(e.target.value)} />
+                                </div>
                             </div>
+                            
                             <div className="form-button-container">
                                 <button type="submit">Submit</button>
                             </div>

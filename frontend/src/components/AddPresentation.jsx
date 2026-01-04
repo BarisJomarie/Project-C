@@ -243,280 +243,299 @@ const AddPresentation = () => {
       <div className="form-container default">
         {pageLoading ? <ShimmerThumbnail height={250} width={300} rounded /> : <>
           <form onSubmit={addPresentations}>
-            {/* DEPARTMENT */}
-            <div className="form-input">
-              <input 
-                name="department" 
-                type="text" 
-                value={department?.department_name || 'Department ?'} 
-                disabled 
-                />
-              <label htmlFor="department">Department</label>
-            </div>
 
             {/* AUTHOR */}
-            <div className="form-input">
-              <input 
-                name="author" 
-                type="text" 
-                value={formData.author}
-                onChange={(e) => setFormData(prev => ({...prev, author: e.target.value}))}
-                placeholder={`Author: Firstname M.I. Lastname`}
-                required
-                />
-              <label htmlFor="author">Author</label>
+            <div className="input-container">
+              <div className="form-input">
+                <label htmlFor="author">Author</label>
+                <input 
+                  name="author" 
+                  type="text" 
+                  value={formData.author}
+                  onChange={(e) => setFormData(prev => ({...prev, author: e.target.value}))}
+                  placeholder={`Author: Firstname M.I. Lastname`}
+                  required
+                  />
+              </div>
             </div>
 
             {/* CO-AUTHORS */}
-            <div className="form-input multi-index">
-              <label htmlFor="coa">Researchers</label>
-              {formData.co_authors.map((res, index) => (
-                <input 
-                  key={index}
-                  ref={el => inputRefs.current[index] = el}
-                  type="text"
-                  name={`co_author_${index}`}
-                  value={res}
-                  onChange={(e) => {
-                    const newCoAuthor = [...formData.co_authors];
-                    newCoAuthor[index] = e.target.value;
-                    setFormData(prev => ({...prev, co_authors: newCoAuthor}));
-                  }}
-                  onKeyDown={(e) => {
-                    //ADD
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
+            <div className="input-container">
+              <div className="form-input multi-index">
+                <label htmlFor="coa">Researchers</label>
+                {formData.co_authors.map((res, index) => (
+                  <input 
+                    key={index}
+                    ref={el => inputRefs.current[index] = el}
+                    type="text"
+                    name={`co_author_${index}`}
+                    value={res}
+                    onChange={(e) => {
+                      const newCoAuthor = [...formData.co_authors];
+                      newCoAuthor[index] = e.target.value;
+                      setFormData(prev => ({...prev, co_authors: newCoAuthor}));
+                    }}
+                    onKeyDown={(e) => {
+                      //ADD
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
 
-                      //IF NEXT INPUT IS EMPTY
-                      if (formData.co_authors[index + 1] !== undefined && formData.co_authors[index + 1].trim() === "") {
-                        setTimeout(() => {
-                          inputRefs.current[index + 1]?.focus();
-                        }, 0);
-                      } 
-                      //CREATES NEW IF CURRENT FOCUS IS LAST INDEX
-                      else if (formData.co_authors.length < 6 && res.trim() !== '') {
-                        setFormData(prev => {
-                          const updated = [...prev.co_authors, ''];
-                          return {...prev, co_authors: updated};
-                        });
+                        //IF NEXT INPUT IS EMPTY
+                        if (formData.co_authors[index + 1] !== undefined && formData.co_authors[index + 1].trim() === "") {
+                          setTimeout(() => {
+                            inputRefs.current[index + 1]?.focus();
+                          }, 0);
+                        } 
+                        //CREATES NEW IF CURRENT FOCUS IS LAST INDEX
+                        else if (formData.co_authors.length < 6 && res.trim() !== '') {
+                          setFormData(prev => {
+                            const updated = [...prev.co_authors, ''];
+                            return {...prev, co_authors: updated};
+                          });
+
+                          setTimeout(() => {
+                            const lastIndex = formData.co_authors.length;
+                            inputRefs.current[lastIndex]?.focus();
+                          }, 0);
+                        }
+                      }
+
+                      //DELETE
+                      if (e.key === 'Backspace' && res === '' && formData.co_authors.length > 1) {
+                        e.preventDefault();
+                        const newCoAuthor = formData.co_authors.filter((_, i) => i !== index);
+                        setFormData(prev => ({...prev, co_authors: newCoAuthor}));
 
                         setTimeout(() => {
-                          const lastIndex = formData.co_authors.length;
-                          inputRefs.current[lastIndex]?.focus();
+                          const prevIndex = index - 1;
+                          if (prevIndex >= 0) {
+                            const prevInput = document.querySelector(`input[name="co_author_${prevIndex}"]`);
+                            prevInput?.focus();
+                          }
                         }, 0);
                       }
-                    }
+                    }}
+                    placeholder={`Co-Author ${index + 1}: Firstname M.I. Lastname`}
+                    required
+                    style={{ display: "block", marginBottom: "10px" }}/>
+                ))}
+                <div className="form-button-container" style={{ justifyContent: 'center', gap: '10px'}}>
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({...prev, co_authors: [...prev.co_authors, '']}))}
+                    disabled={formData.co_authors.length === 6}>
+                      +
+                  </button>
 
-                    //DELETE
-                    if (e.key === 'Backspace' && res === '' && formData.co_authors.length > 1) {
-                      e.preventDefault();
-                      const newCoAuthor = formData.co_authors.filter((_, i) => i !== index);
-                      setFormData(prev => ({...prev, co_authors: newCoAuthor}));
-
-                      setTimeout(() => {
-                        const prevIndex = index - 1;
-                        if (prevIndex >= 0) {
-                          const prevInput = document.querySelector(`input[name="co_author_${prevIndex}"]`);
-                          prevInput?.focus();
-                        }
-                      }, 0);
-                    }
-                  }}
-                  placeholder={`Co-Author ${index + 1}: Firstname M.I. Lastname`}
-                  required
-                  style={{ display: "block", marginBottom: "10px" }}/>
-              ))}
-              <div className="form-button-container" style={{ justifyContent: 'center', gap: '10px'}}>
-                <button
-                  type="button"
-                  onClick={() => setFormData(prev => ({...prev, co_authors: [...prev.co_authors, '']}))}
-                  disabled={formData.co_authors.length === 6}>
-                    +
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setFormData(prev => ({...prev, co_authors: prev.co_authors.slice(0, -1)}))}
-                  disabled={formData.co_authors.length === 1}>
-                    -
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({...prev, co_authors: prev.co_authors.slice(0, -1)}))}
+                    disabled={formData.co_authors.length === 1}>
+                      -
+                  </button>
+                </div>
               </div>
             </div>
 
             {/* RESEARCH TITLE */}
-            <div className="form-input">
-              {formData.research_title.trim() !== "" && (
-                <>
-                  {titleCheck?.exists === true && (
-                    <p style={{ color: "red" }} className="checker">{titleCheck.message}</p>
-                  )}
-                  {titleCheck?.exists === false && (
-                    <p style={{ color: "green" }} className="checker">{titleCheck.message}</p>
-                  )}
-                </>
-              )}
-              <input 
-                name="r-title" 
-                type="text" 
-                value={formData.research_title}
-                onChange={(e) => setFormData(prev => ({...prev, research_title: e.target.value}))}
-                placeholder="Enter Research Presentation Title"
-                required
-                />
-              <label htmlFor="r-title">Research Title</label>
+            <div className="input-container">
+              <div className="form-input">
+                {formData.research_title.trim() !== "" && (
+                  <>
+                    {titleCheck?.exists === true && (
+                      <p style={{ color: "red" }} className="checker">{titleCheck.message}</p>
+                    )}
+                    {titleCheck?.exists === false && (
+                      <p style={{ color: "green" }} className="checker">{titleCheck.message}</p>
+                    )}
+                  </>
+                )}
+                <label htmlFor="r-title">Research Title</label>
+                <input 
+                  name="r-title" 
+                  type="text" 
+                  value={formData.research_title}
+                  onChange={(e) => setFormData(prev => ({...prev, research_title: e.target.value}))}
+                  placeholder="Enter Research Presentation Title"
+                  required
+                  />
+              </div>  
             </div>
 
             {/* SDG ALIGNMENT */}
-            <div className="form-input">
-              <div className="sdg-checkboxes" name="sdg">
-                {sdgOptions.map((sdg, idx) => (
-                  <label key={idx} className="checkbox-option">
-                    <input
-                      type="checkbox"
-                      value={sdg}
-                      checked={formData.sdg_alignment.includes(sdg)}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        if (formData.sdg_alignment.includes(value)) {
-                          //REMOVE
-                          setFormData(prev => ({...prev, sdg_alignment: prev.sdg_alignment.filter(item => item != value)}));
-                        } else {
-                          //SELECT
-                          setFormData(prev => ({...prev, sdg_alignment: [...prev.sdg_alignment, value]}));
-                        }
-                      }} />
-                      {sdg}
-                  </label>
-                ))}
+            <div className="input-container">
+              <div className="form-input">
+                <label htmlFor="sdg">SDG Alignment</label>
+                <div className="sdg-checkboxes" name="sdg">
+                  {sdgOptions.map((sdg, idx) => (
+                    <label key={idx} className="checkbox-option">
+                      <input
+                        type="checkbox"
+                        value={sdg}
+                        checked={formData.sdg_alignment.includes(sdg)}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (formData.sdg_alignment.includes(value)) {
+                            //REMOVE
+                            setFormData(prev => ({...prev, sdg_alignment: prev.sdg_alignment.filter(item => item != value)}));
+                          } else {
+                            //SELECT
+                            setFormData(prev => ({...prev, sdg_alignment: [...prev.sdg_alignment, value]}));
+                          }
+                        }} />
+                        {sdg}
+                    </label>
+                  ))}
+                </div>
               </div>
-              <label htmlFor="sdg">SDG Alignment</label>
             </div>
 
             {/* CONFERRENCE TITLE */}
-            <div className="form-input">
-              <input 
-                name="c-title" 
-                type="text" 
-                value={formData.conference_title}
-                onChange={(e) => setFormData(prev => ({...prev, conference_title: e.target.value}))}
-                placeholder="Enter Conferece"
-                required
-                />
-              <label htmlFor="c-title">Conference Title</label>
+            <div className="input-container">
+              <div className="form-input">
+                <label htmlFor="c-title">Conference Title</label>
+                <input 
+                  name="c-title" 
+                  type="text" 
+                  value={formData.conference_title}
+                  onChange={(e) => setFormData(prev => ({...prev, conference_title: e.target.value}))}
+                  placeholder="Enter Conferece"
+                  required
+                  />
+              </div>
             </div>
 
             {/* ORGANIZER */}
-            <div className="form-input">
-              <input 
-                name="org" 
-                type="text" 
-                value={formData.organizer}
-                onChange={(e) => setFormData(prev => ({...prev, organizer: e.target.value}))}
-                placeholder="Enter Organizer"
-                required
-                />
-              <label htmlFor="org">Organizer</label>
+            <div className="input-container">
+              <div className="form-input">
+                <label htmlFor="org">Organizer</label>
+                <input 
+                  name="org" 
+                  type="text" 
+                  value={formData.organizer}
+                  onChange={(e) => setFormData(prev => ({...prev, organizer: e.target.value}))}
+                  placeholder="Enter Organizer"
+                  required
+                  />
+              </div>
             </div>
 
             {/* VENUE */}
-            <div className="form-input">
-              <input 
-                name="venue" 
-                type="text" 
-                value={formData.venue}
-                onChange={(e) => setFormData(prev => ({...prev, venue: e.target.value}))}
-                placeholder="Enter Venue"
-                required
-                />
-              <label htmlFor="venue">Venue</label>
+            <div className="input-container">
+              <div className="form-input">
+                <label htmlFor="venue">Venue</label>
+                <input 
+                  name="venue" 
+                  type="text" 
+                  value={formData.venue}
+                  onChange={(e) => setFormData(prev => ({...prev, venue: e.target.value}))}
+                  placeholder="Enter Venue"
+                  required
+                  />
+              </div>
             </div>
 
             {/* START DATE */}
-            <div className="form-input">
-              <input 
-                name="s-date" 
-                type="date" 
-                value={formData.date_presented}
-                onChange={(e) => setFormData(prev => ({...prev, date_presented: e.target.value}))}
-                required
-                />
-              <label htmlFor="s-date">Start Date</label>
+            <div className="input-container">
+              <div className="form-input">
+                <label htmlFor="s-date">Start Date</label>
+                <input 
+                  name="s-date" 
+                  type="date" 
+                  value={formData.date_presented}
+                  onChange={(e) => setFormData(prev => ({...prev, date_presented: e.target.value}))}
+                  required
+                  />
+              </div>
             </div>
+           
 
             {/* END DATE */}
-            <div className="form-input">
-              <input 
-                name="e-date" 
-                type="date" 
-                value={formData.end_date_presented}
-                onChange={(e) => setFormData(prev => ({...prev, end_date_presented: e.target.value}))}
-                required
-                />
-              <label htmlFor="e-date">End Date</label>
+            <div className="input-container">
+              <div className="form-input">
+                <label htmlFor="e-date">End Date</label>
+                <input 
+                  name="e-date" 
+                  type="date" 
+                  value={formData.end_date_presented}
+                  onChange={(e) => setFormData(prev => ({...prev, end_date_presented: e.target.value}))}
+                  required
+                  />
+              </div>
             </div>
 
             {/* CONFERENCE CATEGORY */}
-            <div className="form-input">
-              <select
-                name="conference_category"
-                value={formData.conference_category}
-                onChange={(e) => setFormData(prev => ({...prev, conference_category: e.target.value }))}
-                required>
-                <option value={''}>-- Select a Category --</option>
-                {conferenceCategory.map((type, idx) => (
-                  <option key={idx} value={type}>
-                    {type}
-                  </option>
-                ))}
-              </select>
-              <label htmlFor="conference_category">Conference Category</label>
+            <div className="input-container">
+              <div className="form-input">
+                <label htmlFor="conference_category">Conference Category</label>
+                <select
+                  name="conference_category"
+                  value={formData.conference_category}
+                  onChange={(e) => setFormData(prev => ({...prev, conference_category: e.target.value }))}
+                  required>
+                  <option value={''}>-- Select a Category --</option>
+                  {conferenceCategory.map((type, idx) => (
+                    <option key={idx} value={type}>
+                      {type}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             {/* SPECIAL ORDER NO. */}
-            <div className="form-input">
-              <input 
-                name="orderno" 
-                type="text" 
-                value={formData.special_order_no}
-                onChange={(e) => setFormData(prev => ({...prev, special_order_no: e.target.value}))}
-                placeholder="Enter Special Order No."
-                />
-              <label htmlFor="orderno">Special Order No.</label>
+            <div className="input-container">
+              <div className="form-input">
+                <label htmlFor="orderno">Special Order No.</label>
+                <input 
+                  name="orderno" 
+                  type="text" 
+                  value={formData.special_order_no}
+                  onChange={(e) => setFormData(prev => ({...prev, special_order_no: e.target.value}))}
+                  placeholder="Enter Special Order No."
+                  />
+              </div>
             </div>
-
+           
             {/* STATUS */}
-            <div className="form-input">
-              <select
-                name="status"
-                value={formData.status_engage}
-                onChange={(e) => setFormData(prev => ({...prev, status_engage: e.target.value }))}
-                required>
-                <option value={''}>-- Select the Status --</option>
-                {status.map((stat, idx) => (
-                  <option key={idx} value={stat}>
-                    {stat}
-                  </option>
-                ))}
-              </select>
-              <label htmlFor="status">Status</label>
+            <div className="input-container">
+              <div className="form-input">
+                <label htmlFor="status">Status</label>
+                <select
+                  name="status"
+                  value={formData.status_engage}
+                  onChange={(e) => setFormData(prev => ({...prev, status_engage: e.target.value }))}
+                  required>
+                  <option value={''}>-- Select the Status --</option>
+                  {status.map((stat, idx) => (
+                    <option key={idx} value={stat}>
+                      {stat}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
+            
 
             {/* FUNDING SOURCE */}
-            <div className="form-input">
-              <select
-                name="funding"
-                value={formData.funding_source_engage}
-                onChange={(e) => setFormData(prev => ({...prev, funding_source_engage: e.target.value }))}
-                required>
-                <option value={''}>-- Select the Funding Source --</option>
-                {fundingSource.map((fund, idx) => (
-                  <option key={idx} value={fund}>
-                    {fund}
-                  </option>
-                ))}
-              </select>
-              <label htmlFor="funding">Funding Source</label>
+            <div className="input-container last">
+              <div className="form-input">
+                <label htmlFor="funding">Funding Source</label>
+                <select
+                  name="funding"
+                  value={formData.funding_source_engage}
+                  onChange={(e) => setFormData(prev => ({...prev, funding_source_engage: e.target.value }))}
+                  required>
+                  <option value={''}>-- Select the Funding Source --</option>
+                  {fundingSource.map((fund, idx) => (
+                    <option key={idx} value={fund}>
+                      {fund}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
+            
             <div className="form-button-container">
               <button type="button" onClick={() => clearFields()}>Clear</button>
               <button type="submit">Add Research Presentation</button>

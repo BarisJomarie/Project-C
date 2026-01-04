@@ -5,6 +5,8 @@ import { showToast } from "../utils/toast";
 import ConfirmModal from "../utils/ConfirmModal";
 import axios from "axios";
 import Loading from "../utils/Loading";
+import Select from 'react-select'
+import reactSelect from '../styles/reactSelect';
 import '../styles/style.css';
 import '../styles/form.css';
 import '../styles/addPage.css';
@@ -171,11 +173,6 @@ const AddResearch = () => {
 
     if(researchType === 'faculty' && !fundingSource?.trim()) {
       showToast('warning', 'Missing Fields', 'Please select funding source for Faculty Research.');
-      return;
-    }
-
-    if(researchType === 'student' && !course?.trim()) {
-      showToast('warning', 'Missing Fields', 'Please select course for Student Thesis.');
       return;
     }
 
@@ -432,336 +429,350 @@ const AddResearch = () => {
       <div className="form-container default">
         <form onSubmit={handleAddResearch}>
           {/* RESEARCH TYPE */}
-          <div className="form-input" name='rtype'>
-            <div className="radio-group">
-           
-              {/* STUDENT THESIS */}
-              <label className={`${status === 'proposed' ? 'disabled' : ''} radio-buttons`}>
-                <input 
-                  type="radio" 
-                  name="researchType" 
-                  value="student" 
-                  checked={researchType === 'student'} 
-                  onChange={() => {
-                    setResearchType('student'); 
-                    setFundingSource('');
+          <div className="input-container">
+            <div className="form-input" name='rtype'>
+              <label htmlFor="rtype">Research Type</label>
+              <div className="radio-group">
+            
+                {/* STUDENT THESIS */}
+                <label className={`${status === 'proposed' ? 'disabled' : ''} radio-buttons`}>
+                  <input 
+                    type="radio" 
+                    name="researchType" 
+                    value="student" 
+                    checked={researchType === 'student'} 
+                    onChange={() => {
+                      setResearchType('student'); 
+                      setFundingSource('');
 
-                    const currYear = new Date().getFullYear();
-                    setSY(currYear);
-                  }} 
-                  disabled={status === 'proposed'}
-                  />
-                Student Thesis
-              </label>
-
-              {/* FACULTY RESEARCH */}
-              <label className="radio-buttons">
-                <input 
-                  type="radio" 
-                  name="researchType" 
-                  value="faculty" 
-                  checked={researchType === 'faculty'} 
-                  onChange={() => {
-                    setResearchType('faculty'); 
-                    setCourse('');
-
-                    if (status === 'completed') {
                       const currYear = new Date().getFullYear();
                       setSY(currYear);
-                    } else {
-                      setSY('');
-                    }
-                  }}
-                  />
-                Faculty Research
-              </label>
+                    }} 
+                    disabled={status === 'proposed'}
+                    />
+                  Student Thesis
+                </label>
 
+                {/* FACULTY RESEARCH */}
+                <label className="radio-buttons">
+                  <input 
+                    type="radio" 
+                    name="researchType" 
+                    value="faculty" 
+                    checked={researchType === 'faculty'} 
+                    onChange={() => {
+                      setResearchType('faculty'); 
+                      setCourse('');
+
+                      if (status === 'completed') {
+                        const currYear = new Date().getFullYear();
+                        setSY(currYear);
+                      } else {
+                        setSY('');
+                      }
+                    }}
+                    />
+                  Faculty Research
+                </label>
+
+              </div>
             </div>
-            <label htmlFor="rtype">Research Type</label>
           </div>
 
           {/* STATUS */}
-          <div className="form-input" name='status'>
-            <div className="radio-group">
+          <div className="input-container">
+            <div className="form-input" name='status'>
+              <label htmlFor="status">Status</label>
+              <div className="radio-group">
 
-              {/* ON-GOING */}
-              <label>
-                <input 
-                  type="radio" 
-                  name="status" 
-                  value="on-going" 
-                  checked={status === 'on-going'} 
-                  onChange={() => setStatus('on-going')}
-                  />
-                Ongoing
-              </label>
+                {/* ON-GOING */}
+                <label>
+                  <input 
+                    type="radio" 
+                    name="status" 
+                    value="on-going" 
+                    checked={status === 'on-going'} 
+                    onChange={() => setStatus('on-going')}
+                    />
+                  Ongoing
+                </label>
 
-              {/* COMPLETED */}
-              <label>
-                <input 
-                  type="radio" 
-                  name="status" 
-                  value="completed" 
-                  checked={status === 'completed'} 
-                  onChange={() => {
-                    setStatus('completed');
+                {/* COMPLETED */}
+                <label>
+                  <input 
+                    type="radio" 
+                    name="status" 
+                    value="completed" 
+                    checked={status === 'completed'} 
+                    onChange={() => {
+                      setStatus('completed');
 
-                    if (researchType === 'faculty') {
-                      const currYear = new Date().getFullYear();
-                      setSY(currYear);
-                    }
-                  }}
-                  />
-                Completed
-              </label>
+                      if (researchType === 'faculty') {
+                        const currYear = new Date().getFullYear();
+                        setSY(currYear);
+                      }
+                    }}
+                    />
+                  Completed
+                </label>
 
-              {/* PROPOSED */}
-              <label className={`${researchType === 'student' ? 'disabled' : ''}`}>
-                <input 
-                  type="radio" 
-                  name="status" 
-                  value="proposed" 
-                  checked={status === 'proposed'} 
-                  onChange={() =>setStatus('proposed')} 
-                  disabled={researchType === 'student'}
-                  />
-                Proposed
-              </label>
+                {/* PROPOSED */}
+                <label className={`${researchType === 'student' ? 'disabled' : ''}`}>
+                  <input 
+                    type="radio" 
+                    name="status" 
+                    value="proposed" 
+                    checked={status === 'proposed'} 
+                    onChange={() =>setStatus('proposed')} 
+                    disabled={researchType === 'student'}
+                    />
+                  Proposed
+                </label>
 
+              </div>
             </div>
-            <label htmlFor="status">Status</label>
           </div>
 
           {/* FUNDING SOURCE (for Faculty research) */}
-          <div className="form-input" name='funding'>
-            <div className="radio-group">
+          <div className="input-container">
+            <div className="form-input" name='funding'>
+              <label htmlFor="rtype">Funding Source (if any)</label>
+              <div className="radio-group">
 
-              {/* SELF FUNDED */}
-              <label className={`${researchType === 'student' ? 'disabled' : ''}`}>
-                <input 
-                  type="radio" 
-                  name="fundingSource" 
-                  value="self-funded" 
-                  checked={fundingSource === 'self-funded'} 
-                  onChange={() => setFundingSource('self-funded')} 
-                  disabled={researchType === 'student'}
-                  />
-                Self-Funded
-              </label>
+                {/* SELF FUNDED */}
+                <label className={`${researchType === 'student' ? 'disabled' : ''}`}>
+                  <input 
+                    type="radio" 
+                    name="fundingSource" 
+                    value="self-funded" 
+                    checked={fundingSource === 'self-funded'} 
+                    onChange={() => setFundingSource('self-funded')} 
+                    disabled={researchType === 'student'}
+                    />
+                  Self-Funded
+                </label>
 
-              {/* EARIST FUNDED */}
-              <label className={`${researchType === 'student' ? 'disabled' : ''}`}>
-                <input 
-                  type="radio" 
-                  name="fundingSource" 
-                  value="earist" 
-                  checked={fundingSource === 'earist'} 
-                  onChange={() => setFundingSource('earist')} 
-                  disabled={researchType === 'student'}
-                  />
-                EARIST
-              </label>
+                {/* EARIST FUNDED */}
+                <label className={`${researchType === 'student' ? 'disabled' : ''}`}>
+                  <input 
+                    type="radio" 
+                    name="fundingSource" 
+                    value="earist" 
+                    checked={fundingSource === 'earist'} 
+                    onChange={() => setFundingSource('earist')} 
+                    disabled={researchType === 'student'}
+                    />
+                  EARIST
+                </label>
 
+              </div>
             </div>
-            <label htmlFor="rtype">Funding Source (if any)</label>
           </div>
 
           {/* SEMESTER */}
-          <div className="form-input" name='rtype'>
-            <div className="radio-group">
+          <div className="input-container">
+            <div className="form-input" name='rtype'>
+              <label htmlFor="rtype">Semester</label>
+              <div className="radio-group">
 
-              {/* 1st SEMESTER */}
-              <label>
-                <input 
-                  type="radio" 
-                  name="sem" 
-                  value="1st" 
-                  checked={semester === '1st'} 
-                  onChange={() => setSemester('1st')}
-                  />
-                1st Semester
-              </label>
+                {/* 1st SEMESTER */}
+                <label>
+                  <input 
+                    type="radio" 
+                    name="sem" 
+                    value="1st" 
+                    checked={semester === '1st'} 
+                    onChange={() => setSemester('1st')}
+                    />
+                  1st Semester
+                </label>
 
-              {/* 2nd SEMESTER */}
-              <label>
-                <input 
-                  type="radio" 
-                  name="sem" 
-                  value="2nd" 
-                  checked={semester === '2nd'} 
-                  onChange={() => setSemester('2nd')}
-                  />
-                2nd Semester
-              </label>
+                {/* 2nd SEMESTER */}
+                <label>
+                  <input 
+                    type="radio" 
+                    name="sem" 
+                    value="2nd" 
+                    checked={semester === '2nd'} 
+                    onChange={() => setSemester('2nd')}
+                    />
+                  2nd Semester
+                </label>
 
+              </div>
             </div>
-            <label htmlFor="rtype">Semester</label>
           </div>
 
           {/* SY */}
-          <div className="form-input">
-            <input 
-              name="sy" 
-              type="number" 
-              placeholder="YYYY (max 4)" 
-              value={sy} 
-              onChange={(e) => {
-                const value = e.target.value;
-                if (value.length <= 4) {
-                  setSY(e.target.value)
-                }
-              }} 
-              required/>
-            <label htmlFor="sy">School Year</label>
-          </div>
-
-          {/* DEPARTMENT */}
-          <div className="form-input">
-            <input 
-              name="department" 
-              type="text" 
-              value={depData?.department_name || 'Department ?'} 
-              disabled 
-              />
-            <label htmlFor="department">Department</label>
+          <div className="input-container">
+            <div className="form-input">
+              <label htmlFor="sy">School Year</label>
+              <input 
+                name="sy" 
+                type="number" 
+                placeholder="YYYY (max 4)" 
+                value={sy} 
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value.length <= 4) {
+                    setSY(e.target.value)
+                  }
+                }} 
+                required/>
+            </div>
           </div>
 
           {/* COURSE */}
-          <div className="form-input">
-            <select 
-              value={course} 
-              onChange={(e) => setCourse(e.target.value)} 
-              required
-              >
-              <option value="">-- Select Course --</option>
-              {departmentCourses.map((c) => (
-                <option key={c.course_id} value={c.course_id}>{c.course_name}</option>
-              ))}
-            </select>
-            <label>Course</label>
+          <div className="input-container">
+            <div className="form-input">
+              <label>Course</label>
+              <Select
+               name="course"
+               options={departmentCourses.map((c) => ({ value: c.course_id, label: c.course_name }))}
+               value={course ? { value: course, label: departmentCourses.find(c => c.course_id === Number(course))?.course_name } : null}
+               onChange={(selected) => setCourse(selected.value)}
+               isDisabled={researchType === "faculty"}
+               placeholder="-- Select Course --"
+               required={researchType !== "faculty"}
+               styles={reactSelect}
+              />
+            </div>
           </div>
 
           {/* ADVISER */}
-          <div className="form-input">
-            <input 
-              name="adviser" 
-              type="text" 
-              placeholder="Lastname, Firstname MI." 
-              value={adviser} 
-              onChange={(e) => setAdviser(e.target.value)} 
-              disabled={researchType === "faculty"} 
-              required={researchType !== "faculty"} 
-              />           
-            <label htmlFor="adviser">Adviser</label>
+          <div className="input-container">
+            <div className="form-input">
+              <label htmlFor="adviser">Adviser</label>
+              <input 
+                name="adviser" 
+                type="text" 
+                placeholder="Lastname, Firstname MI." 
+                value={adviser} 
+                onChange={(e) => setAdviser(e.target.value)} 
+                disabled={researchType === "faculty"} 
+                required={researchType !== "faculty"} 
+                />           
+            </div>
           </div>
 
           {/* RESEARCHERS */}
-          <div className="form-input">
-            <div className="form-button-container" style={{ justifyContent: 'center', gap: '10px'}}>
+          <div className="input-container">
+            <div className="form-input">
+              <label>Researchers</label>
+              {researchers.map((res, index) => (
+                <input
+                  key={index}
+                  type="text"
+                  value={res}
+                  onChange={(e) => {
+                    const newResearchers = [...researchers];
+                    newResearchers[index] = e.target.value;
+                    setResearchers(newResearchers);
+                  }}
+                  placeholder={`Researcher ${index + 1} Lastname, Firstname MI.`}
+                  required
+                  style={{ display: "block", marginBottom: "10px" }}
+                />
+              ))}
+              <div className="form-button-container" style={{ justifyContent: 'center', gap: '10px'}}>
 
-              {/* ADD RESEARCHER */}
-              <button 
-                type="button" 
-                onClick={() => setResearchers([...researchers, ""])} 
-                disabled={researchers.length === 6}
-                >
-                  +
-              </button>
+                {/* ADD RESEARCHER */}
+                <button 
+                  type="button" 
+                  onClick={() => setResearchers([...researchers, ""])} 
+                  disabled={researchers.length === 6}
+                  >
+                    +
+                </button>
 
-              {/* REMOVE RESEARCHER */}
-              <button 
-                type="button" 
-                onClick={() => setResearchers(researchers.slice(0, -1))} 
-                disabled={researchers.length === 1}
-                >
-                  -
-              </button>
+                {/* REMOVE RESEARCHER */}
+                <button 
+                  type="button" 
+                  onClick={() => setResearchers(researchers.slice(0, -1))} 
+                  disabled={researchers.length === 1}
+                  >
+                    -
+                </button>
 
+              </div>
             </div>
-            {researchers.map((res, index) => (
-              <input
-                key={index}
-                type="text"
-                value={res}
-                onChange={(e) => {
-                  const newResearchers = [...researchers];
-                  newResearchers[index] = e.target.value;
-                  setResearchers(newResearchers);
-                }}
-                placeholder={`Researcher ${index + 1} Lastname, Firstname MI.`}
-                required
-                style={{ display: "block", marginBottom: "10px" }}
-              />
-            ))}
-            <label>Researchers</label>
           </div>
+          
 
           {/* TITLE */}
-          <div className="form-input">
-            <input 
-              name="title" 
-              type="text" 
-              placeholder="Enter research title" 
-              value={rtitle} 
-              onChange={(e) => setRTitle(e.target.value)} 
-              required
-              />
-            <label>Research Title</label>
+          <div className="input-container">
+            <div className="form-input">
+              <label>Research Title</label>
+              <input 
+                name="title" 
+                type="text" 
+                placeholder="Enter research title" 
+                value={rtitle} 
+                onChange={(e) => setRTitle(e.target.value)} 
+                required
+                />
+            </div>
           </div>
 
           {/* ABSTRACT */}
-          <div className="form-input">
-            <textarea 
-              name="abstract" 
-              placeholder="Enter abstract (optional)" 
-              value={abstract} 
-              onChange={(e) => {
-                setAbstract(e.target.value);
-                e.target.style.height = 'auto';
-                e.target.style.height = `${e.target.scrollHeight}px`;
-              }} 
-              />
-            <label htmlFor="abstract">Abstract</label>
+          <div className="input-container">
+            <div className="form-input">
+              <label htmlFor="abstract">Abstract</label>
+              <textarea 
+                name="abstract" 
+                placeholder="Enter abstract (optional)" 
+                value={abstract} 
+                onChange={(e) => {
+                  setAbstract(e.target.value);
+                  e.target.style.height = 'auto';
+                  e.target.style.height = `${e.target.scrollHeight}px`;
+                }} 
+                />
+            </div>
           </div>
 
-          {/* CONCLUSION */}
-          <div className="form-input">
-            <textarea 
-              name="keywords" 
-              placeholder="Enter keywords (optional)" 
-              value={conclusion} 
-              onChange={(e) => {
-                setConclusion(e.target.value);
-                e.target.style.height = 'auto';
-                e.target.style.height = `${e.target.scrollHeight}px`;
-              }} 
-              />
-            <label htmlFor="keywords">Keywords</label>
+          {/* KEYWORDS */}
+          <div className="input-container">
+            <div className="form-input">
+              <label htmlFor="keywords">Keywords</label>
+              <textarea 
+                name="keywords" 
+                placeholder="Enter keywords" 
+                value={conclusion} 
+                onChange={(e) => {
+                  setConclusion(e.target.value);
+                  e.target.style.height = 'auto';
+                  e.target.style.height = `${e.target.scrollHeight}px`;
+                }} 
+                />
+            </div>
           </div>
 
           {/* SDG SELECTION (IF NOT PREDICTION MODE) */}
           <div className={`manual-sdg-section ${!isPredicted ? "visible" : ""}`}>
-            <div className="form-input">
-              <div className="sdg-checkboxes" name="sdg">
-                {sdgOptions.map((opt, idx) => (
-                  <label key={idx} className="checkbox-option">
-                    <input
-                      type="checkbox"
-                      value={opt}
-                      checked={selectedSdgs.some((s) => s.label === opt)}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedSdgs([...selectedSdgs, { label: opt, index: idx + 1 }]);
-                        } else {
-                          setSelectedSdgs(selectedSdgs.filter((s) => s.label !== opt));
-                        }
-                      }}
-                    />
-                    {idx + 1}.&nbsp;{opt}       
-                  </label>
-                ))}
+            <div className="input-container last">
+              <div className="form-input">
+                <label htmlFor="sdg">Select SDG</label>
+                <div className="sdg-checkboxes" name="sdg">
+                  {sdgOptions.map((opt, idx) => (
+                    <label key={idx} className="checkbox-option">
+                      <input
+                        type="checkbox"
+                        value={opt}
+                        checked={selectedSdgs.some((s) => s.label === opt)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedSdgs([...selectedSdgs, { label: opt, index: idx + 1 }]);
+                          } else {
+                            setSelectedSdgs(selectedSdgs.filter((s) => s.label !== opt));
+                          }
+                        }}
+                      />
+                      {idx + 1}.&nbsp;{opt}       
+                    </label>
+                  ))}
+                </div>
               </div>
-              <label htmlFor="sdg">Select SDG</label>
             </div>
           </div>
 

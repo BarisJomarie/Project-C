@@ -141,49 +141,55 @@ const EditProfile = () => {
             </div>
 
             {['firstname', 'lastname', 'middlename', 'extension', 'username', 'email'].map(field => (
-              <div key={field} className="form-input">
-                <input
-                  type="text"
-                  name={field}
-                  value={form[field] || ''}
-                  onChange={handleChange}
-                  required={['firstname', 'lastname', 'username', 'email'].includes(field)}
-                />
-                <label>{field.charAt(0).toUpperCase() + field.slice(1)}:</label>
+              <div className='input-container'>
+                <div key={field} className="form-input">
+                  <label>{field.charAt(0).toUpperCase() + field.slice(1)}:</label>
+                  <input
+                    type="text"
+                    name={field}
+                    value={form[field] || ''}
+                    onChange={handleChange}
+                    required={['firstname', 'lastname', 'username', 'email'].includes(field)}
+                  />
+                </div>
               </div>
             ))}
 
-            <div className="form-input">
-              <select
-                name="security_question"
-                value={form.security_question}
-                onChange={handleChange}
-                required
-              >
-                <option value=''>Select A Security Question</option>
-                  <option value="What is the name of your first pet?">What is the name of your first pet?</option>
-                  <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
-                  <option value="What was the name of your elementary school?">What was the name of your elementary school?</option>
-                  <option value="In what city were you born?">In what city were you born?</option>
-                  <option value="What is your favorite book/movie?">What is your favorite book/movie?</option>
-                  <option value="What was your childhood nickname?">What was your childhood nickname?</option>
-                  <option value="What is the name of the street you grew up on?">What is the name of the street you grew up on?</option>
-                  <option value="What was the make and model of your first car?">What was the make and model of your first car?</option>
-                  <option value="What is the name of your best friend from childhood?">What is the name of your best friend from childhood?</option>
-                  <option value="What was the name of your first employer?">What was the name of your first employer?</option>
-              </select>
-              <label>Security Question:</label>
+            <div className='input-container'>
+              <div className="form-input">
+                <label>Security Question:</label>
+                <select
+                  name="security_question"
+                  value={form.security_question}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value=''>Select A Security Question</option>
+                    <option value="What is the name of your first pet?">What is the name of your first pet?</option>
+                    <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
+                    <option value="What was the name of your elementary school?">What was the name of your elementary school?</option>
+                    <option value="In what city were you born?">In what city were you born?</option>
+                    <option value="What is your favorite book/movie?">What is your favorite book/movie?</option>
+                    <option value="What was your childhood nickname?">What was your childhood nickname?</option>
+                    <option value="What is the name of the street you grew up on?">What is the name of the street you grew up on?</option>
+                    <option value="What was the make and model of your first car?">What was the make and model of your first car?</option>
+                    <option value="What is the name of your best friend from childhood?">What is the name of your best friend from childhood?</option>
+                    <option value="What was the name of your first employer?">What was the name of your first employer?</option>
+                </select>
+              </div>
             </div>
 
-            <div className="form-input">
-              <input
-                type="text"
-                name="security_answer"
-                value={form.security_answer}
-                onChange={handleChange}
-                required
-              />
-              <label>Security Answer:</label>
+            <div className='input-container last'>
+              <div className="form-input">
+                <label>Security Answer:</label>
+                <input
+                  type="text"
+                  name="security_answer"
+                  value={form.security_answer}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
             </div>
             
             <div className='form-button-container'>

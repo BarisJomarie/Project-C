@@ -363,56 +363,79 @@ const Users = () => {
         <>
           <div className={`form-container ${addUserForm ? 'slide-down' : 'slide-up'}`}>
             <form onSubmit={handleAddUser} className="form">
-              <div className="grouped-inputs">
+              <div className="input-container">
                 <div className="form-input">
+                  <label htmlFor="user-code">User Code</label>
                   <input name="user-code" type="text" placeholder="User Code" value={formData.userCode} onChange={(e) => setFormData(prev => ({
                     ...prev, userCode: e.target.value
                   }))} required/>
-                  <label htmlFor="user-code">User Code</label>
                 </div>
+              </div>
+              
+              <div className="input-container">
                 <div className="form-input">
+                  <label htmlFor="username">Username</label>
                   <input name="username" type="text" placeholder="Username" value={formData.username} onChange={(e) => setFormData(prev => ({
                     ...prev, username: e.target.value
                   }))} required/>
-                  <label htmlFor="username">Username</label>
                 </div>
               </div>
-              <div className="grouped-inputs">
+              
+              <div className="input-container">
                 <div className="form-input">
+                  <label htmlFor="lastname">Lastname</label>
                   <input name="lastname" type="text" placeholder="Lastname" value={formData.lastname} onChange={(e) => {
                     const lastname = e.target.value;
                     setFormData((prev) => ({
                       ...prev, lastname, password: prev.autoPassword ? generateAutoPassword(lastname) : prev.password
                     }));
                   }} required/>
-                  <label htmlFor="lastname">Lastname</label>
                 </div>
+              </div>
+
+              <div className="input-container">
                 <div className="form-input">
+                  <label htmlFor="firstname">Firstname</label>
                   <input name="firstname" type="text" placeholder="Firstname" value={formData.firstname} onChange={(e) => setFormData(prev => ({
                     ...prev, firstname: e.target.value
                   }))} required/>
-                  <label htmlFor="firstname">Firstname</label>
                 </div>
+              </div>
+
+              <div className="input-container">
                 <div className="form-input">
+                  <label htmlFor="middlename">Middlename</label>
                   <input name="middlename" type="text" placeholder="Middlename" value={formData.middlename} onChange={(e) => setFormData(prev => ({
                     ...prev, middlename: e.target.value
                   }))} />
-                  <label htmlFor="middlename">Middlename</label>
                 </div>
-                <div className="form-input extension-input">
+              </div>
+
+              <div className="input-container">
+                <div className="form-input">
+                  <label htmlFor="extension">Extension</label>
                   <input name="extension" type="text" placeholder="Extension" value={formData.extension} onChange={(e) => setFormData(prev => ({
                     ...prev, extension: e.target.value
                   }))} />
-                  <label htmlFor="extension">Extension</label>
                 </div>
               </div>
-              <div className="form-input">
-                <input name="email" type="email" placeholder="Email" required value={formData.email} onChange={(e) => setFormData(prev => ({
-                    ...prev, email: e.target.value
-                  }))} />
-                <label htmlFor="email">Email</label>
+              
+              <div className="input-container">
+                <div className="form-input">
+                  <label htmlFor="email">Email</label>
+                  <input name="email" type="email" placeholder="Email" required value={formData.email} onChange={(e) => setFormData(prev => ({
+                      ...prev, email: e.target.value
+                    }))} />
+                </div>
               </div>
-              <div className="form-input">
+                
+              <div className="input-container">
+                <div className="form-input">
+                  <label htmlFor="password">Password</label>
+                  <input name="password" type="text" placeholder="Password" value={formData.password} disabled={formData.autoPassword} onChange={(e) => setFormData((prev) => ({
+                    ...prev, password: e.target.value
+                  }))} required/>
+
                   <div className="add-inputs">
                     <label>Auto-password</label>
                     <input name="auto-password" type="checkbox" id="auto-passsword" checked={formData.autoPassword} onChange={(e) => {
@@ -427,76 +450,86 @@ const Users = () => {
                       <span className="tooltip">Use lastname as the password. (All caps). Re-check if lastname is chanegd</span>
                     </div>
                   </div>
-                <input name="password" type="text" placeholder="Password" value={formData.password} disabled={formData.autoPassword} onChange={(e) => setFormData((prev) => ({
-                  ...prev, password: e.target.value
-                }))} required/>
-                <label htmlFor="password">Password</label>
+                </div>
               </div>
-              <div className="form-input">
-                <select name="role" value={formData.role} onChange={handleRoleChange} required>
-                  <option value={''}>Select A Role</option>
-                  <option value={'admin'}>Admin</option>
-                  <option value={'rph'}>Research Project Head</option>
-                  <option value={'faculty'}>Faculty</option>
-                </select>
-                <label htmlFor="role">Role</label>
+             
+              <div className="input-container">
+                <div className="form-input">
+                  <label htmlFor="role">Role</label>
+                  <select name="role" value={formData.role} onChange={handleRoleChange} required>
+                    <option value={''}>Select A Role</option>
+                    <option value={'admin'}>Admin</option>
+                    <option value={'rph'}>Research Project Head</option>
+                    <option value={'faculty'}>Faculty</option>
+                  </select>
+                </div>
               </div>
+            
                   
               {/* RESEARCH PROJECT HEAD OR FACULTY */}
               <div className={`extra-fields ${['faculty', 'rph'].includes(formData.role) ? 'slide-down' : 'slide-up'}`}>
-                <div className="department form-input">
-                  <select name="department" value={formData.department || ''} onChange={(e) => handleDepartmentChange(e, false)}>
-                    <option value=''>--Select a Department--</option>
-                    {departments.length > 0 && (
-                      departments.map((dep) => (
-                        <option key={dep.department_id} value={dep.department_id}>{dep.department_name}</option>
-                      ))
-                    )}
-                  </select>
-                  <label htmlFor="department">Department</label>
+                <div className="input-container">
+                  <div className="department form-input">
+                    <select name="department" value={formData.department || ''} onChange={(e) => handleDepartmentChange(e, false)}>
+                      <option value=''>--Select a Department--</option>
+                      {departments.length > 0 && (
+                        departments.map((dep) => (
+                          <option key={dep.department_id} value={dep.department_id}>{dep.department_name}</option>
+                        ))
+                      )}
+                    </select>
+                    <label htmlFor="department">Department</label>
+                  </div>
                 </div>
-
-                <div className="course form-input">
-                  <select name="course" value={formData.course || ''} onChange={(e) => setFormData(prev => ({ 
-                    ...prev, course: e.target.value 
-                  }))} >
-                    <option value="">--Select Course--</option>
-                    {courses.length > 0 &&  (
-                      courses.map((c) => (
-                        <option key={c.course_id} value={c.course_id}>{c.course_name}</option>
-                      ))
-                    )}
-                  </select>
-                  <label htmlFor="course">Course</label>
+                
+                <div className="input-container">
+                  <div className="course form-input">
+                    <select name="course" value={formData.course || ''} onChange={(e) => setFormData(prev => ({ 
+                      ...prev, course: e.target.value 
+                    }))} >
+                      <option value="">--Select Course--</option>
+                      {courses.length > 0 &&  (
+                        courses.map((c) => (
+                          <option key={c.course_id} value={c.course_id}>{c.course_name}</option>
+                        ))
+                      )}
+                    </select>
+                    <label htmlFor="course">Course</label>
+                  </div>
                 </div>
+                
               </div>
-
-              <div className="form-input">
-                <select name="sec-q" value={formData.security_question} onChange={(e) => setFormData(prev => ({
-                  ...prev, security_question: e.target.value
-                }))} required>
-                  <option value=''>Select A Security Question</option>
-                  <option value="What is the name of your first pet?">What is the name of your first pet?</option>
-                  <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
-                  <option value="What was the name of your elementary school?">What was the name of your elementary school?</option>
-                  <option value="In what city were you born?">In what city were you born?</option>
-                  <option value="What is your favorite book/movie?">What is your favorite book/movie?</option>
-                  <option value="What was your childhood nickname?">What was your childhood nickname?</option>
-                  <option value="What is the name of the street you grew up on?">What is the name of the street you grew up on?</option>
-                  <option value="What was the make and model of your first car?">What was the make and model of your first car?</option>
-                  <option value="What is the name of your best friend from childhood?">What is the name of your best friend from childhood?</option>
-                  <option value="What was the name of your first employer?">What was the name of your first employer?</option>
-                </select>
-                <label htmlFor="sec-q">Security Question</label>
-              </div>
-              <div className="form-input">
+              
+              <div className="input-container">
                 <div className="form-input">
+                  <label htmlFor="sec-q">Security Question</label>
+                  <select name="sec-q" value={formData.security_question} onChange={(e) => setFormData(prev => ({
+                    ...prev, security_question: e.target.value
+                  }))} required>
+                    <option value=''>Select A Security Question</option>
+                    <option value="What is the name of your first pet?">What is the name of your first pet?</option>
+                    <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
+                    <option value="What was the name of your elementary school?">What was the name of your elementary school?</option>
+                    <option value="In what city were you born?">In what city were you born?</option>
+                    <option value="What is your favorite book/movie?">What is your favorite book/movie?</option>
+                    <option value="What was your childhood nickname?">What was your childhood nickname?</option>
+                    <option value="What is the name of the street you grew up on?">What is the name of the street you grew up on?</option>
+                    <option value="What was the make and model of your first car?">What was the make and model of your first car?</option>
+                    <option value="What is the name of your best friend from childhood?">What is the name of your best friend from childhood?</option>
+                    <option value="What was the name of your first employer?">What was the name of your first employer?</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div className="input-container last">
+                <div className="form-input">
+                  <label htmlFor="sec-ans">Answer</label>
                   <input name="sec-ans" type="text" placeholder="Answer" required value={formData.security_answer} onChange={(e) => setFormData(prev => ({
                     ...prev, security_answer: e.target.value
                   }))} />
-                  <label htmlFor="sec-ans">Answer</label>
                 </div>
               </div>
+              
               <div className="form-button-container">
                 <button type="button" onClick={resetFields}>Clear</button>
                 <button type="submit" style={{margin: 0}}>Add User</button>

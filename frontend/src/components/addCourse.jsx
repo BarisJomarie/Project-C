@@ -214,26 +214,35 @@ const AddCourse = () => {;
         </div>
         <div className={`form-container ${openCourseForm ? 'slide-down' : 'slide-up'}`}>
           <form onSubmit={addCourse}>
-            <div className="form-input">
-              <select value={selectedDepartment} onChange={(e) => setSelectedDepartment(e.target.value)} name="dep" required>
-                <option value="">-- Select a Department --</option>
-                {department.map(dep => (
-                  <option key={dep.department_id} value={dep.department_id}>
-                    {dep.department_name}
-                  </option>
-                ))}
-              </select>
-              <label htmlFor="dep">Select a Department</label>
-            </div>
-            <div className="form-input">
-              <input name="course-name" type="text" value={courseName} onChange={(e) => setCourseName(e.target.value)} required />
-              <label htmlFor="course-name">Course Name</label>
-            </div>
 
-            <div className="form-input">
-              <input name="course-abb" type="text" value={courseAbbreviation} onChange={(e) => setCourseAbbreviation(e.target.value)} required />
-              <label htmlFor="course-abb">Course Abbreviation</label>
+            <div className="input-container">
+              <div className="form-input">
+                <label htmlFor="dep">Select a Department</label>
+                <select value={selectedDepartment} onChange={(e) => setSelectedDepartment(e.target.value)} name="dep" required>
+                  <option value="">-- Select a Department --</option>
+                  {department.map(dep => (
+                    <option key={dep.department_id} value={dep.department_id}>
+                      {dep.department_name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
+           
+            <div className="input-container">
+              <div className="form-input">
+                <label htmlFor="course-name">Course Name</label>
+                <input name="course-name" type="text" value={courseName} onChange={(e) => setCourseName(e.target.value)} required />
+              </div>
+            </div>
+            
+            <div className="input-container last">
+              <div className="form-input">
+                <label htmlFor="course-abb">Course Abbreviation</label>
+                <input name="course-abb" type="text" value={courseAbbreviation} onChange={(e) => setCourseAbbreviation(e.target.value)} required />
+              </div>
+            </div>
+            
             <div className="form-button-container">
               <button type="submit">Add Course</button>
             </div>
