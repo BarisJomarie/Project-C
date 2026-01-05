@@ -98,12 +98,20 @@ exports.getResearchPublicationsByDepartment = (req, res) => {
 
     const data = result.map(r => {
       let coAuthors = [];
+      let index_types = [];
 
-      try { coAuthors = JSON.parse(r.co_authors || "[]"); } catch {}
+      try { 
+        coAuthors = JSON.parse(r.pub_co_authors || "[]"); 
+      } catch {}
+
+      try {
+        index_types = JSON.parse(r.index_type || "[]");
+      } catch {}
 
       return {
         ...r,
-        co_authors: coAuthors
+        co_authors: coAuthors,
+        index_type: index_types
       };
     });
 

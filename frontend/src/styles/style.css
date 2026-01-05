@@ -117,6 +117,31 @@ button[type="submit"]:active {
   transform: scale(0.98);
 }
 
+button[name="dep-user"]:hover {
+  background-color: #3B060A;
+  color: white;
+}
+button[name='dep-student']:hover {
+  background-color: #1e293b;
+  color: white;
+}
+button[name='dep-faculty']:hover {
+  background-color: #490346;
+  color: white;
+}
+button[name='dep-presentation']:hover {
+  background-color: #1E4A40;
+  color: white;
+}
+button[name='dep-publication']:hover {
+  background-color: #000f3f;
+  color: white;
+}
+button[name='dep-course']:hover {
+  background-color: #C83F12;
+  color: white;
+}
+
 .hyperlink {
   color: #3B060A;
   font-weight: 600;

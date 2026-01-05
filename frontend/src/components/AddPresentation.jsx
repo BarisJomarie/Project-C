@@ -104,14 +104,7 @@ const AddPresentation = () => {
       params: { department_id: dep_id },
       headers: { Authorization: `Bearer ${token}` }
     }).then(res => {
-      if (Array.isArray(res.data) && res.data.length > 0) {
-        // console.log(`Department fetched`);
-        //console.log(res.data);
-      } else {
-        console.log(`Department not found`);
-      }
-      // API returns an array in some cases; store the object directly
-      setDepartment(Array.isArray(res.data) && res.data.length > 0 ? res.data[0] : res.data);
+      setDepartment(res.data);
     }).catch(err => {
       console.error('Error fetching department', err);
     });

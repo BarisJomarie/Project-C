@@ -23,13 +23,10 @@ thead.hid-default tr:first-child {
 
 .table-selector {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   border-bottom: 2px solid #e2e8f0;
   margin: 40px 0;
   align-items: center;
-  position: sticky;
-  top: -20px;
-  z-index: 100;
   background-color: #f5f5f5;
 }
 
@@ -38,6 +35,7 @@ thead.hid-default tr:first-child {
   flex-direction: column;
   margin-left: 10px;
 }
+
 .tab-labels {
   display: flex;
   position: relative;
@@ -47,13 +45,13 @@ thead.hid-default tr:first-child {
 .tab-labels h3 {
   flex: 1;
   text-align: center;
-  padding: 12px 20px;
+  padding: 20px 20px;
   margin: 0;
   cursor: pointer;
   border-top-left-radius: 6px;
   border-top-right-radius: 6px;
   transition: all 0.2s ease;
-  font-weight: 500;
+  font-weight: 300;
   font-size: 0.95em;
 }
 
@@ -63,9 +61,27 @@ thead.hid-default tr:first-child {
 }
 
 .tab-labels .active-tab {
-  background-color: #1e293b;
   color: white;
   font-weight: 600;
+}
+
+.tab-labels .active-tab.user {
+  color: #3B060A;
+}
+.tab-labels .active-tab.student {
+  color: #1e293b;
+}
+.tab-labels .active-tab.faculty {
+  color: #490346;
+}
+.tab-labels .active-tab.presentation {
+  color: #1E4A40;
+}
+.tab-labels .active-tab.publication {
+  color: #000f3f;
+}
+.tab-labels .active-tab.course {
+  color: #C83F12;
 }
 
 .tab-group p {
@@ -77,31 +93,33 @@ thead.hid-default tr:first-child {
 .tab-indicator {
   position: absolute;
   bottom: -2.5px;
-  height: 5px;
-  background-color: #0D0D0D;
+  height: 4px;
+  background-color: #4444;
   border-radius: 2px;
-  transition: left 0.3s ease, width 0.3s ease;
+  transition: left 0.3s ease, width 0.3s ease, background-color 0.3s ease;
 }
 
-.esp-tr {
-  border-left: 4px solid #1e293b;
+
+.tab-indicator.user {
+  background-color: #3B060A;
+}
+.tab-indicator.student {
+  background-color: #1e293b;
+}
+.tab-indicator.faculty {
+  background-color: #490346;
+} 
+.tab-indicator.presentation {
+  background-color: #1E4A40;
+}
+.tab-indicator.publication {
+  background-color: #000f3f;
+}
+.tab-indicator.course {
+  background-color: #C83F12;
 }
 
-/* Self-funded row highlighting */
-.self-funded {
-  background-color: #FFFF00 !important;
-  -webkit-print-color-adjust: exact;
-  print-color-adjust: exact;
-}
 
-body.dark .self-funded {
-  background-color: #4a4a00 !important;
-}
-
-/* Action column - hide when printing */
-.action-column {
-  min-width: 80px;
-}
 
 @media print {
   .action-column {
