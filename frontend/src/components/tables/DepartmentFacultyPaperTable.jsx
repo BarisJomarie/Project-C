@@ -102,7 +102,7 @@ const DepartmentFacultyPaperTable = ({ fPapers, loading, role, dep_id, fetchFacu
                 <th>Funding&nbsp;Source<br/>(if any)</th>
                 <th>Academic&nbsp;Year<br/>Sem&nbsp;and&nbsp;SY</th>
                 <th>SDG Label</th>
-                <th>Action</th>
+                <th className="action-column">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -145,7 +145,7 @@ const DepartmentFacultyPaperTable = ({ fPapers, loading, role, dep_id, fetchFacu
                         : <div style={{textAlign: 'left'}}>{paper.sdg_labels}</div>}
                       </td>
 
-                      <td>
+                      <td className="action-column">
                         <button onClick={() => navigate(`/user/department/${dep_id}/paper/${paper.research_id}`)}>
                           <span className="material-symbols-outlined view-icon">visibility</span>
                           <span className="tooltip">View Paper</span>

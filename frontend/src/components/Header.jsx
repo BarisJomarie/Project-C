@@ -343,7 +343,7 @@ const Header = ({ departments, fetchDepartments, deptLoading })  => {
           
           
         </div>
-        <main style={{ marginLeft: isSidebarOpen ? undefined : '10px' }}>
+        <main style={{ marginLeft: isSidebarOpen ? undefined : '10px', height: '100%' }}>
           <Outlet />
         </main>
       </div>

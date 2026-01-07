@@ -12,7 +12,7 @@ const {getUserAuditLogs, getAuditLogs, getAllAuditLogs, deleteLogs} = require('.
 
 const {addResearch, deleteResearchPaper, getDepartmentPapers, getDepartmentPapersFaculty, getDepartmentTotalSDGPaper, getHighestLowestSDG, getCurretUploadedResearchPapers, getSinglePaper, fetchPaperForAnalysis, getStudentTypePapers, getFacultyTypePapers, getMostCommonSDG, addHistoryReport, getUserPapers} = require('../controllers/researchPaperController');
 
-const {addResearchPresentation, presentationTitleChecker, getResearchPresentationsByDepartment, getCurrentUploadedPresentationUser, deleteResearchPresentation} = require('../controllers/researchPresentationController');
+const {addResearchPresentation, presentationTitleChecker, getResearchPresentationsByDepartment, getCurrentUploadedPresentationUser, getPresentationIndexes, getPresentationRows, deleteResearchPresentation} = require('../controllers/researchPresentationController');
 
 const {addResearchPublication, publicationTitleChecker, getPublicationIndexes, getResearchPublicationsByDepartment, deleteResearchPublication} = require('../controllers/researchPublicationController');
 
@@ -85,6 +85,8 @@ router.post("/presentation/add", verifyToken, addResearchPresentation);
 router.get('/presentation/title-checker', verifyToken, presentationTitleChecker);
 router.get("/presentation/department", verifyToken, getResearchPresentationsByDepartment);
 router.get('/presentation/user-current-upload', verifyToken, getCurrentUploadedPresentationUser);
+router.get("/presentation/indexes", verifyToken, getPresentationIndexes);
+router.get('/presentation/selected-table', verifyToken, getPresentationRows);
 
 router.delete("/presentation/delete/:id", verifyToken, deleteResearchPresentation);
 

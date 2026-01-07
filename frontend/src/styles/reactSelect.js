@@ -18,7 +18,6 @@ const customStyles = {
     color: "white",
     borderColor: state.isFocused ? "#C83F12" : "#ccc",
     boxShadow: state.isFocused ? "0 0 0 3px rgba(200, 63, 18, 0.1)" : "none",
-    borderRadius: '5px',
     "&:hover": {
       borderColor: state.isFocused ? '#C83F12' : "#475569",
     },
@@ -65,6 +64,10 @@ const customStyles = {
       color: "#C83F12",
     },
   }),
+  menu: (provided) => ({
+    ...provided,
+    zIndex: 10,
+  })
 };
 
 export default customStyles;

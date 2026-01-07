@@ -144,6 +144,102 @@ exports.getCurrentUploadedPresentationUser = (req, res) => {
   });
 };
 
+// FOR FETCHING EXISTING STUFF SA PRESENTATION
+exports.getPresentationIndexes = (req, res) => {
+  const searchTerm = req.query.query?.toLowerCase() || "";
+  const column = req.query.column || 'author';
+
+  const allowedColumns = ['author', 'co_authors', 'research_title', 'sdg_alignment', 'conference_title', 'organizer', 'venue', 'conference_category', 'special_order_no', 'status_engage', 'funding_source_engage'];
+  if(!allowedColumns.includes(column)) return res.status(400).json({message: 'Invalid column parameter.'});
+
+  const query = `SELECT ${column} FROM research_presentations WHERE ${column} IS NOT NULL AND ${column} <> ''`;
+
+  db.query(query, (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Database query error' });
+    }
+    if (result.length === 0) {
+      return res.status(404).json({ message: 'No indexes found.' });
+    }
+
+    const allValues = result.flatMap(row => {
+      try {
+        return JSON.parse(row[column]); //if column is jason
+      } catch {
+        return row[column] ? [row[column]] : [];
+      }
+    });
+
+    const filtered = searchTerm
+      ? allValues.filter(type => type.toLowerCase().includes(searchTerm))
+      : allValues;
+
+
+    const normalizeJson = [...new Set(filtered)].sort((a, b) => a.localeCompare(b)).map(type => ({
+      value: type,
+      label: type
+    }));
+
+    res.status(200).json(normalizeJson);
+  });
+};
+
+//FILTERED TABLE
+exports.getPresentationRows = (req, res) => {
+  const column = req.query.column || "author";
+  const searchTerm = req.query.query?.toLowerCase() || "";
+
+
+  const allowedColumns = [
+    "author",
+    "co_authors",
+    "research_title",
+    "sdg_alignment",
+    "conference_title",
+    "organizer",
+    "venue",
+    "conference_category",
+    "special_order_no",
+    "status_engage",
+    "funding_source_engage"
+  ];
+  if (!allowedColumns.includes(column)) {
+    return res.status(400).json({ message: "Invalid column parameter." });
+  }
+
+  const sql = `
+    SELECT * 
+    FROM research_presentations 
+    WHERE ${column} IS NOT NULL 
+      AND ${column} <> '' 
+      AND LOWER(${column}) LIKE ?
+  `;
+  const values = [`%${searchTerm}%`];
+
+  db.query(sql, values, (err, results) => {
+    if (err) return res.status(500).json({ message: "Database error", error: err });
+
+    const data = results.map(r => {
+      let coAuthors = [];
+      let alignment = [];
+
+      try { coAuthors = JSON.parse(r.co_authors || "[]"); } catch {}
+      try { alignment = JSON.parse(r.sdg_alignment || "[]"); } catch {}
+
+      return {
+        ...r,
+        co_authors: coAuthors,
+        sdg_alignment: alignment,
+        end_date_presented: r.end_date_presented
+      };
+    });
+
+    res.json(data);
+  });
+};
+
+
 // DELETE RESEARCH PRESENTATION
 exports.deleteResearchPresentation = (req, res) => {
   const { id } = req.params;

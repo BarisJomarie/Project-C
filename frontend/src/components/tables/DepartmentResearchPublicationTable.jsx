@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import axios from "axios";
 import { ShimmerTable, ShimmerButton } from "react-shimmer-effects";
 import { useNavigate } from "react-router-dom";
 import { showToast } from "../../utils/toast";
 import ConfirmModal from "../../utils/ConfirmModal";
+import PublicationPrint from "../../utils/print/PublicationPrint";
 import * as XLSX from 'xlsx';
+import useSortableTable from "../../hooks/useSortableTable";
 
 const DepartmentResearchPublicationTable = ({ publication, loading, department, user, fetchPublications }) => {
   const navigate = useNavigate();
@@ -32,303 +34,53 @@ const DepartmentResearchPublicationTable = ({ publication, loading, department, 
     setModalConfig(prev => ({...prev, show:false}));
   };
 
-  const confirmPrint = () => {
-    showModal(
-      'Printing Presentation',
-      `This presentation will be printed. Do you want to continue?`,
-      async () => {
-        try {
-          const printContents = document.getElementById('printable-table')?.innerHTML;
-          if (!printContents) return;
+  const [author, setAuthor] = useState('');
+  const [yearRange, setYearRange] = useState({ start: '', end: '' });
+  
+  const filteredData = useMemo(() => {
+    return publication.filter(item => {
+      // Author filter
+      const matchesAuthor = author
+        ? item.pub_author?.toLowerCase().includes(author.toLowerCase())
+        : true;
 
-          const printWindow = window.open('', '_blank', 'width=1200,height=800');
+      // Year range filter
+      const matchesYear = yearRange.start || yearRange.end
+        ? (() => {
+          const raw = item.date_of_publication;
 
-          printWindow.document.write(`
-            <html>
-            <head>
-            <title>Research Publication</title>
-            <style>
-              * {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                color-adjust: exact !important;
-              }
-              body { 
-                font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; 
-                font-size: 0.85em; 
-                background: #fff; 
-                color: #000; 
-                margin: 0;
-                padding: 20px;
-              }
-              table { 
-                width: 100%; 
-                border-collapse: collapse !important;
-                page-break-inside: auto;
-                border: none;
-              }
+          // Extract all 4-digit years from the string
+          const years = raw.match(/\d{4}/g)?.map(y => parseInt(y)) || [];
 
-              th, td { 
-                border: 1px solid black !important;
-                padding: 8px 6px; 
-                text-align: left; 
-                vertical-align: top;
-                page-break-inside: avoid;
-                page-break-after: auto;
-              }
-              thead th {
-                border: 1px solid grey !important;
-              }
-              tbody td {
-                border: 1px solid grey !important;
-              }
-              tfoot td {
-                border: 1px solid grey !important;
-              }
-              thead tr:first-child th {
-                border: none !important;
-                font-size: 1em;
-                font-weight: bold;
-                padding: 15px 10px;
-                background: transparent;
-                text-transform: uppercase;
-              }
-              thead tr:nth-child(2) th {
-                background-color: #000f3f !important;
-                color: white !important;
-                font-weight: 600;
-                padding: 10px 6px;
-                border: none !important;
-                text-transform: none;
-                text-align: center;
-                font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                color-adjust: exact !important;
-              }
-              tbody td {
-                font-size: 0.85em;
-                line-height: 1.4;
-                font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
-              }
-              tbody tr {
-                page-break-inside: avoid;
-                page-break-after: auto;
-              }
-              tr.self-funded {
-                background-color: #FFFF00 !important;
-              }
-              .print-footer {
-                border-top: 1px solid #000;
-                font-weight: 600;
-                text-transform: uppercase;
-                white-space: nowrap !important;
-                vertical-align: middle;
-              }
+          // If no year found, skip
+          if (years.length === 0) return true;
 
-              @media print {
-                
-                @page {
-                  size: A4 landscape;
-                  margin: 10mm;
-                    @bottom-right {
-                    content: "Page " counter(page);
-                    font-size: 1em;
-                    font-weight: 600;
-                    font-family: 'Arial';
-                  }
-                }
-                * {
-                  -webkit-print-color-adjust: exact !important;
-                  print-color-adjust: exact !important;
-                  color-adjust: exact !important;
-                }
-                body {
-                  margin: 0;
-                  padding: 0;
-                  background: white;
-                }
+          // If it's a range like "May-June 2025", years will just be [2025]
+          // If it's "2024-2025", years will be [2024, 2025]
+          const minYear = Math.min(...years);
+          const maxYear = Math.max(...years);
 
-                .print-footer-left,
-                .print-footer-center {
-                  display: block;
-                  position: fixed;
-                  bottom: 0mm;
-                  font-size: 1em;
-                  font-weight: 600;
-                  text-transform: uppercase;
-                }
+          const start = yearRange.start ? parseInt(yearRange.start) : null;
+          const end = yearRange.end ? parseInt(yearRange.end) : null;
 
-                .print-footer-left { left: 10mm; text-align: left; }
-                .print-footer-center { left: 50%; transform: translateX(-30%); text-align: center; }
-                
-                .print-header {
-                  display: table-header-group;
-                }
-                .print-footer {
-                  display: table-cell !important;
-                  padding: 30px 10px 10px 10px !important;
-                  font-weight: 600 !important;
-                  font-size: 11px !important;
-                  text-transform: uppercase !important;
-                  white-space: nowrap !important;
-                  vertical-align: middle !important;
-                  visibility: visible !important;
-                  border: none !important;
-                }
-                .print-page-number::after {
-                  counter-increment: page;
-                  content: " " counter(page);
-                }
-                tfoot {
-                  display: table-footer-group !important;
-                  visibility: visible !important;
-                  border: none;
-                }
-                tfoot tr {
-                  display: table-row !important;
-                  page-break-inside: avoid !important;
-                  page-break-after: avoid !important;
-                  visibility: visible !important;
-                  border: none;
-                }
-                tfoot td {
-                  display: table-cell !important;
-                  white-space: nowrap !important;
-                  padding: 10px !important;
-                  font-size: 11px !important;
-                  visibility: visible !important;
-                  border: none;
-                }
-                
-                table {
-                  border-collapse: collapse;
-                  width: 100%;
-                  border: 1px solid #D3D3D3 !important;
-                  page-break-inside: auto;
-                }
-                thead {
-                  display: table-header-group;
-                }
-                tfoot {
-                  display: table-footer-group;
-                }
-                thead tr:first-child th {
-                  border: none !important;
-                  font-size: 1em;
-                  font-weight: bold;
-                  padding: 15px 10px;
-                  background: transparent !important;
-                  text-transform: uppercase;
-                }
-                thead tr:nth-child(2) th {
-                  background-color: #000f3f !important;
-                  color: white !important;
-                  border: 1px solid #D3D3D3 !important;
-                  font-weight: 600 !important;
-                  border: none !important;
-                  -webkit-print-color-adjust: exact !important;
-                  print-color-adjust: exact !important;
-                  color-adjust: exact !important;
-                  padding: 10px 6px !important;
-                  text-transform: none !important;
-                  text-align: left !important;
-                  font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif !important;
-                }
-                table {
-                  border-collapse: collapse !important;
-                  border: none !important;
-                }
-                table th, table td {
-                  border: 1px solid #D3D3D3 !important;
-                }
-                thead th {
-                  border: 1px solid #D3D3D3 !important;
-                }
-                tbody td {
-                  border: 1px solid #D3D3D3 !important;
-                }
-                tfoot td {
-                  border: none !important;
-                }
-                tbody tr {
-                  page-break-inside: avoid;
-                  page-break-after: auto;
-                }
-                table th, table td {
-                  border: 1px solid #D3D3D3 !important;
-                  font-size: 0.85em;
-                  padding: 8px 6px;
-                  text-align: left;
-                  vertical-align: top;
-                  page-break-inside: avoid;
-                  font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif !important;
-                }
-                table td:first-child {
-                  text-align: center;
-                }
-                table tr {
-                  border: none;
-                }
-                thead tr:first-child, tfoot tr {
-                  border: none;
-                }
-                thead tr.esp-tr th {
-                  background-color: #000f3f !important;
-                  color: white !important;
-                  text-transform: none !important;
-                  text-align: center !important;
-                  font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif !important;
-                  -webkit-print-color-adjust: exact !important;
-                  print-color-adjust: exact !important;
-                  color-adjust: exact !important;
-                }
-                table th:last-child,
-                table tbody td:last-child,
-                .delete-btn,
-                .department-buttons-container,
-                button[onclick="confirmPrint()"],
-                .add-form-container,
-                .action-column {
-                  display: none !important;
-                }
-                tfoot,
-                tfoot tr,
-                tfoot td {
-                  visibility: visible !important;
-                  border: none;
-                }
+          // Check overlap between presentation year(s) and filter range
+          return (!start || maxYear >= start) && (!end || minYear <= end);
+        })()
+        : true;
 
-                .print-footer {
-                  border: none;
-                }
-              }
-            </style>
-            </head>
-            <body>${printContents}</body>
-            </html>
-            `);
-
-
-          printWindow.document.close();
-
-          printWindow.onload = () => {
-            printWindow.focus();
-            printWindow.print();
-          };
-
-          // No audit log for printing
-
-        } catch (err) {
-          console.error("Error printing presentation:", err);
-          showToast("error", "Print Error", "Something went wrong while printing."); 
-        } finally {
-          closeModal();
-        }
-      },
-      'Print presentation'
-    );
-  };
+      return matchesAuthor && matchesYear;
+    });
+  }, [publication, author, yearRange]);
+  
+  const { 
+    sortedData, 
+    sortColumn, 
+    sortDirection, 
+    hoveredColumn, 
+    setHoveredColumn, 
+    handleSort,
+    resetSort
+  } = useSortableTable(filteredData);
 
   const handleExportPublicationToExcel = () => {
     try {
@@ -410,22 +162,120 @@ const DepartmentResearchPublicationTable = ({ publication, loading, department, 
   return (
     <>
       {loading 
-        ? <div className="department-buttons-container">
-            <ShimmerButton size="lg" />
-            <ShimmerButton size="lg" />
-            <ShimmerButton size="lg" />
+        ? <div className="department-buttons-filter-container">
+            <div className="left">
+              <ShimmerButton size="lg"/>
+              <ShimmerButton size="lg"/>
+              <ShimmerButton size="lg"/>
+            </div>
+            <div className="right">
+              <ShimmerButton size="lg"/>
+              <ShimmerButton size="lg"/>
+              <ShimmerButton size="lg"/>
+              <ShimmerButton size="lg"/>
+            </div>
           </div> 
-        : <div className="department-buttons-container">
-            <button
-              type="button"
-              onClick={() => navigate(`/user/department/${dep_id}/research-publication-add`)}
-              name="dep-publication"
-            >
-              Add Research Publication
-            </button>
+        : <div className="department-buttons-filter-container">
+            <div className="left">
+              <div className="slider-button">
+                <button
+                  type="button"
+                  onClick={() => navigate(`/user/department/${dep_id}/research-publication-add`)}
+                  name="dep-publication"
+                >
+                  <span className="material-symbols-outlined">
+                    add
+                  </span>
+                  <div className="slide-info">
+                    Add Research Publication
+                  </div>
+                </button>
+                
+              </div>
 
-            <button type="button" onClick={confirmPrint} name="dep-publication">Print Table</button>
-            <button type="button" onClick={handleExportPublicationToExcel} name="dep-publication">Save as Excel</button>
+              <div className="slider-button">
+                <button 
+                  type="button" 
+                  onClick={() => PublicationPrint(showModal, closeModal)}
+                  name="dep-publication"
+                  >
+                    <span className="material-symbols-outlined">
+                      print
+                    </span>
+                    <div className="slide-info">
+                      Print Current Publication Table
+                    </div>
+                </button>
+              </div>
+
+              <div className="slider-button">
+                <button 
+                  type="button" 
+                  onClick={handleExportPublicationToExcel}
+                  name="dep-publication"
+                  >
+                    <span className="material-symbols-outlined">
+                      file_export
+                      </span>
+                    <div className="slide-info">
+                      Save Current Table as Excel
+                    </div>
+                </button>
+              </div>
+            </div>
+
+            <div className="right">
+              <div>
+                <input 
+                  placeholder='Enter Author' 
+                  name='dep-publication'
+                  type="text" 
+                  value={author} 
+                  onChange={(e) => setAuthor(e.target.value)} 
+                  />
+              </div>
+
+              <div className="year-range">
+                <input 
+                  type="number"
+                  name="dep-publication" 
+                  placeholder="Start Year (YYYY)" 
+                  value={yearRange.start} 
+                  onChange={(e) => setYearRange({ 
+                    ...yearRange, start: e.target.value 
+                  })} 
+                  /> 
+                -
+                <input 
+                  type="number" 
+                  name="dep-publication"
+                  placeholder="End Year (YYYY)" 
+                  value={yearRange.end} 
+                  onChange={(e) => setYearRange({ 
+                    ...yearRange, end: e.target.value 
+                    })} 
+                  />
+              </div>
+
+              <div className="slider-button">
+                <button 
+                  onClick={() => {
+                    setAuthor('');
+                    setYearRange({ start: '', end: '' });
+                    resetSort();
+                  }} 
+                  type="button"
+                  name="dep-publication"
+                  >
+                    <span class="material-symbols-outlined">
+                      reset_settings
+                    </span>
+                    <div className="slide-info">
+                      Reset Filter
+                    </div>
+                </button>
+              </div>
+            </div>
           </div>
       }
 
@@ -448,24 +298,310 @@ const DepartmentResearchPublicationTable = ({ publication, loading, department, 
 
               <tr className="esp-tr">
                 <th className="hid-th">#</th>
-                <th>Published Title</th>
-                <th>Author</th>
-                <th>Co-author</th>
-                <th className="hid-th">Title of Journal / Publication</th>
-                <th className="hid-th">Conference / Proceedings</th>
-                <th>Publisher</th>
-                <th>Date of Publication</th>
-                <th className="hid-th">DOI</th>
-                <th className="hid-th">ISSN / ISBN</th>
-                <th className="hid-th">Volume & Issue No.</th>
-                <th className="hid-th">Index</th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('published_title')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('published_title')}
+                  className="filter-col"
+                  >
+                    <div className="filter-inner">
+                      <span>Published Title</span>
+                      <div className={`filter-arrow ${sortColumn === 'published_title' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'published_title' || sortColumn === 'published_title') && ( 
+                          <span> 
+                            {sortColumn === 'published_title' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>
+                </th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('pub_author')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('pub_author')}
+                  className="filter-col"
+                  >
+                    <div className="filter-inner">
+                      <span>Author</span>
+                      <div className={`filter-arrow ${sortColumn === 'pub_author' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'pub_author' || sortColumn === 'pub_author') && ( 
+                          <span> 
+                            {sortColumn === 'pub_author' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>
+                </th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('co_authors')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('co_authors')}
+                  className="filter-col"
+                  >
+                    <div className="filter-inner">
+                      <span>Co-author</span>
+                      <div className={`filter-arrow ${sortColumn === 'co_authors' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'co_authors' || sortColumn === 'co_authors') && ( 
+                          <span> 
+                            {sortColumn === 'co_authors' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>
+                </th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('journal_title')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('journal_title')}
+                  className="filter-col"
+                  >
+                    <div className="filter-inner">
+                      <span>Title of Journal / Publication</span>
+                      <div className={`filter-arrow ${sortColumn === 'journal_title' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'journal_title' || sortColumn === 'journal_title') && ( 
+                          <span> 
+                            {sortColumn === 'journal_title' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>
+                </th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('conference_or_proceedings')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('conference_or_proceedings')}
+                  className="filter-col"
+                  >
+                    <div className="filter-inner">
+                      <span>Conference / Proceedings</span>
+                      <div className={`filter-arrow ${sortColumn === 'conference_or_proceedings' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'conference_or_proceedings' || sortColumn === 'conference_or_proceedings') && ( 
+                          <span> 
+                            {sortColumn === 'conference_or_proceedings' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>
+                </th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('publisher')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('publisher')}
+                  className="filter-col"
+                  >
+                    <div className="filter-inner">
+                      <span>Publisher</span>
+                      <div className={`filter-arrow ${sortColumn === 'publisher' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'publisher' || sortColumn === 'publisher') && ( 
+                          <span> 
+                            {sortColumn === 'publisher' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>
+                </th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('date_of_publication')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('date_of_publication')}
+                  className="filter-col"
+                  >
+                    <div className="filter-inner">
+                      <span>Date of Publication</span>
+                      <div className={`filter-arrow ${sortColumn === 'date_of_publication' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'date_of_publication' || sortColumn === 'date_of_publication') && ( 
+                          <span> 
+                            {sortColumn === 'date_of_publication' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>
+                </th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('doi')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('doi')}
+                  className="filter-col"
+                  >
+                    <div className="filter-inner">
+                      <span>DOI</span>
+                      <div className={`filter-arrow ${sortColumn === 'doi' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'doi' || sortColumn === 'doi') && ( 
+                          <span> 
+                            {sortColumn === 'doi' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>
+                </th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('issn_isbn')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('issn_isbn')}
+                  className="filter-col"
+                  >
+                    <div className="filter-inner">
+                      <span>ISSN / ISBN</span>
+                      <div className={`filter-arrow ${sortColumn === 'issn_isbn' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'issn_isbn' || sortColumn === 'issn_isbn') && ( 
+                          <span> 
+                            {sortColumn === 'issn_isbn' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>
+                </th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('volume_issue')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('volume_issue')}
+                  className="filter-col"
+                  >
+                    <div className="filter-inner">
+                      <span>Volume & Issue No.</span>
+                      <div className={`filter-arrow ${sortColumn === 'volume_issue' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'volume_issue' || sortColumn === 'volume_issue') && ( 
+                          <span> 
+                            {sortColumn === 'volume_issue' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>
+                </th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('index_type')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('index_type')}
+                  className="filter-col"
+                  >
+                    <div className="filter-inner">
+                      <span>Index</span>
+                      <div className={`filter-arrow ${sortColumn === 'index_type' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'index_type' || sortColumn === 'index_type') && ( 
+                          <span> 
+                            {sortColumn === 'index_type' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>
+                </th>
                 <th className="action-column">Action</th>
               </tr>
             </thead>
 
             <tbody>
-              {publication.length > 0 ? (
-                publication.map((item, index) => (
+              {sortedData.length > 0 ? (
+                sortedData.map((item, index) => (
                   <tr key={item.id}>
                     <td className="hid-td">{index + 1}</td>
                     <td>{item.published_title}</td>
@@ -475,14 +611,14 @@ const DepartmentResearchPublicationTable = ({ publication, loading, department, 
                         ? item.co_authors.filter(co => co && co.trim() !== "").map((co, idx) => <div key={idx} style={{marginBottom: '4px'}}>{co}</div>)
                         : 'N/A'}
                     </td>
-                    <td className="hid-td">{item.journal_title}</td>
-                    <td className="hid-td">{item.conference_or_proceedings || "N/A"}</td>
+                    <td>{item.journal_title}</td>
+                    <td>{item.conference_or_proceedings || "N/A"}</td>
                     <td>{item.publisher}</td>
                     <td>{item.date_of_publication ? item.date_of_publication : "N/A"}</td>
-                    <td className="hid-td">{item.doi || "N/A"}</td>
-                    <td className="hid-td">{item.issn_isbn}</td>
-                    <td className="hid-td">{item.volume_issue || "N/A"}</td>
-                    <td className="hid-td">
+                    <td>{item.doi || "N/A"}</td>
+                    <td>{item.issn_isbn}</td>
+                    <td>{item.volume_issue || "N/A"}</td>
+                    <td>
                       {Array.isArray(item.index_type) && item.index_type.length > 0
                         ? item.index_type.map((index, idx) => <div key={idx} style={{marginBottom: '4px'}}>{index}</div>)
                         : 'N/A'}

@@ -4,6 +4,7 @@ import { ShimmerTable, ShimmerButton } from "react-shimmer-effects";
 import { useNavigate } from "react-router-dom";
 import ConfirmModal from "../../utils/ConfirmModal";
 import { showToast } from "../../utils/toast";
+import useSortableTable from "../../hooks/useSortableTable";
 
 const DepartmentStudentPaperTable = ({ sPapers, loading, role, dep_id, fetchStudentPapers }) => {
   const navigate = useNavigate();
@@ -29,6 +30,15 @@ const DepartmentStudentPaperTable = ({ sPapers, loading, role, dep_id, fetchStud
   const closeModal = () => {
     setModalConfig(prev => ({...prev, show:false}));
   };
+
+  const { 
+    sortedData, 
+    sortColumn, 
+    sortDirection, 
+    hoveredColumn, 
+    setHoveredColumn, 
+    handleSort 
+  } = useSortableTable(sPapers || []);
 
   const sdgColors = [
     "#e5233d", "#dda73a", "#4ca146", "#c7212f",
@@ -96,18 +106,44 @@ const DepartmentStudentPaperTable = ({ sPapers, loading, role, dep_id, fetchStud
           <table>
             <thead className="stick-header dep-student-thead">
               <tr className="esp-tr student">
-                <th>Title Thesis</th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('research_title')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('research_title')}
+                  className="filter-col"
+                  >
+                    <div className="filter-inner">
+                       <span>Title Thesis</span>
+                      <div className={`filter-arrow ${sortColumn === 'research_title' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'research_title' || sortColumn === 'research_title') && ( 
+                          <span> 
+                            {sortColumn === 'research_title' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>
+                </th>
                 <th>Researchers</th>
                 <th>Adviser</th>
                 <th>Academic&nbsp;Year<br/>Sem&nbsp;and&nbsp;SY</th>
                 <th>SDG Label</th>
                 <th>Course</th>
-                <th>Action</th>
+                <th className="action-column">Action</th>
               </tr>
             </thead>
             <tbody>
               {sPapers.length > 0 ? (
-                sPapers.map((paper) => {
+                sortedData.map((paper) => {
                   const color = getSdgColor(paper.sdg_number);
 
                   return (
@@ -149,7 +185,7 @@ const DepartmentStudentPaperTable = ({ sPapers, loading, role, dep_id, fetchStud
                           <span className="material-symbols-outlined view-icon">visibility</span>
                           <span className="tooltip">View Paper</span>
                         </button>
-                        <button onClick={() => handleDeletePaper(paper.research_id)}>
+                        <button onClick={() => handleDeletePaper(paper.research_id)} className="action-column">
                           <span className="material-symbols-outlined delete-icon">delete</span>
                           <span className="tooltip">Delete Paper</span>
                         </button>

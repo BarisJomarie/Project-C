@@ -79,7 +79,7 @@ const DepartmentCourseTable = ({ courses, loading, role, fetchCourse }) => {
               <tr>
                 <th>Course&nbsp;Name</th>
                 <th>Course&nbsp;Abbreviation</th>
-                {role === 'admin' && <th>Action</th>}
+                {role === 'admin' && <th className="action-column">Action</th>}
               </tr>
             </thead>
             <tbody>
@@ -91,7 +91,7 @@ const DepartmentCourseTable = ({ courses, loading, role, fetchCourse }) => {
                       <td>{course.course_name}</td>
                       <td>{course.course_abb}</td>
                       {role === 'admin' && (
-                        <td>
+                        <td className="action-column">
                           <button onClick={() => handleDeleteCourse(course.course_id)}>
                             <span className="material-symbols-outlined delete-icon">delete</span>
                             <span className="tooltip">Delete Course</span>

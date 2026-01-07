@@ -1,12 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import axios from "axios";
 import ConfirmModal from "../../utils/ConfirmModal";
 import {ShimmerButton, ShimmerTable} from "react-shimmer-effects";
 import {useNavigate} from "react-router-dom";
 import * as XLSX from 'xlsx';
 import { showToast } from "../../utils/toast";
+import PresentationPrint from "../../utils/print/PresentationPrint";
 import '../../styles/department.css';
 import '../../styles/table.css';
+import useSortableTable from "../../hooks/useSortableTable";
 
 const DepartmentResearchPresentationTable = ({ presentations, loading, department, user, fetchPresentation }) => {
   const navigate = useNavigate();
@@ -34,319 +36,51 @@ const DepartmentResearchPresentationTable = ({ presentations, loading, departmen
     setModalConfig(prev => ({...prev, show:false}));
   };
 
-  const confirmPrint = () => {
-    showModal(
-      'Printing Presentation',
-      `This presentation will be printed. Do you want to continue?`,
-      async () => {
-        try {
-          const printContents = document.getElementById('printable-table')?.innerHTML;
-          if (!printContents) return;
+  const [author, setAuthor] = useState('');
+  const [yearRange, setYearRange] = useState({ start: '', end: '' });
 
-          const printWindow = window.open('', '_blank', 'width=1200,height=800');
+  const filteredData = useMemo(() => {
+    return presentations.filter(item => {
+      // Author filter
+      const matchesAuthor = author
+        ? item.author?.toLowerCase().includes(author.toLowerCase())
+        : true;
 
-          printWindow.document.write(`
-            <html>
-            <head>
-            <title>Research Presentation</title>
-            <style>
-              * {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                color-adjust: exact !important;
-              }
-              body { 
-                font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; 
-                font-size: 0.85em; 
-                background: #fff; 
-                color: #000; 
-                margin: 0;
-                padding: 20px;
-              }
-              table { 
-                width: 100%; 
-                border-collapse: collapse !important;
-                page-break-inside: auto;
-                border-left: none;
-              }
-              tbody tr {
-                border-left: 2px solid #1e293b;
-              }
+      // Year range filter
+      const matchesYear = yearRange.start || yearRange.end
+        ? (() => {
+            const year = new Date(item.date_presented).getFullYear();
+            const start = yearRange.start ? parseInt(yearRange.start) : null;
+            const end = yearRange.end ? parseInt(yearRange.end) : null;
+            return (!start || year >= start) && (!end || year <= end);
+          })()
+        : true;
 
-              th, td { 
-                border: none !important;
-                padding: 8px 6px; 
-                text-align: left; 
-                vertical-align: top;
-                page-break-inside: avoid;
-                page-break-after: auto;
-              }
-              thead th {
-                border: none !important;
-              }
-              tbody td {
-                border: none !important;
-              }
-              tfoot td {
-                border: none !important;
-              }
-              thead tr:first-child th {
-                border: none !important;
-                font-size: 1em;
-                font-weight: bold;
-                padding: 15px 10px;
-                background: transparent;
-                text-transform: uppercase;
-              }
-              thead tr:nth-child(2) th {
-                background-color: #1e293b !important;
-                color: white !important;
-                font-weight: 600;
-                padding: 10px 6px;
-                border: none !important;
-                text-transform: none;
-                text-align: left;
-                font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                color-adjust: exact !important;
-              }
-              tbody td {
-                font-size: 0.85em;
-                line-height: 1.4;
-                font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
-              }
-              tbody tr {
-                page-break-inside: avoid;
-                page-break-after: auto;
-              }
-              tr.self-funded {
-                background-color: #FFFF00 !important;
-              }
-              .print-footer {
-                border-top: 1px solid #000;
-                font-weight: 600;
-                text-transform: uppercase;
-                white-space: nowrap !important;
-                vertical-align: middle;
-              }
+      return matchesAuthor && matchesYear;
+    });
+  }, [presentations, author, yearRange]);
 
-              .hid-th,
-              .hid-td {
-                visibility: visible;
-              }
+  const { 
+    sortedData, 
+    sortColumn, 
+    sortDirection, 
+    hoveredColumn, 
+    setHoveredColumn, 
+    handleSort,
+    resetSort
+  } = useSortableTable(filteredData);
 
-              @media print {
-                
-                @page {
-                  size: A4 landscape;
-                  margin: 10mm;
-                    @bottom-right {
-                    content: "Page " counter(page);
-                    font-size: 1em;
-                    font-weight: 600;
-                    font-family: 'Arial';
-                  }
-                }
-                  
-                * {
-                  -webkit-print-color-adjust: exact !important;
-                  print-color-adjust: exact !important;
-                  color-adjust: exact !important;
-                }
+  const facultyCounts = useMemo(() => {
+    // use sortedData if you want counts to reflect the table as displayed
+    const baseData = sortedData ?? presentations ?? [];
+    
+    return baseData.reduce((acc, item) => {
+      const faculty = item.faculty || 'Unknown';
+      acc[faculty] = (acc[faculty] || 0) + 1;
+      return acc;
+    }, {});
+  }, [sortedData, presentations]);
 
-                html {
-                  counter-reset: page;
-                }
-
-                body {
-                  margin: 0;
-                  padding: 0;
-                  background: white;
-                }
-
-                
-
-                .print-footer-left,
-                .print-footer-center {
-                  display: block;
-                  position: fixed;
-                  bottom: 0mm;
-                  font-size: 1em;
-                  font-weight: 600;
-                  text-transform: uppercase;
-                }
-
-                .print-footer-left { left: 10mm; text-align: left; }
-                .print-footer-center { left: 50%; transform: translateX(-30%); text-align: center; }
-                
-                .print-header {
-                  display: table-header-group;
-                }
-                .print-footer {
-                  display: table-cell !important;
-                  padding: 30px 10px 10px 10px !important;
-                  font-weight: 600 !important;
-                  font-size: 11px !important;
-                  text-transform: uppercase !important;
-                  white-space: nowrap !important;
-                  vertical-align: middle !important;
-                  visibility: visible !important;
-                }
-                
-                
-                tbody tr {
-                  border-left: 2px solid #1e293b;
-                  page-break-inside: auto !important;
-                }
-                tfoot {
-                  display: table-footer-group !important;
-                  visibility: visible !important;
-                }
-                tfoot tr {
-                  display: table-row !important;
-                  page-break-inside: auto !important;
-                  visibility: visible !important;
-                }
-                tfoot td {
-                  display: table-cell !important;
-                  white-space: nowrap !important;
-                  padding: 10px !important;
-                  font-size: 1em !important;
-                  visibility: visible !important;
-                }
-                
-                table {
-                  border-collapse: collapse;
-                  width: 100%;
-                  border: 1px solid #000 !important;
-                  page-break-inside: auto;
-                }
-                thead {
-                  display: table-header-group;
-                }
-                tfoot {
-                  display: table-footer-group;
-                }
-                thead tr:first-child th {
-                  border: none !important;
-                  font-size: 1em;
-                  font-weight: bold;
-                  padding: 15px 10px;
-                  background: transparent !important;
-                  text-transform: uppercase;
-                }
-                thead tr:nth-child(2) th {
-                  background-color: #1e293b !important;
-                  color: white !important;
-                  font-weight: 600 !important;
-                  border: none !important;
-                  -webkit-print-color-adjust: exact !important;
-                  print-color-adjust: exact !important;
-                  color-adjust: exact !important;
-                  padding: 10px 6px !important;
-                  text-transform: none !important;
-                  text-align: left !important;
-                  font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif !important;
-                }
-                table {
-                  border-collapse: collapse !important;
-                  border: none !important;
-                }
-                table th, table td {
-                  border: none !important;
-                }
-                thead th {
-                  border: none !important;
-                }
-                tbody td {
-                  border: none !important;
-                }
-                tfoot td {
-                  border: none !important;
-                }
-                tbody tr {
-                  page-break-after: auto;
-                }
-                tr.self-funded {
-                  background-color: #FFFF00 !important;
-                  -webkit-print-color-adjust: exact !important;
-                  print-color-adjust: exact !important;
-                  color-adjust: exact !important;
-                }
-                table th, table td {
-                  border: none !important;
-                  font-size: 0.85em;
-                  padding: 8px 6px;
-                  text-align: left;
-                  vertical-align: top;
-                  page-break-inside: avoid;
-                  font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif !important;
-                }
-                table td:first-child {
-                  text-align: center;
-                }
-                table tr {
-                  border: none;
-                }
-                thead tr:first-child, tfoot tr {
-                  border: none;
-                }
-                thead tr.esp-tr th {
-                  background-color: #1E4A40 !important;
-                  color: white !important;
-                  text-transform: none !important;
-                  text-align: left !important;
-                  font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif !important;
-                  -webkit-print-color-adjust: exact !important;
-                  print-color-adjust: exact !important;
-                  color-adjust: exact !important;
-                }
-                table th:last-child,
-                table tbody td:last-child,
-                .delete-btn,
-                .department-buttons-container,
-                button[onclick="confirmPrint()"],
-                .add-form-container,
-                .action-column {
-                  display: none !important;
-                }
-                tfoot,
-                tfoot tr,
-                tfoot td {
-                  visibility: visible !important;
-                }
-              }
-            </style>
-            </head>
-            <body>
-              <div id="page-marker"></div>
-              <div id="page-number"></div>
-              ${printContents}
-            </body>
-            </html>
-            `);
-
-
-          printWindow.document.close();
-
-          printWindow.onload = () => {
-            printWindow.focus();
-            printWindow.print();
-          };
-
-          // No audit log for printing
-
-        } catch (err) {
-          console.error("Error printing presentation:", err);
-          showToast("error", "Print Error", "Something went wrong while printing."); 
-        } finally {
-          closeModal();
-        }
-      },
-      'Print presentation'
-    );
-  };
 
   function formatDateRange(startDate, endDate) {
     if (!startDate) return '';
@@ -452,23 +186,128 @@ const DepartmentResearchPresentationTable = ({ presentations, loading, departmen
   return (
     <>
       {loading ? 
-      <div className="department-buttons-container">
-        <ShimmerButton size="lg"/>
-        <ShimmerButton size="lg"/>
-        <ShimmerButton size="lg"/>
+      <div className="department-buttons-filter-container">
+        <div className="left">
+          <ShimmerButton size="lg"/>
+          <ShimmerButton size="lg"/>
+          <ShimmerButton size="lg"/>
+        </div>
+        <div className="right">
+          <ShimmerButton size="lg"/>
+          <ShimmerButton size="lg"/>
+          <ShimmerButton size="lg"/>
+          <ShimmerButton size="lg"/>
+        </div>
       </div>
-      : <div className="department-buttons-container">
-          <button
-            type="button"
-            onClick={() => navigate(`/user/department/${dep_id}/research-presentation-add`)}
-            name="dep-presentation"
-          >
-            Add Research Presentation
-          </button>
-          <button type="button" onClick={confirmPrint} name="dep-presentation">Print Table</button>
-          <button type="button" onClick={handleExportPresentationToExcel} name="dep-presentation">Save as Excel</button>
+      : <div className="department-buttons-filter-container">
+          <div className="left">
+            <div className="slider-button">
+              <button
+                type="button"
+                onClick={() => navigate(`/user/department/${dep_id}/research-presentation-add`)}
+                name="dep-presentation"
+              >
+                <span className="material-symbols-outlined">
+                  add
+                </span>
+                <div className="slide-info">
+                  Add Research Presentation
+                </div>
+              </button>
+              
+            </div>
+
+            <div className="slider-button">
+              <button 
+                type="button" 
+                onClick={() => PresentationPrint(showModal, closeModal)} 
+                name="dep-presentation"
+                >
+                  <span className="material-symbols-outlined">
+                    print
+                  </span>
+                  <div className="slide-info">
+                    Print Current Presentation Table
+                  </div>
+              </button>
+            </div>
+
+            <div className="slider-button">
+              <button 
+                type="button" 
+                onClick={handleExportPresentationToExcel}
+                name="dep-presentation"
+                >
+                  <span className="material-symbols-outlined">
+                    file_export
+                    </span>
+                  <div className="slide-info">
+                    Save Current Table as Excel
+                  </div>
+              </button>
+            </div>
+          </div>
+          
+          <div className="right">
+
+            <div>
+              <input 
+                placeholder='Enter Author' 
+                name='dep-presentation'
+                type="text" 
+                value={author} 
+                onChange={(e) => setAuthor(e.target.value)} 
+                />
+            </div>
+
+            <div className="year-range">
+              <input 
+                type="number" 
+                name="dep-presentation"
+                placeholder="Start Year (YYYY)" 
+                value={yearRange.start} 
+                onChange={(e) => setYearRange({ 
+                  ...yearRange, start: e.target.value 
+                })} 
+                /> 
+              -
+              <input 
+                type="number" 
+                name="dep-presentation"
+                placeholder="End Year (YYYY)" 
+                value={yearRange.end} 
+                onChange={(e) => setYearRange({ 
+                  ...yearRange, end: e.target.value 
+                  })} 
+                />
+            </div>
+
+            <div className="slider-button">
+              <button 
+                onClick={() => {
+                  setAuthor('');
+                  setYearRange({ start: '', end: '' });
+                  resetSort();
+                }} 
+                type="button"
+                name="dep-presentation"
+                >
+                  <span class="material-symbols-outlined">
+                    reset_settings
+                  </span>
+                  <div className="slide-info">
+                    Reset Filter
+                  </div>
+              </button>
+            </div>
+          </div>
         </div>
       }
+
+      <div className={`count-div ${author !== '' || yearRange.start !== '' || yearRange.end !== '' ? 'active' : ''}`}>
+        <h4>Total Presentations: <span>{sortedData.length}</span></h4>
+      </div>
+      
       {loading ? <ShimmerTable row={6} col={4} /> : (
         <div className="table-container sticky" id="printable-table">
           <table>
@@ -482,25 +321,337 @@ const DepartmentResearchPresentationTable = ({ presentations, loading, departmen
 
               <tr className="esp-tr">
                 <th className="hid-th">Department</th>
-                <th>Author</th>
-                <th>Co-author</th>
-                <th>Title of Research Paper</th>
-                <th>SDG Alignment</th>
-                <th className="hid-th">Conference Title</th>
-                <th className="hid-th">Organizer</th>
-                <th className="hid-th">Venue</th>
-                <th>Date Presented</th>
-                <th className="hid-th">Type of Conference</th>
-                <th className="hid-th">Special Order No.</th>
-                <th className="hid-th">Status</th>
-                <th className="hid-th">Funding Source</th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('author')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('author')}
+                  className="filter-col"
+                  >
+                    <div className="filter-inner">
+                       <span>Author</span>
+                      <div className={`filter-arrow ${sortColumn === 'author' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'author' || sortColumn === 'author') && ( 
+                          <span> 
+                            {sortColumn === 'author' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>
+                </th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('co_authors')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('co_authors')}
+                  className="filter-col"
+                  >
+                    <div className="filter-inner">
+                      <span>Co-author</span>
+                      <div className={`filter-arrow ${sortColumn === 'co_authors' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'co_authors' || sortColumn === 'co_authors') && ( 
+                          <span> 
+                            {sortColumn === 'co_authors' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>  
+                </th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('research_title')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('research_title')}
+                  className="filter-col"
+                  >
+                    <div className="filter-inner">
+                      <span>Title of Research Paper</span>
+                      <div className={`filter-arrow ${sortColumn === 'research_title' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'research_title' || sortColumn === 'research_title') && ( 
+                          <span> 
+                            {sortColumn === 'research_title' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>  
+                </th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('sdg_alignment')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('sdg_alignment')}
+                  className="filter-col"
+                  >
+                    <div className="filter-inner"> 
+                      <span>SDG Alignment</span>
+                      <div className={`filter-arrow ${sortColumn === 'sdg_alignment' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'sdg_alignment' || sortColumn === 'sdg_alignment') && ( 
+                          <span> 
+                            {sortColumn === 'sdg_alignment' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>
+                </th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('conference_title')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('conference_title')}
+                  className="filter-col"
+                  >
+                    <div className="filter-inner"> 
+                      <span>Conference Title</span>
+                      <div className={`filter-arrow ${sortColumn === 'conference_title' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'conference_title' || sortColumn === 'conference_title') && ( 
+                          <span> 
+                            {sortColumn === 'conference_title' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>
+                </th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('organizer')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('organizer')}
+                  className="filter-col"
+                  >
+                    <div className="filter-inner"> 
+                      <span>Organizer</span>
+                      <div className={`filter-arrow ${sortColumn === 'organizer' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'organizer' || sortColumn === 'organizer') && ( 
+                          <span> 
+                            {sortColumn === 'organizer' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>
+                </th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('venue')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('venue')}
+                  className="filter-col"
+                  >
+                    <div className="filter-inner"> 
+                      <span>Venue</span>
+                      <div className={`filter-arrow ${sortColumn === 'venue' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'venue' || sortColumn === 'venue') && ( 
+                          <span> 
+                            {sortColumn === 'venue' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>
+                </th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('date_presented')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('date_presented')}
+                  className="filter-col"
+                  >
+                    <div className="filter-inner"> 
+                      <span>Date Presented</span>
+                      <div className={`filter-arrow ${sortColumn === 'date_presented' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'date_presented' || sortColumn === 'date_presented') && ( 
+                          <span> 
+                            {sortColumn === 'date_presented' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>
+                </th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('conference_category')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('conference_category')}
+                  className="filter-col"
+                  >
+                    <div className="filter-inner"> 
+                      <span>Type of Conference</span>
+                      <div className={`filter-arrow ${sortColumn === 'conference_category' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'conference_category' || sortColumn === 'conference_category') && ( 
+                          <span> 
+                            {sortColumn === 'conference_category' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>
+                </th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('special_order_no')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('special_order_no')}
+                  className="filter-col"
+                  >
+                    <div className="filter-inner"> 
+                      <span>Special Order No.</span>
+                      <div className={`filter-arrow ${sortColumn === 'special_order_no' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'special_order_no' || sortColumn === 'special_order_no') && ( 
+                          <span> 
+                            {sortColumn === 'special_order_no' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>
+                </th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('status_engage')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('status_engage')}
+                  className="filter-col"
+                  >
+                    <div className="filter-inner"> 
+                      <span>Status</span>
+                      <div className={`filter-arrow ${sortColumn === 'status_engage' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'status_engage' || sortColumn === 'status_engage') && ( 
+                          <span> 
+                            {sortColumn === 'status_engage' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>
+                </th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('funding_source_engage')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('funding_source_engage')}
+                  className="filter-col"
+                  >
+                    <div className="filter-inner"> 
+                      <span>Funding Source</span>
+                      <div className={`filter-arrow ${sortColumn === 'funding_source_engage' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'funding_source_engage' || sortColumn === 'funding_source_engage') && ( 
+                          <span> 
+                            {sortColumn === 'funding_source_engage' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>
+                </th>
                 <th className="action-column">Action</th>
               </tr>
             </thead>
 
             <tbody>
-              {presentations.length > 0 ? (
-                presentations.map(item => {
+              {sortedData.length > 0 ? (
+                sortedData.map(item => {
                   const isSelfFunded = item.funding_source_engage?.toLowerCase() === "self funded";
 
                   return (
@@ -518,25 +669,45 @@ const DepartmentResearchPresentationTable = ({ presentations, loading, departmen
                           ? item.sdg_alignment.map((sdg, i) => (
                               <div key={i} style={{marginBottom: '4px'}}>{sdg}</div>
                             ))
-                          : item.sdg_alignment || 'N/A'}
+                          : typeof item.sdg_alignment === 'string' 
+                            ? (() => {
+                                try {
+                                  const parsed = JSON.parse(item.sdg_alignment);
+                                  return Array.isArray(parsed) && parsed.length > 0 
+                                    ? parsed.map((sdg, i) => <div key={i} style={{marginBottom: '4px'}}>{sdg}</div>)
+                                    : 'N/A';
+                                } catch {
+                                  return item.sdg_alignment || 'N/A';
+                                }
+                              })()
+                            : 'N/A'}
                       </td>
-                      <td className="hid-th">{item.conference_title}</td>
-                      <td className="hid-th">{item.organizer}</td>
-                      <td className="hid-th">{item.venue}</td>
+                      <td>{item.conference_title}</td>
+                      <td>{item.organizer}</td>
+                      <td>{item.venue}</td>
                       <td>{formatDateRange(item.date_presented, item.end_date_presented)}</td>
-                      <td className="hid-th">{item.conference_category}</td>
-                      <td className="hid-th">{item.special_order_no || "N/A"}</td>
-                      <td className="hid-th">{item.status_engage}</td>
-                      <td className="hid-th">{item.funding_source_engage}</td>
-                    <td className="action-column">
-                      <button
-                        onClick={() => handleDeletePresentation(item.id)}
-                        className="delete-btn"
-                      >
-                        <span className="material-symbols-outlined delete-icon">delete</span>
-                        <span className="tooltip">Delete Presentation</span>
-                      </button>
-                    </td>
+                      <td>{item.conference_category}</td>
+                      <td>{item.special_order_no || "N/A"}</td>
+                      <td>{
+                        item.status_engage ? 
+                          item.status_engage === 'completed'
+                          ? 'Completed'
+                          : item.status_engage === 'ongoing'
+                          ? 'Ongoing'
+                          : item.status_engage === 'proposed'
+                          && 'Proposed'
+                        : ''
+                      }</td>
+                      <td>{item.funding_source_engage}</td>
+                      <td className="action-column">
+                        <button
+                          onClick={() => handleDeletePresentation(item.id)}
+                          className="delete-btn"
+                        >
+                          <span className="material-symbols-outlined delete-icon">delete</span>
+                          <span className="tooltip">Delete Presentation</span>
+                        </button>
+                      </td>
                     </tr>
                   );
                 })

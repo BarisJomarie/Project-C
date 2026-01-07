@@ -25,7 +25,7 @@ const DepartmentUserTable = ({ users, loading }) => {
               <tr>
                 <th>Fullname</th>
                 <th>Course</th>
-                <th>Action</th>
+                <th className="action-column">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -44,7 +44,7 @@ const DepartmentUserTable = ({ users, loading }) => {
                         {depU.course_abb ? depU.course_abb : "N/A"}
                       </td>
 
-                      <td>
+                      <td className="action-column">
                         <button onClick={() => navigate(`/user/users/${depU.id}`)}>
                           <span className="material-symbols-outlined view-icon">visibility</span>
                           <span className="tooltip">View User</span>
