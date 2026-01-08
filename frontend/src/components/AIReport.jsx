@@ -428,6 +428,72 @@ const AIReport = () => {
     }
   };
 
+  // Export Report as CSV
+  const handleExportCSV = () => {
+    try {
+      let csvContent = "data:text/csv;charset=utf-8,";
+      
+      // Header Information
+      csvContent += `"SDG Analysis Report - ${department.department_name}"\n`;
+      csvContent += `"Academic Year","${getSelectedYear()}"\n`;
+      csvContent += `"Created By","${userData.lastname}, ${userData.firstname}"\n`;
+      csvContent += `"Created Date","${new Date().toLocaleDateString()}"\n`;
+      csvContent += `"Endorsed By","${endorsedBy}"\n\n`;
+
+      // Student Thesis Section
+      csvContent += `"STUDENT THESIS ALIGNMENT WITH SDGs"\n`;
+      csvContent += `"Number","Title","Students","Adviser","Academic Year","SDG Number","SDG Title","Status"\n`;
+      
+      Object.entries(studentPapers || {}).forEach(([course, papers]) => {
+        papers.forEach((paper, index) => {
+          const researchers = Array.isArray(paper.researchers) ? paper.researchers.join("; ") : paper.researchers;
+          const sdgNumbers = Array.isArray(paper.sdg_number) ? paper.sdg_number.join("; ") : paper.sdg_number;
+          const sdgLabels = Array.isArray(paper.sdg_labels) ? paper.sdg_labels.join("; ") : paper.sdg_labels;
+          
+          csvContent += `"${index + 1}","${paper.research_title}","${researchers}","${paper.adviser}","${paper.semester} ${paper.academic_year}-${paper.academic_year + 1}","${sdgNumbers}","${sdgLabels}","${paper.status}"\n`;
+        });
+      });
+      
+      csvContent += `\n"FACULTY RESEARCH ALIGNMENT WITH SDGs"\n`;
+      csvContent += `"Number","Title","Researcher/s","Funding Source","Academic Year","SDG Number","SDG Title","Status"\n`;
+      
+      Object.entries(facultyPapers || {}).forEach(([course, papers]) => {
+        papers.forEach((paper, index) => {
+          const researchers = Array.isArray(paper.researchers) ? paper.researchers.join("; ") : paper.researchers;
+          const sdgNumbers = Array.isArray(paper.sdg_number) ? paper.sdg_number.join("; ") : paper.sdg_number;
+          const sdgLabels = Array.isArray(paper.sdg_labels) ? paper.sdg_labels.join("; ") : paper.sdg_labels;
+          const fundingSource = paper.funding_source === 'earist' ? 'EARIST' : paper.funding_source === 'self-funded' ? 'Self-Funded' : 'N/A';
+          
+          csvContent += `"${index + 1}","${paper.research_title}","${researchers}","${fundingSource}","${paper.semester} ${paper.academic_year}-${paper.academic_year + 1}","${sdgNumbers}","${sdgLabels}","${paper.status}"\n`;
+        });
+      });
+
+      // Summary and Analysis
+      csvContent += `\n"SUMMARY AND ANALYSIS"\n`;
+      csvContent += `"Total Student Theses","${Object.values(studentPapers).reduce((sum, papers) => sum + papers.length, 0)}"\n`;
+      csvContent += `"Total Faculty Research","${Object.values(facultyPapers).reduce((sum, papers) => sum + papers.length, 0)}"\n`;
+      csvContent += `"Most Common SDGs","${commonSDG.length > 0 ? commonSDG.map(item => item.sdg).join("; ") : "No data"}"\n`;
+      csvContent += `\n"GAPS AND AREAS FOR IMPROVEMENT"\n`;
+      csvContent += `"${aiResult.lackSection ? aiResult.lackSection.replace(/"/g, '""') : ""}"\n`;
+      csvContent += `\n"RECOMMENDATIONS"\n`;
+      csvContent += `"${aiResult.recommendationSection ? aiResult.recommendationSection.replace(/"/g, '""') : ""}"\n`;
+
+      // Create download link
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `SDG_Report_${department.department_abb}_${getSelectedYear()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      showToast('success', 'Export Successful', 'Report exported as CSV.');
+    } catch (err) {
+      console.error('Failed to export CSV:', err);
+      showToast('error', 'Export Failed', 'Could not export report as CSV.');
+    }
+  };
+
 
   // FOR ROMAN STUFF
   const toRoman = (num) => {
@@ -528,7 +594,7 @@ const AIReport = () => {
 
 
 
-        {aiResult.aiText && (
+        {/* {aiResult.aiText && ( */}
           <div className='report-container' id='report-container'>
             <div style={{
               display: 'flex',
@@ -538,6 +604,7 @@ const AIReport = () => {
               flexWrap: 'wrap'
             }}>
               <button type="button" className="ai-rep-but" onClick={() => AIReportPrint(showModal, closeModal)} style={{margin: 0}}>Print Report</button>
+              <button type="button" className="ai-rep-but" onClick={handleExportCSV} style={{margin: 0}}>Export as CSV</button>
               {/* <button type="button" className="ai-rep-but" onClick={handleSaveReport} style={{margin: 0}}>Save Report</button> */}
             </div>
 
@@ -839,7 +906,7 @@ const AIReport = () => {
               </div>
             </div>
           </div>
-        )}
+        {/* )} */}
 
       <ConfirmModal
         show={modalConfig.show}

@@ -73,11 +73,25 @@ exports.getDepartmentPapers = (req, res) => {
     if (err) return res.status(500).send(err);
     if (result.length === 0) return res.status(200).send([]);
 
+    const safeParse = (value) => {
+      if (Array.isArray(value)) return value; // already parsed
+      if (typeof value === 'object' && value !== null) return value; // already object
+      if (typeof value === 'string') {
+        try {
+          const parsed = JSON.parse(value);
+          return Array.isArray(parsed) ? parsed : [parsed];
+        } catch {
+          return [value]; // treat plain string as array
+        }
+      }
+      return [];
+    };
+
     const formattedResult = result.map(row => ({
       ...row,
-      researchers: JSON.parse(row.researchers || '[]'),
-      sdg_labels: JSON.parse(row.sdg_labels || '[]'),
-      sdg_number: JSON.parse(row.sdg_number || '[]')
+      researchers: safeParse(row.researchers),
+      sdg_labels: safeParse(row.sdg_labels),
+      sdg_number: safeParse(row.sdg_number)
     }));
 
     res.status(200).send(formattedResult);
@@ -107,11 +121,25 @@ exports.getDepartmentPapersFaculty = (req, res) => {
     if (err) return res.status(500).send(err);
     if (result.length === 0) return res.status(200).send([]);
 
+    const safeParse = (value) => {
+      if (Array.isArray(value)) return value; // already parsed
+      if (typeof value === 'object' && value !== null) return value; // already object
+      if (typeof value === 'string') {
+        try {
+          const parsed = JSON.parse(value);
+          return Array.isArray(parsed) ? parsed : [parsed];
+        } catch {
+          return [value]; // treat plain string as array
+        }
+      }
+      return [];
+    };
+
     const formattedResult = result.map(row => ({
       ...row,
-      researchers: JSON.parse(row.researchers || '[]'),
-      sdg_labels: JSON.parse(row.sdg_labels || '[]'),
-      sdg_number: JSON.parse(row.sdg_number || '[]')
+      researchers: safeParse(row.researchers),
+      sdg_labels: safeParse(row.sdg_labels),
+      sdg_number: safeParse(row.sdg_number)
     }));
 
     res.status(200).send(formattedResult);

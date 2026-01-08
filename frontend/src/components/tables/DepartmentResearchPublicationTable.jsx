@@ -267,7 +267,7 @@ const DepartmentResearchPublicationTable = ({ publication, loading, department, 
                   type="button"
                   name="dep-publication"
                   >
-                    <span class="material-symbols-outlined">
+                    <span className="material-symbols-outlined">
                       reset_settings
                     </span>
                     <div className="slide-info">
@@ -278,6 +278,10 @@ const DepartmentResearchPublicationTable = ({ publication, loading, department, 
             </div>
           </div>
       }
+
+      <div className={`count-div ${author !== '' || yearRange.start !== '' || yearRange.end !== '' ? 'active' : ''}`}>
+        <h4>Total Publications Found: <span>{sortedData.length}</span></h4>
+      </div>
 
       {loading ? <ShimmerTable row={6} col={4} /> : (
         <div className="table-container sticky" id="printable-table">

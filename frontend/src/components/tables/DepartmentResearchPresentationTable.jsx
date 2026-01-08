@@ -292,7 +292,7 @@ const DepartmentResearchPresentationTable = ({ presentations, loading, departmen
                 type="button"
                 name="dep-presentation"
                 >
-                  <span class="material-symbols-outlined">
+                  <span className="material-symbols-outlined">
                     reset_settings
                   </span>
                   <div className="slide-info">
@@ -305,7 +305,7 @@ const DepartmentResearchPresentationTable = ({ presentations, loading, departmen
       }
 
       <div className={`count-div ${author !== '' || yearRange.start !== '' || yearRange.end !== '' ? 'active' : ''}`}>
-        <h4>Total Presentations: <span>{sortedData.length}</span></h4>
+        <h4>Total Presentations Found: <span>{sortedData.length}</span></h4>
       </div>
       
       {loading ? <ShimmerTable row={6} col={4} /> : (

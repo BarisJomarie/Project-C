@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import axios from "axios";
 import { ShimmerTable, ShimmerButton } from "react-shimmer-effects";
 import { useNavigate } from "react-router-dom";
 import ConfirmModal from "../../utils/ConfirmModal";
 import { showToast } from "../../utils/toast";
+import useSortableTable from "../../hooks/useSortableTable";
 
 const DepartmentCourseTable = ({ courses, loading, role, fetchCourse }) => {
   const navigate = useNavigate();
@@ -29,6 +30,29 @@ const DepartmentCourseTable = ({ courses, loading, role, fetchCourse }) => {
   const closeModal = () => {
     setModalConfig(prev => ({...prev, show:false}));
   };
+
+  const [course, setCourse] = useState('');
+
+  const filteredData = useMemo(() => {
+    return courses.filter(item => {
+      // Course Filter
+      const matchesCourse = course
+        ? item.course_name?.toLowerCase().includes(course.toLowerCase())
+        : true;
+
+      return matchesCourse;
+    });
+  }, [courses, course]);
+
+  const { 
+    sortedData, 
+    sortColumn, 
+    sortDirection, 
+    hoveredColumn, 
+    setHoveredColumn, 
+    handleSort,
+    resetSort
+  } = useSortableTable(filteredData);
 
   // DELETE COURSE
   const handleDeleteCourse = (id) => {
@@ -62,29 +86,136 @@ const DepartmentCourseTable = ({ courses, loading, role, fetchCourse }) => {
   }
   return (
     <>
-      {loading
-        ? <div className="department-buttons-container">
-          <ShimmerButton size="lg" />
-        </div>
-        : <div className="department-buttons-container">
-          <button onClick={() => navigate('/user/course_add')} type="button" name="dep-course">
-            Add A Course
-          </button>
-        </div>
+      {loading 
+        ? <div className="department-buttons-filter-container">
+            <div className="left">
+              <ShimmerButton size="lg"/>
+            </div>
+            <div className="right">
+              <ShimmerButton size="lg"/>
+              <ShimmerButton size="lg"/>
+            </div>
+          </div> 
+        : <div className="department-buttons-filter-container">
+            <div className="left">
+              <div className="slider-button">
+                <button
+                  type="button"
+                  onClick={() => navigate('/user/course_add')}
+                  name="dep-course"
+                >
+                  <span className="material-symbols-outlined">
+                    add
+                  </span>
+                  <div className="slide-info">
+                    Add New Course
+                  </div>
+                </button>
+                
+              </div>
+            </div>
+
+            <div className="right">
+              <div>
+                <input 
+                  placeholder='Enter Course Name' 
+                  name='dep-course'
+                  type="text" 
+                  value={course} 
+                  onChange={(e) => setCourse(e.target.value)} 
+                  />
+              </div>
+
+              <div className="slider-button">
+                <button 
+                  onClick={() => {
+                    setCourse('');
+                    resetSort();
+                  }} 
+                  type="button"
+                  name="dep-course"
+                  >
+                    <span className="material-symbols-outlined">
+                      reset_settings
+                    </span>
+                    <div className="slide-info">
+                      Reset Filter
+                    </div>
+                </button>
+              </div>
+            </div>
+          </div>
       }
+
+      <div className={`count-div ${course !== '' ? 'active' : ''}`}>
+        <h4>Total Courses Found: <span>{sortedData.length}</span></h4>
+      </div>
+
       {loading ? <ShimmerTable row={3} col={4} /> : (
         <div className="table-container sticky">
           <table>
             <thead className="stick-header dep-course-thead">
               <tr>
-                <th>Course&nbsp;Name</th>
-                <th>Course&nbsp;Abbreviation</th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('course_name')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('course_name')}
+                  className="filter-col"
+                  >
+                    <div className="filter-inner">
+                      <span>Course&nbsp;Name</span>
+                      <div className={`filter-arrow ${sortColumn === 'course_name' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'course_name' || sortColumn === 'course_name') && ( 
+                          <span> 
+                            {sortColumn === 'course_name' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>
+                  </th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('course_abb')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('course_abb')}
+                  className="filter-col"
+                  >
+                    <div className="filter-inner">
+                      <span>Course&nbsp;Abbreviation</span>
+                      <div className={`filter-arrow ${sortColumn === 'course_abb' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'course_abb' || sortColumn === 'course_abb') && ( 
+                          <span> 
+                            {sortColumn === 'course_abb' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>
+                </th>
                 {role === 'admin' && <th className="action-column">Action</th>}
               </tr>
             </thead>
             <tbody>
-              {courses.length > 0 ? (
-                courses.map((course) => {
+              {sortedData.length > 0 ? (
+                sortedData.map((course) => {
 
                   return (
                     <tr key={course.course_id}>

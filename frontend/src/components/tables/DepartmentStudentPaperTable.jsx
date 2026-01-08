@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import axios from "axios";
 import { ShimmerTable, ShimmerButton } from "react-shimmer-effects";
 import { useNavigate } from "react-router-dom";
@@ -31,14 +31,53 @@ const DepartmentStudentPaperTable = ({ sPapers, loading, role, dep_id, fetchStud
     setModalConfig(prev => ({...prev, show:false}));
   };
 
+  const [adviser, setAdviser] = useState('');
+  const [yearRange, setYearRange] = useState({ start: '', end: '' });
+
+  const filteredData = useMemo(() => {
+    return sPapers.filter(item => {
+      // Adviser filter
+      const matchedAdviser = adviser
+        ? item.adviser?.toLowerCase().includes(adviser.toLowerCase())
+        : true;
+
+      // Year range filter
+      const matchesYear = yearRange.start || yearRange.end
+        ? (() => {
+          const raw = String(item.academic_year);
+
+          // Extract all 4-digit years from the string
+          const years = raw.match(/\d{4}/g)?.map(y => parseInt(y)) || [];
+
+          // If no year found, skip
+          if (years.length === 0) return true;
+
+          // If it's a range like "May-June 2025", years will just be [2025]
+          // If it's "2024-2025", years will be [2024, 2025]
+          const minYear = Math.min(...years);
+          const maxYear = Math.max(...years);
+
+          const start = yearRange.start ? parseInt(yearRange.start) : null;
+          const end = yearRange.end ? parseInt(yearRange.end) : null;
+
+          // Check overlap between presentation year(s) and filter range
+          return (!start || maxYear >= start) && (!end || minYear <= end);
+        })()
+        : true;
+
+      return matchedAdviser && matchesYear;
+    });
+  }, [sPapers, adviser, yearRange]);
+
   const { 
     sortedData, 
     sortColumn, 
     sortDirection, 
     hoveredColumn, 
     setHoveredColumn, 
-    handleSort 
-  } = useSortableTable(sPapers || []);
+    handleSort,
+    resetSort
+  } = useSortableTable(filteredData);
 
   const sdgColors = [
     "#e5233d", "#dda73a", "#4ca146", "#c7212f",
@@ -88,18 +127,113 @@ const DepartmentStudentPaperTable = ({ sPapers, loading, role, dep_id, fetchStud
 
   return (
     <>
-      {loading ? <ShimmerButton size="lg" /> : (
-        <div className="department-buttons-container">
-          <button onClick={() => navigate(`/user/department/${dep_id}/research_add`)} type="button" name="dep-student">
-            Add Paper
-          </button>
-          {role !== 'faculty' && (
-            <button onClick={() => navigate(`/user/department/${dep_id}/ai_report`)} type="button" name="dep-student">
-              AI Analysis
-              </button>
-          )}
-        </div>
-      )}
+      {loading 
+        ? <div className="department-buttons-filter-container">
+            <div className="left">
+              <ShimmerButton size="lg"/>
+              <ShimmerButton size="lg"/>
+            </div>
+            <div className="right">
+              <ShimmerButton size="lg"/>
+              <ShimmerButton size="lg"/>
+              <ShimmerButton size="lg"/>
+              <ShimmerButton size="lg"/>
+            </div>
+          </div>
+        : <div className="department-buttons-filter-container">
+            <div className="left">
+              <div className="slider-button">
+                <button
+                  type="button"
+                  onClick={() => navigate(`/user/department/${dep_id}/research_add`)}
+                  name="dep-student"
+                >
+                  <span className="material-symbols-outlined">
+                    add
+                  </span>
+                  <div className="slide-info">
+                    Add Student Thesis
+                  </div>
+                </button>
+                
+              </div>
+
+              {role !== 'faculty' && (
+                <div className="slider-button">
+                  <button 
+                    type="button" 
+                    onClick={() => navigate(`/user/department/${dep_id}/ai_report`)}
+                    name="dep-student"
+                    >
+                      <span className="material-symbols-outlined">
+                        article_shortcut
+                      </span>
+                      <div className="slide-info">
+                        AI Analysis Report
+                      </div>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <div className="right">
+              <div>
+                <input 
+                  placeholder='Enter Adviser' 
+                  name='dep-student'
+                  type="text" 
+                  value={adviser} 
+                  onChange={(e) => setAdviser(e.target.value)} 
+                  />
+              </div>
+
+              <div className="year-range">
+                <input 
+                  type="number"
+                  name="dep-student" 
+                  placeholder="Start Year (YYYY)" 
+                  value={yearRange.start} 
+                  onChange={(e) => setYearRange({ 
+                    ...yearRange, start: e.target.value 
+                  })} 
+                  /> 
+                -
+                <input 
+                  type="number" 
+                  name="dep-student"
+                  placeholder="End Year (YYYY)" 
+                  value={yearRange.end} 
+                  onChange={(e) => setYearRange({ 
+                    ...yearRange, end: e.target.value 
+                    })} 
+                  />
+              </div>
+
+              <div className="slider-button">
+                <button 
+                  onClick={() => {
+                    setAdviser('');
+                    setYearRange({ start: '', end: '' });
+                    resetSort();
+                  }} 
+                  type="button"
+                  name="dep-student"
+                  >
+                    <span className="material-symbols-outlined">
+                      reset_settings
+                    </span>
+                    <div className="slide-info">
+                      Reset Filter
+                    </div>
+                </button>
+              </div>
+            </div>
+          </div>
+      }
+
+      <div className={`count-div ${adviser !== '' || yearRange.start !== '' || yearRange.end !== '' ? 'active' : ''}`}>
+        <h4>Total Student Thesis Found: <span>{sortedData.length}</span></h4>
+      </div>
 
       {loading ? <ShimmerTable row={5} col={4} /> : (
         <div className="table-container sticky">
@@ -133,16 +267,147 @@ const DepartmentStudentPaperTable = ({ sPapers, loading, role, dep_id, fetchStud
                       </div>
                     </div>
                 </th>
-                <th>Researchers</th>
-                <th>Adviser</th>
-                <th>Academic&nbsp;Year<br/>Sem&nbsp;and&nbsp;SY</th>
-                <th>SDG Label</th>
-                <th>Course</th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('researchers')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('researchers')}
+                  className="filter-col"
+                  >
+                    <div className="filter-inner">
+                       <span>Researchers</span>
+                      <div className={`filter-arrow ${sortColumn === 'researchers' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'researchers' || sortColumn === 'researchers') && ( 
+                          <span> 
+                            {sortColumn === 'researchers' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>
+                </th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('adviser')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('adviser')}
+                  className="filter-col"
+                  >
+                    <div className="filter-inner">
+                      <span>Adviser</span>
+                      <div className={`filter-arrow ${sortColumn === 'adviser' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'adviser' || sortColumn === 'adviser') && ( 
+                          <span> 
+                            {sortColumn === 'adviser' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>
+                </th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('semester')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('semester')}
+                  className="filter-col"
+                  >
+                    <div className="filter-inner">
+                      <span>Academic&nbsp;Year<br/>Sem&nbsp;and&nbsp;SY</span>
+                      <div className={`filter-arrow ${sortColumn === 'semester' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'semester' || sortColumn === 'semester') && ( 
+                          <span> 
+                            {sortColumn === 'semester' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>
+                </th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('sdg_labels')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('sdg_labels')}
+                  className="filter-col"
+                  >
+                    <div className="filter-inner">
+                      <span>SDG Label</span>
+                      <div className={`filter-arrow ${sortColumn === 'sdg_labels' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'sdg_labels' || sortColumn === 'sdg_labels') && ( 
+                          <span> 
+                            {sortColumn === 'sdg_labels' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>
+                </th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('course_abb')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('course_abb')}
+                  className="filter-col"
+                  >
+                    
+                    <div className="filter-inner">
+                      <span>Course</span>
+                      <div className={`filter-arrow ${sortColumn === 'course_abb' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'course_abb' || sortColumn === 'course_abb') && ( 
+                          <span> 
+                            {sortColumn === 'course_abb' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>
+                </th>
                 <th className="action-column">Action</th>
               </tr>
             </thead>
             <tbody>
-              {sPapers.length > 0 ? (
+              {sortedData.length > 0 ? (
                 sortedData.map((paper) => {
                   const color = getSdgColor(paper.sdg_number);
 
@@ -180,12 +445,12 @@ const DepartmentStudentPaperTable = ({ sPapers, loading, role, dep_id, fetchStud
                         {paper.course_abb}
                       </td>
 
-                      <td>
+                      <td className="action-column">
                         <button onClick={() => navigate(`/user/department/${dep_id}/paper/${paper.research_id}`)}>
                           <span className="material-symbols-outlined view-icon">visibility</span>
                           <span className="tooltip">View Paper</span>
                         </button>
-                        <button onClick={() => handleDeletePaper(paper.research_id)} className="action-column">
+                        <button onClick={() => handleDeletePaper(paper.research_id)}>
                           <span className="material-symbols-outlined delete-icon">delete</span>
                           <span className="tooltip">Delete Paper</span>
                         </button>

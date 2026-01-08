@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import axios from "axios";
 import { ShimmerTable, ShimmerButton } from "react-shimmer-effects";
 import { useNavigate } from "react-router-dom";
 import ConfirmModal from "../../utils/ConfirmModal";
 import { showToast } from "../../utils/toast";
+import useSortableTable from "../../hooks/useSortableTable";
 
 const DepartmentFacultyPaperTable = ({ fPapers, loading, role, dep_id, fetchFacultyPapers }) => {
   const navigate = useNavigate();
@@ -29,6 +30,56 @@ const DepartmentFacultyPaperTable = ({ fPapers, loading, role, dep_id, fetchFacu
   const closeModal = () => {
     setModalConfig(prev => ({...prev, show:false}));
   };
+
+  const [researchers, setResearchers] = useState('');
+  const [yearRange, setYearRange] = useState({ start: '', end: '' });
+
+  const filteredData = useMemo(() => {
+    return fPapers.filter(item => {
+      // Author filter
+      const matchedResearchers = researchers
+        ? Array.isArray(item.researchers)
+          ? item.researchers.some(r => r.toLowerCase().includes(researchers.toLowerCase()))
+          : item.researchers?.toLowerCase().includes(researchers.toLowerCase())
+        : true;
+
+      // Year range filter
+      const matchesYear = yearRange.start || yearRange.end
+        ? (() => {
+          const raw = String(item.academic_year);
+
+          // Extract all 4-digit years from the string
+          const years = raw.match(/\d{4}/g)?.map(y => parseInt(y)) || [];
+
+          // If no year found, skip
+          if (years.length === 0) return true;
+
+          // If it's a range like "May-June 2025", years will just be [2025]
+          // If it's "2024-2025", years will be [2024, 2025]
+          const minYear = Math.min(...years);
+          const maxYear = Math.max(...years);
+
+          const start = yearRange.start ? parseInt(yearRange.start) : null;
+          const end = yearRange.end ? parseInt(yearRange.end) : null;
+
+          // Check overlap between presentation year(s) and filter range
+          return (!start || maxYear >= start) && (!end || minYear <= end);
+        })()
+        : true;
+
+      return matchedResearchers && matchesYear;
+    });
+  }, [fPapers, researchers, yearRange]);
+
+  const { 
+    sortedData, 
+    sortColumn, 
+    sortDirection, 
+    hoveredColumn, 
+    setHoveredColumn, 
+    handleSort,
+    resetSort
+  } = useSortableTable(filteredData);
 
   // DELETE PAPER
   const handleDeletePaper = (id) => {
@@ -79,35 +130,261 @@ const DepartmentFacultyPaperTable = ({ fPapers, loading, role, dep_id, fetchFacu
 
   return (
     <>
-      {loading ? <ShimmerButton size="lg" /> : (
-        <div className="department-buttons-container">
-          <button onClick={() => navigate(`/user/department/${dep_id}/research_add`)} type="button" name="dep-faculty">
-            Add Paper
-          </button>
-          {role !== 'faculty' && (
-            <button onClick={() => navigate(`/user/department/${dep_id}/ai_report`)} type="button" name="dep-faculty">
-              AI Analysis
-              </button>
-          )}
-        </div>
-      )}
+      {loading 
+        ? <div className="department-buttons-filter-container">
+            <div className="left">
+              <ShimmerButton size="lg"/>
+              <ShimmerButton size="lg"/>
+            </div>
+            <div className="right">
+              <ShimmerButton size="lg"/>
+              <ShimmerButton size="lg"/>
+              <ShimmerButton size="lg"/>
+              <ShimmerButton size="lg"/>
+            </div>
+          </div>
+        : <div className="department-buttons-filter-container">
+            <div className="left">
+              <div className="slider-button">
+                <button
+                  type="button"
+                  onClick={() => navigate(`/user/department/${dep_id}/research_add`)}
+                  name="dep-faculty"
+                >
+                  <span className="material-symbols-outlined">
+                    add
+                  </span>
+                  <div className="slide-info">
+                    Add Faculty Research
+                  </div>
+                </button>
+                
+              </div>
+
+              {role !== 'faculty' && (
+                <div className="slider-button">
+                  <button 
+                    type="button" 
+                    onClick={() => navigate(`/user/department/${dep_id}/ai_report`)}
+                    name="dep-faculty"
+                    >
+                      <span className="material-symbols-outlined">
+                        article_shortcut
+                      </span>
+                      <div className="slide-info">
+                        AI Analysis Report
+                      </div>
+                  </button>
+                </div>
+              )}
+              
+            </div>
+
+            <div className="right">
+              <div>
+                <input 
+                  placeholder='Enter A Researcher' 
+                  name='dep-faculty'
+                  type="text" 
+                  value={researchers} 
+                  onChange={(e) => setResearchers(e.target.value)} 
+                  />
+              </div>
+
+              <div className="year-range">
+                <input 
+                  type="number"
+                  name="dep-faculty" 
+                  placeholder="Start Year (YYYY)" 
+                  value={yearRange.start} 
+                  onChange={(e) => setYearRange({ 
+                    ...yearRange, start: e.target.value 
+                  })} 
+                  /> 
+                -
+                <input 
+                  type="number" 
+                  name="dep-faculty"
+                  placeholder="End Year (YYYY)" 
+                  value={yearRange.end} 
+                  onChange={(e) => setYearRange({ 
+                    ...yearRange, end: e.target.value 
+                    })} 
+                  />
+              </div>
+
+              <div className="slider-button">
+                <button 
+                  onClick={() => {
+                    setResearchers('');
+                    setYearRange({ start: '', end: '' });
+                    resetSort();
+                  }} 
+                  type="button"
+                  name="dep-faculty"
+                  >
+                    <span className="material-symbols-outlined">
+                      reset_settings
+                    </span>
+                    <div className="slide-info">
+                      Reset Filter
+                    </div>
+                </button>
+              </div>
+            </div>
+          </div>
+      }
+
+      <div className={`count-div ${researchers !== '' || yearRange.start !== '' || yearRange.end !== '' ? 'active' : ''}`}>
+        <h4>Total Faculty Research Found: <span>{sortedData.length}</span></h4>
+      </div>
 
       {loading ? <ShimmerTable row={5} col={4} /> : (
         <div className="table-container sticky">
           <table>
             <thead className="stick-header dep-faculty-thead">
               <tr className="esp-tr faculty">
-                <th>Title of Research</th>
-                <th>Name&nbsp;of&nbsp;Researcher/s</th>
-                <th>Funding&nbsp;Source<br/>(if any)</th>
-                <th>Academic&nbsp;Year<br/>Sem&nbsp;and&nbsp;SY</th>
-                <th>SDG Label</th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('research_title')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('research_title')}
+                  className="filter-col"
+                  >
+                    <div className="filter-inner">
+                      <span>Title of Research</span>
+                      <div className={`filter-arrow ${sortColumn === 'research_title' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'research_title' || sortColumn === 'research_title') && ( 
+                          <span> 
+                            {sortColumn === 'research_title' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>
+                </th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('researchers')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('researchers')}
+                  className="filter-col"
+                  >
+                    <div className="filter-inner">
+                      <span>Name of Researchers</span>
+                      <div className={`filter-arrow ${sortColumn === 'researchers' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'researchers' || sortColumn === 'researchers') && ( 
+                          <span> 
+                            {sortColumn === 'researchers' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>
+                </th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('funding_source')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('funding_source')}
+                  className="filter-col"
+                  >
+                    <div className="filter-inner">
+                      <span>Funding&nbsp;Source<br/>(if any)</span>
+                      <div className={`filter-arrow ${sortColumn === 'funding_source' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'funding_source' || sortColumn === 'funding_source') && ( 
+                          <span> 
+                            {sortColumn === 'funding_source' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>
+                </th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('semester')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('semester')}
+                  className="filter-col"
+                  >
+                    <div className="filter-inner">
+                      <span>Academic&nbsp;Year<br/>Sem&nbsp;and&nbsp;SY</span>
+                      <div className={`filter-arrow ${sortColumn === 'semester' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'semester' || sortColumn === 'semester') && ( 
+                          <span> 
+                            {sortColumn === 'semester' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>
+                </th>
+                <th
+                  onMouseEnter={() => setHoveredColumn('sdg_labels')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                  onClick={() => handleSort('sdg_labels')}
+                  className="filter-col"
+                  >
+                    <div className="filter-inner">
+                      <span>SDG Label</span>
+                      <div className={`filter-arrow ${sortColumn === 'sdg_labels' ? 'active' : ''}`}>
+                        {(hoveredColumn === 'sdg_labels' || sortColumn === 'sdg_labels') && ( 
+                          <span> 
+                            {sortColumn === 'sdg_labels' ? sortDirection === 'asc' 
+                            ? <span className="material-symbols-outlined">
+                                arrow_upward
+                              </span> 
+                            : <span className="material-symbols-outlined">
+                                arrow_downward
+                              </span>
+                            : <span className="material-symbols-outlined">
+                                filter_alt
+                              </span> 
+                            } 
+                          </span> 
+                        )}
+                      </div>
+                    </div>
+                </th>
                 <th className="action-column">Action</th>
               </tr>
             </thead>
             <tbody>
-              {fPapers.length > 0 ? (
-                fPapers.map((paper) => {
+              {sortedData.length > 0 ? (
+                sortedData.map((paper) => {
                   const color = getSdgColor(paper.sdg_number);
 
                   return (
