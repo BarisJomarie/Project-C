@@ -1,6 +1,27 @@
 const db = require('../db');
 const { logAudit } = require('./auditsController')
 
+const SDG_MAP = {
+  "No Poverty": "SDG1",
+  "Zero Hunger": "SDG2",
+  "Good Health and Well-being": "SDG3",
+  "Quality Education": "SDG4",
+  "Gender Equality": "SDG5",
+  "Clean Water and Sanitation": "SDG6",
+  "Affordable and Clean Energy": "SDG7",
+  "Decent Work and Economic Growth": "SDG8",
+  "Industry, Innovation and Infrastructure": "SDG9",
+  "Reduced Inequalities": "SDG10",
+  "Sustainable Cities and Communities": "SDG11",
+  "Responsible Consumption and Production": "SDG12",
+  "Climate Action": "SDG13",
+  "Life Below Water": "SDG14",
+  "Life on Land": "SDG15",
+  "Peace, Justice and Strong Institutions": "SDG16",
+  "Partnerships for the Goals": "SDG17"
+};
+
+
 //ADD PAPER
 exports.addResearch = (req, res) => {
   const { user_id, research_type, semester, sy, funding_source, title, abstract, conclusion, adviser, researchers, department, course, sdg_number, sdg_label, confidence_scores, status, user_code, role } = req.body;
@@ -576,16 +597,50 @@ exports.getDepartmentTotalSDGPaper = (req, res) => {
   }
 
   const query = `
-    SELECT rp.sdg_labels, COUNT(*) AS total
-    FROM research_paper rp
-    WHERE rp.department_id = ?
-      AND YEAR(rp.created_at) = YEAR(CURDATE())
-    GROUP BY rp.sdg_labels
-    ORDER BY total DESC
+    SELECT sdg_labels
+    FROM research_paper
+    WHERE department_id = ?
   `;
 
-  db.query(query, [department_id], (err, result) => {
+  db.query(query, [department_id], (err, rows) => {
     if (err) return res.status(500).send(err);
-    res.status(200).send(result || []);
+
+    // Initialize SDG counters
+    const sdgCount = {};
+    Object.values(SDG_MAP).forEach(sdg => {
+      sdgCount[sdg] = 0;
+    });
+
+    rows.forEach(row => {
+      let labels = [];
+
+      try {
+        // Case 1: JSON array string
+        if (row.sdg_labels.startsWith("[")) {
+          labels = JSON.parse(row.sdg_labels);
+        }
+        // Case 2: single string like "Quality Education"
+        else {
+          labels = [JSON.parse(row.sdg_labels)];
+        }
+      } catch {
+        return;
+      }
+
+      labels.forEach(label => {
+        const sdgCode = SDG_MAP[label];
+        if (sdgCode) {
+          sdgCount[sdgCode] += 1;
+        }
+      });
+    });
+
+    // Convert to array (SDG1 → SDG17)
+    const result = Object.keys(sdgCount).map(sdg => ({
+      sdg,
+      total: sdgCount[sdg]
+    }));
+
+    res.status(200).send(result);
   });
 };

@@ -9,6 +9,25 @@ import '../styles/list.css'
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { ShimmerTitle, ShimmerThumbnail, ShimmerTable } from "react-shimmer-effects";
 
+import SDG1 from '../assets/sdg_goals/SDG1.svg';
+import SDG2 from '../assets/sdg_goals/SDG2.svg';
+import SDG3 from '../assets/sdg_goals/SDG3.svg';
+import SDG4 from '../assets/sdg_goals/SDG4.svg';
+import SDG5 from '../assets/sdg_goals/SDG5.svg';
+import SDG6 from '../assets/sdg_goals/SDG6.svg';
+import SDG7 from '../assets/sdg_goals/SDG7.svg';
+import SDG8 from '../assets/sdg_goals/SDG8.svg';
+import SDG9 from '../assets/sdg_goals/SDG9.svg';
+import SDG10 from '../assets/sdg_goals/SDG10.svg';
+import SDG11 from '../assets/sdg_goals/SDG11.svg';
+import SDG12 from '../assets/sdg_goals/SDG12.svg';
+import SDG13 from '../assets/sdg_goals/SDG13.svg';
+import SDG14 from '../assets/sdg_goals/SDG14.svg';
+import SDG15 from '../assets/sdg_goals/SDG15.svg';
+import SDG16 from '../assets/sdg_goals/SDG16.svg';
+import SDG17 from '../assets/sdg_goals/SDG17.svg';
+
+
 
 const Homepage = () => {
   const [userDataLoading, setUserDataLoading] = useState(true);
@@ -33,6 +52,75 @@ const Homepage = () => {
   const width = 500;
 
   const API_URL = import.meta.env.VITE_API_URL;
+
+  const SDG_ICONS = {
+  SDG1,
+  SDG2,
+  SDG3,
+  SDG4,
+  SDG5,
+  SDG6,
+  SDG7,
+  SDG8,
+  SDG9,
+  SDG10,
+  SDG11,
+  SDG12,
+  SDG13,
+  SDG14,
+  SDG15,
+  SDG16,
+  SDG17,
+};
+
+const sdgNamesMap = {
+  SDG1: "No Poverty",
+  SDG2: "Zero Hunger",
+  SDG3: "Good Health and Well-being",
+  SDG4: "Quality Education",
+  SDG5: "Gender Equality",
+  SDG6: "Clean Water and Sanitation",
+  SDG7: "Affordable and Clean Energy",
+  SDG8: "Decent Work and Economic Growth",
+  SDG9: "Industry, Innovation and Infrastructure",
+  SDG10: "Reduced Inequalities",
+  SDG11: "Sustainable Cities and Communities",
+  SDG12: "Responsible Consumption and Production",
+  SDG13: "Climate Action",
+  SDG14: "Life Below Water",
+  SDG15: "Life on Land",
+  SDG16: "Peace, Justice and Strong Institutions",
+  SDG17: "Partnerships for the Goals"
+};  
+
+const SdgIconTick = ({ x, y, payload }) => {
+  const icon = SDG_ICONS[payload.value];
+   const name = sdgNamesMap[payload.value];
+
+
+  if (!icon) return null;
+
+  return (
+    <g transform={`translate(${x - 160}, ${y - 2})`}>
+      <image
+        href={icon}
+        x={-40}
+        y={-12}
+        width={24}
+        height={24}
+        preserveAspectRatio="xMidYMid meet"
+      />
+      <text
+        x={-5}          // space between icon and text
+        y={4}            // center vertically with icon
+        textAnchor="start"
+        fontSize={10}
+      >{name}</text>
+    </g>
+  );
+};
+
+
 
   // Get User Data
   const getUserData = () => {
@@ -132,7 +220,7 @@ const Homepage = () => {
       params: { department_id: dep_id }
     }).then(response => {
       if (Array.isArray(response.data) && response.data.length > 0) {
-        // console.log(`Department Papers fetched`);
+        console.log(`Department Papers fetched`);
       } else {
         console.log(`No Department Papers papers found`);
       }
@@ -445,7 +533,7 @@ const Homepage = () => {
                 <h4>Amount of SDG Research created in a department</h4>
                 {totalPapers.length > 0 ? (
                   <>
-                    <ResponsiveContainer width="100%" height={400}>
+                    <ResponsiveContainer width="100%" height={600}>
                       <BarChart
                         data={totalPapers}
                         layout="vertical"   // <-- Makes it horizontal
@@ -456,10 +544,10 @@ const Homepage = () => {
 
                       {/* Left side labels */}
                       <YAxis
-                        dataKey="sdg_labels"
+                        dataKey="sdg"
                         type="category"
-                        width={50}
-                        tick={{ fontSize: 8 }}
+                        width={160}
+                        tick={<SdgIconTick />}
                       />
 
 
@@ -476,7 +564,7 @@ const Homepage = () => {
                         {totalPapers.map((entry, index) => (
                           <Cell
                             key={`bar-${index}`}
-                            fill={getSdgColor(entry.sdg_labels)}
+                            fill={getSdgColor(entry.sdg)}
                           />
                         ))}
                       </Bar>
@@ -498,7 +586,7 @@ const Homepage = () => {
                 <h4>Highest and Lowest SDG Created in each course.</h4>
                 {highestLowestSDG.length > 0 ? (
                   <>
-                    <ResponsiveContainer width='100%' height={400}>
+                    <ResponsiveContainer width='100%' height={600}>
                       <BarChart data={groupedData}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="course_abb" />

@@ -11,6 +11,25 @@ import '../styles/style.css';
 import '../styles/form.css';
 import '../styles/addPage.css';
 
+import SDG1 from '../assets/sdg_goals/SDG1.svg';
+import SDG2 from '../assets/sdg_goals/SDG2.svg';
+import SDG3 from '../assets/sdg_goals/SDG3.svg';
+import SDG4 from '../assets/sdg_goals/SDG4.svg';
+import SDG5 from '../assets/sdg_goals/SDG5.svg';
+import SDG6 from '../assets/sdg_goals/SDG6.svg';
+import SDG7 from '../assets/sdg_goals/SDG7.svg';
+import SDG8 from '../assets/sdg_goals/SDG8.svg';
+import SDG9 from '../assets/sdg_goals/SDG9.svg';
+import SDG10 from '../assets/sdg_goals/SDG10.svg';
+import SDG11 from '../assets/sdg_goals/SDG11.svg';
+import SDG12 from '../assets/sdg_goals/SDG12.svg';
+import SDG13 from '../assets/sdg_goals/SDG13.svg';
+import SDG14 from '../assets/sdg_goals/SDG14.svg';
+import SDG15 from '../assets/sdg_goals/SDG15.svg';
+import SDG16 from '../assets/sdg_goals/SDG16.svg';
+import SDG17 from '../assets/sdg_goals/SDG17.svg';
+
+
 const AddResearch = () => {
   const { dep_id } = useParams();
   const [modalConfig, setModalConfig] = useState({
@@ -159,6 +178,46 @@ const AddResearch = () => {
     "#f26a2e", "#e01483", "#f89d2a", "#bf8d2c",
     "#407f46", "#1f97d4", "#59ba47", "#136a9f",
     "#14496b"
+  ];
+
+  const sdgIcons = {
+    SDG1,
+    SDG2,
+    SDG3,
+    SDG4,
+    SDG5,
+    SDG6,
+    SDG7,
+    SDG8,
+    SDG9,
+    SDG10,
+    SDG11,
+    SDG12,
+    SDG13,
+    SDG14,
+    SDG15,
+    SDG16,
+    SDG17
+  };
+
+  const sdgNames = [
+    "No Poverty",
+      "Zero Hunger",
+      "Good Health and Well-being",
+      "Quality Education",
+      "Gender Equality",
+      "Clean Water and Sanitation",
+      "Affordable and Clean Energy",
+      "Decent Work and Economic Growth",
+      "Industry, Innovation and Infrastructure",
+      "Reduced Inequalities",
+      "Sustainable Cities and Communities",
+      "Responsible Consumption and Production",
+      "Climate Action",
+      "Life Below Water",
+      "Life on Land",
+      "Peace, Justice and Strong Institutions",
+      "Partnerships for the Goals"
   ];
 
 
@@ -360,50 +419,75 @@ const AddResearch = () => {
 
 
 
-  const ConfidenceChart = ({ data }) => (
-    <div className="confidence-chart">
-      <ResponsiveContainer width="100%" height="100%">
-        <BarChart 
-          data={data}
-          layout="vertical"
-          margin={{ left: 30}}
-          >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis type="number" />
-          <YAxis type="category" dataKey="sdg" tick={{ fontSize: 8, width: 90 }}/>
-          <Tooltip
-            content={({ active, payload }) => {
-              if (active && payload && payload.length) {
-                const idx = payload[0].payload.index;
-                const textColor = sdgColors[idx % sdgColors.length];
-                const bgmColor = getContrastYIQ(textColor);
-                return (
-                  <div className="confidence-chart-tooltip" style={{
-                    backgroundColor: bgmColor,
-                    color: textColor,
-                  }}>
-                    <div>
-                      {payload[0].payload.sdg}
-                    </div>
-                    <div>
-                      Score: {payload[0].value}
-                    </div>
-                  </div>
-                );
-              }
-              return null;
-            }}
-          />
+  const CustomYAxisTick = ({ x, y, payload }) => {
+  const sdgName = payload.value; // this is "No Poverty", etc.
+  const index = sdgNames.indexOf(sdgName);
+  const icon = sdgIcons[`SDG${index + 1}`];
 
-          <Bar dataKey="score">
-            {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={sdgColors[index % sdgColors.length]}/>
-            ))}
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
-    </div>
+  if (index === -1) return null;
+
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <foreignObject x={-160} y={-12} width={160} height={24}>
+        <div className="sdg-tick">
+          <img src={icon} alt={sdgName} />
+          <span>{sdgName}</span>
+        </div>
+      </foreignObject>
+    </g>
   );
+};
+
+
+  const ConfidenceChart = ({ data }) => (
+  <div className="confidence-chart">
+    <ResponsiveContainer width="100%" height="100%">
+      <BarChart 
+        data={data}
+        layout="vertical"
+        margin={{ left: 30 }}
+      >
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis type="number" />
+       <YAxis
+          type="category"
+          dataKey="sdg"
+          width={150}
+          tick={<CustomYAxisTick />}
+        />
+
+        <Tooltip
+          content={({ active, payload }) => {
+            if (active && payload && payload.length) {
+              const idx = payload[0].payload.index;
+              const textColor = sdgColors[idx % sdgColors.length];
+              const bgmColor = getContrastYIQ(textColor);
+              return (
+                <div className="confidence-chart-tooltip" style={{
+                  backgroundColor: bgmColor,
+                  color: textColor,
+                }}>
+                  <div>
+                    {payload[0].payload.sdg}
+                  </div>
+                  <div>
+                    Score: {payload[0].value}
+                  </div>
+                </div>
+              );
+            }
+            return null;
+          }}
+        />
+        <Bar dataKey="score">
+          {data.map((entry, index) => (
+            <Cell key={`cell-${index}`} fill={sdgColors[index % sdgColors.length]} />
+          ))}
+        </Bar>
+      </BarChart>
+    </ResponsiveContainer>
+  </div>
+);
 
 
 

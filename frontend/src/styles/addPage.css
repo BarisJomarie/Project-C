@@ -31,21 +31,46 @@
 }
 
 .confidence-chart-tooltip {
-  /* fontSize: '0.8em',
-                    fontWeight: '500',
-                    letterSpacing: '0.8px',
-                    minWidth: '120px',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
-                    padding: '15px 20px',
-                    borderRadius: '4px', */
   font-size: 0.8em;
   font-weight: 500;
   letter-spacing: 0.8px;
   min-width: 120px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   padding: 15px 20px;
   border-radius: 4px;
 }
+
+.confidence-chart .recharts-yAxis-tick {
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+}
+
+.confidence-chart .recharts-yAxis-tick img {
+  margin-right: 8px;
+}
+
+.sdg-tick {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  line-height: 1.2;
+  max-width: 240px;
+}
+
+.sdg-tick span {
+  white-space: normal;       /* allow wrapping */
+  word-break: break-word;
+}
+
+.sdg-tick img {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;            /* icon never shrinks */
+}
+
+
 
 @media (max-width: 600px) {
   .add-research-container {
