@@ -65,6 +65,7 @@ const AddResearch = () => {
   const userId = localStorage.getItem('userId');
 
   const API_URL = import.meta.env.VITE_API_URL;
+  const MAX_KEYWORDS = 5;
 
 
 
@@ -821,13 +822,19 @@ const AddResearch = () => {
               <label htmlFor="keywords">Keywords</label>
               <textarea 
                 name="keywords" 
-                placeholder="Enter keywords" 
+                placeholder="Enter keywords (Adding comma(,) to count the keyword.)" 
                 value={conclusion} 
-                onChange={(e) => {
-                  setConclusion(e.target.value);
-                  e.target.style.height = 'auto';
-                  e.target.style.height = `${e.target.scrollHeight}px`;
-                }} 
+                onChange={(e) => { 
+                  const input = e.target.value; 
+                  const keywords = input.split(',').map(k => k.trim()).filter(k => k.length > 0); 
+                  if (keywords.length <= MAX_KEYWORDS) { 
+                    setConclusion(input); 
+                    e.target.style.height = 'auto'; 
+                    e.target.style.height = `${e.target.scrollHeight}px`; 
+                  } else { 
+                    showToast('warning', 'Keyword Limit Exceeded', `You can only enter up to ${MAX_KEYWORDS} keywords.`); 
+                  } 
+                }}
                 />
             </div>
           </div>
@@ -874,17 +881,6 @@ const AddResearch = () => {
               <h3>Predicted SDG:</h3>
               <p>{prediction}</p>
               <p>Confidence: {(confidence * 100).toFixed(2)}%</p>
-              
-              {confidenceData && confidenceData.length > 0 ? (
-                <div className="confidence-chart-container">
-                  <ConfidenceChart data={confidenceData} />
-                </div>
-              ) : (
-                <div>
-                  <p>Cannot generate graph.</p>
-                </div>
-              )}
-
               {confidence < 0.7 ? (
                 <div>
                   <p style={{color: 'red'}}>Low confidence detected. It is recommended to select the SDG manually.</p>
@@ -896,6 +892,16 @@ const AddResearch = () => {
               ) : (
                 <div>
                   <p style={{color: 'green'}}>High confidence detected. Prediction is reliable.</p>
+                </div>
+              )}
+              
+              {confidenceData && confidenceData.length > 0 ? (
+                <div className="confidence-chart-container">
+                  <ConfidenceChart data={confidenceData} />
+                </div>
+              ) : (
+                <div>
+                  <p>Cannot generate graph.</p>
                 </div>
               )}
 

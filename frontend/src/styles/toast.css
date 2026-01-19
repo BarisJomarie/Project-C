@@ -56,11 +56,7 @@
 .toast-message {
   display: block;
   margin-left: 10px;
-}
-
-.toast-message {
-  display: block;
-  margin-left: 10px;
+  font-weight: 300;
 }
 
 
