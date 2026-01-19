@@ -111,8 +111,6 @@ th .filter-arrow {
 
 .table-container td {
   font-size: 0.8em;
-  max-width: 300px;
-  min-width: 100px;
   word-wrap: break-word;
   white-space: normal;
   overflow-wrap: break-word;
@@ -126,7 +124,7 @@ th .filter-arrow {
   overflow-wrap: anywhere;
   word-break: break-word;
   max-width: 300px;
-  min-width: 200px;
+  min-width: 250px;
 }
 
 .hid-th,

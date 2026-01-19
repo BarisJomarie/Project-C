@@ -87,21 +87,18 @@ const SecurityQuestion = () => {
   return (
     <>
       {loading && <Loading text="Verifying answer.."/>}
-      <div className="signup-bg">
-        <div className="signup-container">
-          <img src={earistLogo} alt="earist-logo" draggable="false" />
-          <form className="signup-form" onSubmit={handleVerify}>
-            <div className="signup-content">
+      <div className="login-bg">
+        <div className="login-container">
+          <img src={earistLogo} className="login-img" alt="earist-logo" draggable="false" />
+          <form className="login-form" onSubmit={handleVerify}>
+            <div className="login-content">
               <h1>Security Verification</h1>
-
-
-              <div className="in-block-notif"><span style={{fontWeight: 600, marginRight: '10px'}}>Question:</span>  {question}</div>
-
-
-              <div className="signup-input-box">
+              <div><span style={{fontWeight: 600}}>Question:</span>  {question}</div>
+              <div className="login-input-box">
                 <input
                   type="text"
-                  id="security-answer"
+                  id="user-code"
+                  name="user-code"
                   placeholder=" "
                   value={answer}
                   onChange={(e) => setAnswer(e.target.value)}
@@ -114,13 +111,10 @@ const SecurityQuestion = () => {
               <button type="submit">Verify</button>
             </div>
           </form>
-
-
-          <div className="toast-box" id="toast-box"></div>
         </div>
       </div>
+      <div className="toast-box" id="toast-box"></div>
     </>
-    
   );
 };
 

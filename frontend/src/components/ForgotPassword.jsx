@@ -51,8 +51,6 @@ const ForgotPassword = () => {
             <div className="login-content">
               <h1>Forgot Password</h1>
               <div className="in-block-notif">Enter your registered email to receive a reset link.</div>
-              
-
 
               <div className="login-input-box">
                 <input

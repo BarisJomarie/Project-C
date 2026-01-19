@@ -603,8 +603,8 @@ const AIReport = () => {
               margin: '48px 0',
               flexWrap: 'wrap'
             }}>
-              <button type="button" className="ai-rep-but" onClick={() => AIReportPrint(showModal, closeModal)} style={{margin: 0}}>Print Report</button>
-              <button type="button" className="ai-rep-but" onClick={handleExportCSV} style={{margin: 0}}>Export as CSV</button>
+              <button type="button" className="ai-rep-but" disabled={aiResult.aiText === ''} onClick={() => AIReportPrint(showModal, closeModal)} style={{margin: 0}}>Print Report</button>
+              <button type="button" className="ai-rep-but" disabled={aiResult.aiText === ''} onClick={handleExportCSV} style={{margin: 0}}>Export as CSV</button>
               {/* <button type="button" className="ai-rep-but" onClick={handleSaveReport} style={{margin: 0}}>Save Report</button> */}
             </div>
 

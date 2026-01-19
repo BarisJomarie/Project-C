@@ -24,6 +24,7 @@ exports.publicationTitleChecker = (req, res) => {
 exports.addResearchPublication = (req, res) => {
   const {department_id, published_title, pub_author, pub_co_authors, journal_title, conference_or_proceedings, publisher, start_month, end_month, year, doi, issn_isbn, volume_no, issue_no, index_type } = req.body;
 
+  console.log(req.body);
   if(!department_id) return res.status(400).json({message: 'No Department ID'})
   
   const toNullable = (value) => {

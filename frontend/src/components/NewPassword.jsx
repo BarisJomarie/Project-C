@@ -61,15 +61,15 @@ const NewPassword = () => {
   return (
     <>
     {loading && <Loading text="Changing your password..."/>}
-      <div className="signup-bg">
-        <div className="signup-container">
-          <img src={earistLogo} alt="earist-logo" draggable="false" />
-          <form className="signup-form" onSubmit={handleSubmit}>
-            <div className="signup-content">
+      <div className="login-bg">
+        <div className="login-container">
+          <img src={earistLogo} alt="earist-logo" className="login-img" draggable="false" />
+          <form className="login-form" onSubmit={handleSubmit}>
+            <div className="login-content">
               <h1>Set New Password</h1>
 
 
-              <div className="signup-input-box">
+              <div className="login-input-box">
                 <input
                   type={showPassword ? "text" : "password"}
                   id="new-password"
@@ -88,7 +88,7 @@ const NewPassword = () => {
               </div>
 
 
-              <div className="signup-input-box">
+              <div className="login-input-box">
                 <input
                   type={showPassword ? "text" : "password"}
                   id="repeat-password"
@@ -105,8 +105,9 @@ const NewPassword = () => {
             </div>
           </form>
         </div>
-        <div className="toast-box" id="toast-box"></div>
       </div>
+
+      <div className="toast-box" id="toast-box"></div>
     </>
   );
 };
