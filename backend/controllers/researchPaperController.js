@@ -556,7 +556,6 @@ exports.getHighestLowestSDG = (req, res) => {
         RANK() OVER (PARTITION BY rp.course_id ORDER BY COUNT(*) ASC) AS rk_asc
       FROM research_paper rp
       WHERE rp.department_id = ?
-      AND YEAR(rp.created_at) = YEAR(CURDATE())
       GROUP BY rp.course_id, rp.sdg_labels
     )
 

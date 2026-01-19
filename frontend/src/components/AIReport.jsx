@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { showToast } from '../utils/toast';
-import { addAuditLog } from '../utils/addAudit';
 import { useNavigate, useParams } from 'react-router-dom';
 import ConfirmModal from '../utils/ConfirmModal';
 import ReactMarkdown from 'react-markdown';
@@ -413,20 +412,39 @@ const AIReport = () => {
       await axios.post(`${API_URL}/api/ai/save-report`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
-      addAuditLog({
-        userData,
-        token,
-        action: `Saved AI Report (Feedback: ${selectedRating}/5)`,
-        actor_type: 'user',
-      });
-
+      
       showToast('success', 'Report Saved', 'Your feedback has been saved.');
     } catch (err) {
       console.error('Failed to save report:', err);
       showToast('error', 'Save Failed', 'Something went wrong while saving.');
     }
   };
+
+  function formatAiOutputForCSV(text) {
+    // Split into lines
+    const lines = text.split("\n");
+
+    return lines.map(line => {
+      // Trim whitespace
+      const trimmed = line.trim();
+
+      // If it's a heading with **, strip them and put in a new cell
+      if (trimmed.startsWith("**") && trimmed.endsWith("**")) {
+        const heading = trimmed.replace(/\*\*/g, "");
+        return `"${heading}",""`; // heading in first cell, empty second cell
+      }
+
+      // If it's a bullet line, just put it in the next cell
+      if (trimmed.startsWith("-")) {
+        const bullet = trimmed.replace(/^-+\s*/, "");
+        return `"","${bullet}"`; // empty first cell, bullet in second cell
+      }
+
+      // Otherwise, return as a single-cell row
+      return `"${trimmed}"`;
+    }).join("\n");
+  }
+
 
   // Export Report as CSV
   const handleExportCSV = () => {
@@ -474,9 +492,15 @@ const AIReport = () => {
       csvContent += `"Total Faculty Research","${Object.values(facultyPapers).reduce((sum, papers) => sum + papers.length, 0)}"\n`;
       csvContent += `"Most Common SDGs","${commonSDG.length > 0 ? commonSDG.map(item => item.sdg).join("; ") : "No data"}"\n`;
       csvContent += `\n"GAPS AND AREAS FOR IMPROVEMENT"\n`;
-      csvContent += `"${aiResult.lackSection ? aiResult.lackSection.replace(/"/g, '""') : ""}"\n`;
+      if (aiResult.lackSection) {
+        csvContent += formatAiOutputForCSV(aiResult.lackSection) + "\n";
+      }
+
       csvContent += `\n"RECOMMENDATIONS"\n`;
-      csvContent += `"${aiResult.recommendationSection ? aiResult.recommendationSection.replace(/"/g, '""') : ""}"\n`;
+      if (aiResult.lackSection) {
+        csvContent += formatAiOutputForCSV(aiResult.recommendationSection) + "\n";
+      }
+
 
       // Create download link
       const encodedUri = encodeURI(csvContent);
