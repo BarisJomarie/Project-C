@@ -33,41 +33,51 @@ const DepartmentStudentPaperTable = ({ sPapers, loading, role, dep_id, fetchStud
 
   const [adviser, setAdviser] = useState('');
   const [yearRange, setYearRange] = useState({ start: '', end: '' });
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredData = useMemo(() => {
-    return sPapers.filter(item => {
-      // Adviser filter
-      const matchedAdviser = adviser
-        ? item.adviser?.toLowerCase().includes(adviser.toLowerCase())
-        : true;
+const filteredData = useMemo(() => {
+  return sPapers.filter(item => {
+    // Search across multiple fields
+    const matchesSearch = searchTerm
+      ? ['research_title', 'research_abstract', 'research_conclusion', 'adviser', 'sdg_labels', 'researchers', 'course_abb'].some(key => {
+          const value = item[key];
+          if (!value) return false;
 
-      // Year range filter
-      const matchesYear = yearRange.start || yearRange.end
-        ? (() => {
+          if (Array.isArray(value)) {
+            return value.some(v => v.toLowerCase().includes(searchTerm.toLowerCase()));
+          }
+
+          return String(value).toLowerCase().includes(searchTerm.toLowerCase());
+        })
+      : true;
+
+    // Adviser filter (optional)
+    const matchedAdviser = adviser
+      ? item.adviser?.toLowerCase().includes(adviser.toLowerCase())
+      : true;
+
+    // Academic year range filter
+    const matchesYear = yearRange.start || yearRange.end
+      ? (() => {
           const raw = String(item.academic_year);
-
-          // Extract all 4-digit years from the string
           const years = raw.match(/\d{4}/g)?.map(y => parseInt(y)) || [];
-
-          // If no year found, skip
           if (years.length === 0) return true;
 
-          // If it's a range like "May-June 2025", years will just be [2025]
-          // If it's "2024-2025", years will be [2024, 2025]
           const minYear = Math.min(...years);
           const maxYear = Math.max(...years);
 
           const start = yearRange.start ? parseInt(yearRange.start) : null;
           const end = yearRange.end ? parseInt(yearRange.end) : null;
 
-          // Check overlap between presentation year(s) and filter range
           return (!start || maxYear >= start) && (!end || minYear <= end);
         })()
-        : true;
+      : true;
 
-      return matchedAdviser && matchesYear;
-    });
-  }, [sPapers, adviser, yearRange]);
+    return matchesSearch && matchedAdviser && matchesYear;
+  });
+}, [sPapers, searchTerm, adviser, yearRange]);
+
+
 
   const { 
     sortedData, 
@@ -179,11 +189,11 @@ const DepartmentStudentPaperTable = ({ sPapers, loading, role, dep_id, fetchStud
             <div className="right">
               <div>
                 <input 
-                  placeholder='Enter Adviser' 
+                  placeholder='search' 
                   name='dep-student'
                   type="text" 
-                  value={adviser} 
-                  onChange={(e) => setAdviser(e.target.value)} 
+                  value={searchTerm} 
+                  onChange={(e) => setSearchTerm(e.target.value)} 
                   />
               </div>
 

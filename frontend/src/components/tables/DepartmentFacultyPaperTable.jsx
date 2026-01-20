@@ -33,43 +33,44 @@ const DepartmentFacultyPaperTable = ({ fPapers, loading, role, dep_id, fetchFacu
 
   const [researchers, setResearchers] = useState('');
   const [yearRange, setYearRange] = useState({ start: '', end: '' });
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredData = useMemo(() => {
+ const filteredData = useMemo(() => {
     return fPapers.filter(item => {
-      // Author filter
-      const matchedResearchers = researchers
-        ? Array.isArray(item.researchers)
-          ? item.researchers.some(r => r.toLowerCase().includes(researchers.toLowerCase()))
-          : item.researchers?.toLowerCase().includes(researchers.toLowerCase())
+      // Multi-field search
+      const matchesSearch = searchTerm
+        ? ['research_title', 'funding_source', 'sdg_labels', 'researchers'].some(key => {
+            const value = item[key];
+            if (!value) return false;
+
+            if (Array.isArray(value)) {
+              return value.some(v => v.toLowerCase().includes(searchTerm.toLowerCase()));
+            }
+
+            return String(value).toLowerCase().includes(searchTerm.toLowerCase());
+          })
         : true;
 
       // Year range filter
       const matchesYear = yearRange.start || yearRange.end
         ? (() => {
-          const raw = String(item.academic_year);
+            const raw = String(item.academic_year);
+            const years = raw.match(/\d{4}/g)?.map(y => parseInt(y)) || [];
+            if (years.length === 0) return true;
 
-          // Extract all 4-digit years from the string
-          const years = raw.match(/\d{4}/g)?.map(y => parseInt(y)) || [];
+            const minYear = Math.min(...years);
+            const maxYear = Math.max(...years);
 
-          // If no year found, skip
-          if (years.length === 0) return true;
+            const start = yearRange.start ? parseInt(yearRange.start) : null;
+            const end = yearRange.end ? parseInt(yearRange.end) : null;
 
-          // If it's a range like "May-June 2025", years will just be [2025]
-          // If it's "2024-2025", years will be [2024, 2025]
-          const minYear = Math.min(...years);
-          const maxYear = Math.max(...years);
-
-          const start = yearRange.start ? parseInt(yearRange.start) : null;
-          const end = yearRange.end ? parseInt(yearRange.end) : null;
-
-          // Check overlap between presentation year(s) and filter range
-          return (!start || maxYear >= start) && (!end || minYear <= end);
-        })()
+            return (!start || maxYear >= start) && (!end || minYear <= end);
+          })()
         : true;
 
-      return matchedResearchers && matchesYear;
+      return matchesSearch && matchesYear;
     });
-  }, [fPapers, researchers, yearRange]);
+  }, [fPapers, searchTerm, yearRange]);
 
   const { 
     sortedData, 
@@ -183,11 +184,11 @@ const DepartmentFacultyPaperTable = ({ fPapers, loading, role, dep_id, fetchFacu
             <div className="right">
               <div>
                 <input 
-                  placeholder='Enter A Researcher' 
+                  placeholder='Search' 
                   name='dep-faculty'
                   type="text" 
-                  value={researchers} 
-                  onChange={(e) => setResearchers(e.target.value)} 
+                  value={searchTerm} 
+                  onChange={(e) => setSearchTerm(e.target.value)}  
                   />
               </div>
 

@@ -39,38 +39,49 @@ const DepartmentResearchPublicationTable = ({ publication, loading, department, 
   
   const filteredData = useMemo(() => {
     return publication.filter(item => {
-      // Author filter
-      const matchesAuthor = author
-        ? item.pub_author?.toLowerCase().includes(author.toLowerCase())
+      const search = author.toLowerCase();
+
+      const matchesSearch = author
+        ? [
+            item.published_title,
+            item.pub_author,
+            item.pub_co_authors?.join?.(', '),
+            item.journal_title,
+            item.conference_or_proceedings,
+            item.publisher,
+            item.doi,
+            item.issn_isbn,
+            item.volume_issue,
+            item.index_type?.join?.(', '),
+            item.date_of_publication
+          ]
+            .filter(Boolean)
+            .some(value =>
+              value.toString().toLowerCase().includes(search)
+            )
         : true;
 
-      // Year range filter
-      const matchesYear = yearRange.start || yearRange.end
-        ? (() => {
-          const raw = item.date_of_publication;
+      const matchesYear =
+        yearRange.start || yearRange.end
+          ? (() => {
+              const raw = item.date_of_publication;
+              const years = raw?.match(/\d{4}/g)?.map(Number) || [];
+              if (years.length === 0) return true;
 
-          // Extract all 4-digit years from the string
-          const years = raw.match(/\d{4}/g)?.map(y => parseInt(y)) || [];
+              const minYear = Math.min(...years);
+              const maxYear = Math.max(...years);
 
-          // If no year found, skip
-          if (years.length === 0) return true;
+              const start = yearRange.start ? parseInt(yearRange.start) : null;
+              const end = yearRange.end ? parseInt(yearRange.end) : null;
 
-          // If it's a range like "May-June 2025", years will just be [2025]
-          // If it's "2024-2025", years will be [2024, 2025]
-          const minYear = Math.min(...years);
-          const maxYear = Math.max(...years);
+              return (!start || maxYear >= start) && (!end || minYear <= end);
+            })()
+          : true;
 
-          const start = yearRange.start ? parseInt(yearRange.start) : null;
-          const end = yearRange.end ? parseInt(yearRange.end) : null;
-
-          // Check overlap between presentation year(s) and filter range
-          return (!start || maxYear >= start) && (!end || minYear <= end);
-        })()
-        : true;
-
-      return matchesAuthor && matchesYear;
+      return matchesSearch && matchesYear;
     });
   }, [publication, author, yearRange]);
+
   
   const { 
     sortedData, 
@@ -227,7 +238,7 @@ const DepartmentResearchPublicationTable = ({ publication, loading, department, 
             <div className="right">
               <div>
                 <input 
-                  placeholder='Enter Author' 
+                  placeholder='Search' 
                   name='dep-publication'
                   type="text" 
                   value={author} 

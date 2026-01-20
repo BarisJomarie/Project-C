@@ -41,12 +41,29 @@ const DepartmentResearchPresentationTable = ({ presentations, loading, departmen
 
   const filteredData = useMemo(() => {
     return presentations.filter(item => {
-      // Author filter
-      const matchesAuthor = author
-        ? item.author?.toLowerCase().includes(author.toLowerCase())
+
+      const search = author.toLowerCase();
+
+      const matchesSearch = author
+        ? [
+            item.author,
+            item.co_authors?.join?.(', '),
+            item.research_title,
+            item.sdg_alignment?.join?.(', '),
+            item.conference_title,
+            item.organizer,
+            item.venue,
+            item.conference_category,
+            item.special_order_no,
+            item.status_engage,
+            item.funding_source_engage
+          ]
+            .filter(Boolean)
+            .some(value =>
+              value.toString().toLowerCase().includes(search)
+            )
         : true;
 
-      // Year range filter
       const matchesYear = yearRange.start || yearRange.end
         ? (() => {
             const year = new Date(item.date_presented).getFullYear();
@@ -56,9 +73,10 @@ const DepartmentResearchPresentationTable = ({ presentations, loading, departmen
           })()
         : true;
 
-      return matchesAuthor && matchesYear;
+      return matchesSearch && matchesYear;
     });
   }, [presentations, author, yearRange]);
+
 
   const { 
     sortedData, 
@@ -252,7 +270,7 @@ const DepartmentResearchPresentationTable = ({ presentations, loading, departmen
 
             <div>
               <input 
-                placeholder='Enter Author' 
+                placeholder='Search' 
                 name='dep-presentation'
                 type="text" 
                 value={author} 
