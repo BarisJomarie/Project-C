@@ -9,6 +9,8 @@ import PresentationPrint from "../../utils/print/PresentationPrint";
 import '../../styles/department.css';
 import '../../styles/table.css';
 import useSortableTable from "../../hooks/useSortableTable";
+import SummaryModal from "../SummaryModal";
+import { useGroupedByField } from "../../hooks/useGroupedByField";
 
 const DepartmentResearchPresentationTable = ({ presentations, loading, department, user, fetchPresentation }) => {
   const navigate = useNavigate();
@@ -38,6 +40,8 @@ const DepartmentResearchPresentationTable = ({ presentations, loading, departmen
 
   const [author, setAuthor] = useState('');
   const [yearRange, setYearRange] = useState({ start: '', end: '' });
+
+  const { isOpen, open, close, grouped } = useGroupedByField(presentations, "author");
 
   const filteredData = useMemo(() => {
     return presentations.filter(item => {
@@ -261,6 +265,21 @@ const DepartmentResearchPresentationTable = ({ presentations, loading, departmen
                     </span>
                   <div className="slide-info">
                     Save Current Table as Excel
+                  </div>
+              </button>
+            </div>
+
+            <div className="slider-button">
+              <button 
+                type="button" 
+                onClick={open}
+                name="dep-presentation"
+                >
+                  <span className="material-symbols-outlined">
+                  article
+                  </span>
+                  <div className="slide-info">
+                    Report Count of Produce Research
                   </div>
               </button>
             </div>
@@ -753,6 +772,13 @@ const DepartmentResearchPresentationTable = ({ presentations, loading, departmen
         confirmText={modalConfig.confirmText}
         onCancel={closeModal}
         />
+      
+      <SummaryModal 
+        isOpen={isOpen} 
+        onClose={close} 
+        grouped={grouped} 
+        fields={["research_title", "sdg_alignment"]}
+      />
 
       <div className="toast-box" id="toast-box"></div>
     </>
