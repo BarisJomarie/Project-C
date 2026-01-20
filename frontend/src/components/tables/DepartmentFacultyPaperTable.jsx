@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import ConfirmModal from "../../utils/ConfirmModal";
 import { showToast } from "../../utils/toast";
 import useSortableTable from "../../hooks/useSortableTable";
+import SummaryModal from "../SummaryModal";
+import { useGroupedByField } from "../../hooks/useGroupedByField";
 
 const DepartmentFacultyPaperTable = ({ fPapers, loading, role, dep_id, fetchFacultyPapers }) => {
   const navigate = useNavigate();
@@ -33,6 +35,17 @@ const DepartmentFacultyPaperTable = ({ fPapers, loading, role, dep_id, fetchFacu
 
   const [researchers, setResearchers] = useState('');
   const [yearRange, setYearRange] = useState({ start: '', end: '' });
+
+  const { isOpen, open, close } = useGroupedByField(fPapers, "researchers");
+  const grouped = {};
+  fPapers.forEach(paper => {
+    paper.researchers.forEach(author => {
+      if (!grouped[author]) grouped[author] = { count: 0, rows: [] };
+      grouped[author].count++;
+      grouped[author].rows.push(paper);
+    });
+  });
+
 
   const filteredData = useMemo(() => {
     return fPapers.filter(item => {
@@ -177,7 +190,21 @@ const DepartmentFacultyPaperTable = ({ fPapers, loading, role, dep_id, fetchFacu
                   </button>
                 </div>
               )}
-              
+
+              <div className="slider-button">
+                <button 
+                  type="button" 
+                  onClick={open}
+                  name="dep-faculty"
+                  >
+                    <span className="material-symbols-outlined">
+                    article
+                    </span>
+                    <div className="slide-info">
+                      Report Count of Produce Research
+                    </div>
+                </button>
+              </div>
             </div>
 
             <div className="right">
@@ -452,6 +479,13 @@ const DepartmentFacultyPaperTable = ({ fPapers, loading, role, dep_id, fetchFacu
         onConfirm={modalConfig.onConfirm}
         confirmText={modalConfig.confirmText}
         onCancel={closeModal}
+        />
+
+       <SummaryModal 
+          isOpen={isOpen} 
+          onClose={close} 
+          grouped={grouped} 
+          fields={["research_title", "sdg_labels"]}
         />
 
       <div className="toast-box" id="toast-box"></div>

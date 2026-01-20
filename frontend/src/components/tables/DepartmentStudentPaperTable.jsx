@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import ConfirmModal from "../../utils/ConfirmModal";
 import { showToast } from "../../utils/toast";
 import useSortableTable from "../../hooks/useSortableTable";
+import SummaryModal from "../SummaryModal";
+import { useGroupedByField } from "../../hooks/useGroupedByField";
 
 const DepartmentStudentPaperTable = ({ sPapers, loading, role, dep_id, fetchStudentPapers }) => {
   const navigate = useNavigate();
@@ -33,6 +35,8 @@ const DepartmentStudentPaperTable = ({ sPapers, loading, role, dep_id, fetchStud
 
   const [adviser, setAdviser] = useState('');
   const [yearRange, setYearRange] = useState({ start: '', end: '' });
+
+  const { isOpen, open, close, grouped } = useGroupedByField(sPapers, "adviser");
 
   const filteredData = useMemo(() => {
     return sPapers.filter(item => {
@@ -174,6 +178,21 @@ const DepartmentStudentPaperTable = ({ sPapers, loading, role, dep_id, fetchStud
                   </button>
                 </div>
               )}
+
+              <div className="slider-button">
+                <button 
+                  type="button" 
+                  onClick={open}
+                  name="dep-student"
+                  >
+                    <span className="material-symbols-outlined">
+                    article
+                    </span>
+                    <div className="slide-info">
+                      Report Count of Produce Research
+                    </div>
+                </button>
+              </div>
             </div>
 
             <div className="right">
@@ -476,6 +495,13 @@ const DepartmentStudentPaperTable = ({ sPapers, loading, role, dep_id, fetchStud
         confirmText={modalConfig.confirmText}
         onCancel={closeModal}
         />
+      
+      <SummaryModal 
+        isOpen={isOpen} 
+        onClose={close} 
+        grouped={grouped} 
+        fields={["research_title", "sdg_labels"]}
+      />
 
       <div className="toast-box" id="toast-box"></div>
     </>

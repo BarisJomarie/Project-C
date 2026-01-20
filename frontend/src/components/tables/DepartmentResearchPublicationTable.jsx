@@ -7,6 +7,8 @@ import ConfirmModal from "../../utils/ConfirmModal";
 import PublicationPrint from "../../utils/print/PublicationPrint";
 import * as XLSX from 'xlsx';
 import useSortableTable from "../../hooks/useSortableTable";
+import SummaryModal from "../SummaryModal";
+import { useGroupedByField } from "../../hooks/useGroupedByField";
 
 const DepartmentResearchPublicationTable = ({ publication, loading, department, user, fetchPublications }) => {
   const navigate = useNavigate();
@@ -36,6 +38,8 @@ const DepartmentResearchPublicationTable = ({ publication, loading, department, 
 
   const [author, setAuthor] = useState('');
   const [yearRange, setYearRange] = useState({ start: '', end: '' });
+
+  const { isOpen, open, close, grouped } = useGroupedByField(publication, "pub_author");
   
   const filteredData = useMemo(() => {
     return publication.filter(item => {
@@ -219,6 +223,21 @@ const DepartmentResearchPublicationTable = ({ publication, loading, department, 
                       </span>
                     <div className="slide-info">
                       Save Current Table as Excel
+                    </div>
+                </button>
+              </div>
+
+              <div className="slider-button">
+                <button 
+                  type="button" 
+                  onClick={open}
+                  name="dep-publication"
+                  >
+                    <span className="material-symbols-outlined">
+                    article
+                    </span>
+                    <div className="slide-info">
+                      Report Count of Produce Research
                     </div>
                 </button>
               </div>
@@ -662,6 +681,13 @@ const DepartmentResearchPublicationTable = ({ publication, loading, department, 
         confirmText={modalConfig.confirmText}
         onCancel={closeModal}
         />
+      
+      <SummaryModal 
+        isOpen={isOpen} 
+        onClose={close} 
+        grouped={grouped} 
+        fields={["published_title"]}
+      />
 
       <div className="toast-box" id="toast-box"></div>
     </>
