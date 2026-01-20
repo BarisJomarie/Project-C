@@ -37,6 +37,8 @@ const DepartmentFacultyPaperTable = ({ fPapers, loading, role, dep_id, fetchFacu
   const [yearRange, setYearRange] = useState({ start: '', end: '' });
   const [searchTerm, setSearchTerm] = useState('');
 
+  const { isOpen, open, close, grouped } = useGroupedByField(fPapers, "researchers");
+
  const filteredData = useMemo(() => {
     return fPapers.filter(item => {
       // Multi-field search
@@ -252,7 +254,7 @@ const DepartmentFacultyPaperTable = ({ fPapers, loading, role, dep_id, fetchFacu
           </div>
       }
 
-      <div className={`count-div ${researchers !== '' || yearRange.start !== '' || yearRange.end !== '' ? 'active' : ''}`}>
+      <div className={`count-div ${searchTerm !== '' || yearRange.start !== '' || yearRange.end !== '' ? 'active' : ''}`}>
         <h4>Total Faculty Research Found: <span>{sortedData.length}</span></h4>
       </div>
 

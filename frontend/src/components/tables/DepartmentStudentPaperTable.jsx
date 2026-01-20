@@ -37,6 +37,8 @@ const DepartmentStudentPaperTable = ({ sPapers, loading, role, dep_id, fetchStud
   const [yearRange, setYearRange] = useState({ start: '', end: '' });
   const [searchTerm, setSearchTerm] = useState('');
 
+  const { isOpen, open, close, grouped } = useGroupedByField(sPapers, "adviser");
+
 const filteredData = useMemo(() => {
   return sPapers.filter(item => {
     // Search across multiple fields
@@ -258,7 +260,7 @@ const filteredData = useMemo(() => {
           </div>
       }
 
-      <div className={`count-div ${adviser !== '' || yearRange.start !== '' || yearRange.end !== '' ? 'active' : ''}`}>
+      <div className={`count-div ${searchTerm !== '' || yearRange.start !== '' || yearRange.end !== '' ? 'active' : ''}`}>
         <h4>Total Student Thesis Found: <span>{sortedData.length}</span></h4>
       </div>
 
