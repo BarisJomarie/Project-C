@@ -37,6 +37,8 @@ const DepartmentStudentPaperTable = ({ sPapers, loading, role, dep_id, fetchStud
   const [yearRange, setYearRange] = useState({ start: '', end: '' });
   const [searchTerm, setSearchTerm] = useState('');
 
+
+
 const filteredData = useMemo(() => {
   return sPapers.filter(item => {
     // Search across multiple fields
@@ -77,7 +79,18 @@ const filteredData = useMemo(() => {
 
     return matchesSearch && matchedAdviser && matchesYear;
   });
-}, [sPapers, searchTerm, adviser, yearRange]);
+}, [sPapers, searchTerm, adviser, yearRange]);  
+
+  // For SummaryModal
+const [isSummaryOpen, setIsSummaryOpen] = useState(false);
+
+// Functions to open/close
+const openSummaryModal = () => setIsSummaryOpen(true);
+const closeSummaryModal = () => setIsSummaryOpen(false);
+
+// Grouped data for SummaryModal
+const grouped = useGroupedByField(filteredData, "sdg_labels");
+
 
 
 
@@ -190,7 +203,7 @@ const filteredData = useMemo(() => {
               <div className="slider-button">
                 <button 
                   type="button" 
-                  onClick={open}
+                  onClick={openSummaryModal}
                   name="dep-student"
                   >
                     <span className="material-symbols-outlined">
@@ -504,12 +517,13 @@ const filteredData = useMemo(() => {
         onCancel={closeModal}
         />
       
-      <SummaryModal 
-        isOpen={isOpen} 
-        onClose={close} 
-        grouped={grouped} 
-        fields={["research_title", "sdg_labels"]}
-      />
+   <SummaryModal 
+  isOpen={isSummaryOpen} 
+  onClose={closeSummaryModal} 
+  grouped={grouped} 
+  fields={["research_title", "sdg_labels"]}
+/>
+
 
       <div className="toast-box" id="toast-box"></div>
     </>

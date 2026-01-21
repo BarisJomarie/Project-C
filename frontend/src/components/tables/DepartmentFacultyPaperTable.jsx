@@ -73,6 +73,14 @@ const DepartmentFacultyPaperTable = ({ fPapers, loading, role, dep_id, fetchFacu
       return matchesSearch && matchesYear;
     });
   }, [fPapers, searchTerm, yearRange]);
+  // grouped data
+const grouped = useGroupedByField(filteredData, "sdg_labels");
+
+  const [isSummaryOpen, setIsSummaryOpen] = useState(false);
+
+// Functions to open/close modal
+const openSummaryModal = () => setIsSummaryOpen(true);
+const closeSummaryModal = () => setIsSummaryOpen(false);
 
   const { 
     sortedData, 
@@ -184,7 +192,7 @@ const DepartmentFacultyPaperTable = ({ fPapers, loading, role, dep_id, fetchFacu
               <div className="slider-button">
                 <button 
                   type="button" 
-                  onClick={open}
+                  onClick={openSummaryModal}
                   name="dep-faculty"
                   >
                     <span className="material-symbols-outlined">
@@ -472,11 +480,11 @@ const DepartmentFacultyPaperTable = ({ fPapers, loading, role, dep_id, fetchFacu
         />
 
        <SummaryModal 
-          isOpen={isOpen} 
-          onClose={close} 
-          grouped={grouped} 
-          fields={["research_title", "sdg_labels"]}
-        />
+  isOpen={isSummaryOpen} 
+  onClose={closeSummaryModal} 
+  grouped={grouped} 
+  fields={["research_title", "sdg_labels"]}
+/>
 
       <div className="toast-box" id="toast-box"></div>
     </>
