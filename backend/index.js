@@ -15,23 +15,16 @@ const downloadRoutes = require('./routes/downloadRoutes');
 
 
 // Allow your Netlify frontend (if production) and localhost (if development) to access the backend
-const corsOptions = { 
-  origin: [ 
-    "http://localhost:5173", 
-    "https://ccsresearch.netlify.app" 
-  ], 
-  methods: [
-    "GET", 
-    "POST", 
-    "PUT", 
-    "DELETE", 
-    "OPTIONS"
-  ], 
-  credentials: true 
-}; 
-
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "https://ccsresearch.netlify.app"
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
+}));
+app.options("*", cors());
 
 app.use(express.json());
 
