@@ -1,39 +1,39 @@
 require('dotenv').config();
-const nodemailer = require('nodemailer');
+const SibApiV3Sdk = require('sib-api-v3-sdk');
 
-let transporter;
 
-function createTransporter() {
-  transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: Number(process.env.EMAIL_PORT) || 587,
-    secure: false, // 587 = STARTTLS
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-    tls: {
-      rejectUnauthorized: false,
-    },
-    connectionTimeout: 5000,
-    greetingTimeout: 5000,
-    socketTimeout: 5000,
-  });
-}
+// Configure Brevo API client
+const client = SibApiV3Sdk.ApiClient.instance;
+client.authentications['api-key'].apiKey = process.env.BREVO_API_KEY;
 
-// Create once
-createTransporter();
 
+const tranEmailApi = new SibApiV3Sdk.TransactionalEmailsApi();
+
+
+/**
+ * Send email using Brevo Transactional Email API
+ * @param {string} to
+ * @param {string} subject
+ * @param {string} message (plain text or HTML)
+ */
 exports.sendEmail = async (to, subject, message) => {
+  const emailData = {
+    sender: {
+      email: process.env.EMAIL_FROM,
+      name: 'SDG Classification & Analytics',
+    },
+    to: [{ email: to }],
+    subject,
+    htmlContent: message.replace(/\n/g, '<br/>'), // supports your text emails
+  };
+
+
   try {
-    return await transporter.sendMail({
-      from: `"SDG Classification & Analytics" <${process.env.EMAIL_FROM}>`,
-      to,
-      subject,
-      text: message,
-    });
-  } catch (err) {
-    console.error('❌ EMAIL FAILED:', err.message);
-    return null; // 🚑 NEVER crash login
+    await tranEmailApi.sendTransacEmail(emailData);
+  } catch (error) {
+    console.error('Brevo email error:', error);
+    throw error;
   }
 };
+
+
