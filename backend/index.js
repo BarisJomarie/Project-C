@@ -17,7 +17,7 @@ const downloadRoutes = require('./routes/downloadRoutes');
 // Allow your Netlify frontend (if production) and localhost (if development) to access the backend
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://sdgclassification.netlify.app"
+  "https://ccsresearch.netlify.app"
 ];
 
 app.use(cors({
