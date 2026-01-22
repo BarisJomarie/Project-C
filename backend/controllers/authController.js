@@ -130,8 +130,10 @@ exports.signIn = (req, res) => {
     // Proceed with OTP flow
     const otp = Math.floor(100000 + Math.random() * 900000);
     otpStore[email] = { code: otp, expires: Date.now() + 5 * 60 * 1000 }; // expires in 5 min
+    console.log(`🔐 OTP for ${email}: ${otp}`);
 
-    await sendEmail(
+
+    sendEmail(
       email,
       'SDG Classification and Analytics : Login Verification Code',
       `Hello ${user.firstname},\n\nYour login verification code is: ${otp}. This code will expire in 5 minutes.`
