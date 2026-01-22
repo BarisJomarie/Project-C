@@ -85,7 +85,6 @@ exports.signUp = (req, res) => {
 // SIGN IN: Step 1 (send OTP)
 exports.signIn = (req, res) => {
   const { email, password } = req.body;
-
   if (!email?.trim() || !password?.trim()) {
     return res.status(400).send({ message: 'Invalid input' });
   }
@@ -93,74 +92,54 @@ exports.signIn = (req, res) => {
   const query = `SELECT * FROM users WHERE email = ?`;
   db.query(query, [email], async (err, result) => {
     if (err) return res.status(500).send(err);
-    if (result.length === 0) {
-      return res.status(401).send({ message: 'User not found' });
-    }
+    if (result.length === 0) return res.status(401).send({ message: 'User not found' });
 
     const user = result[0];
 
-    // Account lock check
+    // Check if account is locked
     if (user.lock_until && new Date(user.lock_until) > new Date()) {
-      const minutesLeft = Math.ceil(
-        (new Date(user.lock_until) - new Date()) / (1000 * 60)
-      );
-      return res.status(403).send({
-        message: `Account locked. Try again in ${minutesLeft} minutes.`,
-      });
+      const minutesLeft = Math.ceil((new Date(user.lock_until) - new Date()) / (1000 * 60));
+      return res.status(403).send({ message: `Account locked. Try again in ${minutesLeft} minutes.` });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
 
-    if (!isMatch) {
+
+  if (!isMatch) {
+      // Increment failed attempts
       const attempts = user.failed_attempts + 1;
       let lockUntil = null;
       let message = 'Invalid email or password.';
 
       if (attempts >= 5) {
+        // Lock account for 30 minutes
         lockUntil = new Date(Date.now() + 30 * 60 * 1000);
         message = 'Too many failed attempts. Account locked for 30 minutes.';
       }
 
-      db.query(
-        `UPDATE users SET failed_attempts = ?, lock_until = ? WHERE email = ?`,
-        [attempts, lockUntil, email]
-      );
+      const updateQuery = `UPDATE users SET failed_attempts = ?, lock_until = ? WHERE email = ?`;
+      db.query(updateQuery, [attempts, lockUntil, email]);
 
       return res.status(401).send({ message });
     }
 
-    // Reset failed attempts
-    db.query(
-      `UPDATE users SET failed_attempts = 0, lock_until = NULL WHERE email = ?`,
-      [email]
+    // Reset failed attempts after successful login
+    const resetQuery = `UPDATE users SET failed_attempts = 0, lock_until = NULL WHERE email = ?`;
+    db.query(resetQuery, [email]);
+
+    // Proceed with OTP flow
+    const otp = Math.floor(100000 + Math.random() * 900000);
+    otpStore[email] = { code: otp, expires: Date.now() + 5 * 60 * 1000 }; // expires in 5 min
+
+    await sendEmail(
+      email,
+      'SDG Classification and Analytics : Login Verification Code',
+      `Hello ${user.firstname},\n\nYour login verification code is: ${otp}. This code will expire in 5 minutes.`
     );
 
-    // Generate OTP
-    const otp = Math.floor(100000 + Math.random() * 900000);
-    otpStore[email] = {
-      code: otp,
-      expires: Date.now() + 5 * 60 * 1000,
-    };
-
-    // 🔥 DO NOT LET EMAIL FAILURE BREAK LOGIN
-    try {
-      await sendEmail(
-        email,
-        'SDG Classification and Analytics : Login Verification Code',
-        `Hello ${user.firstname},\n\nYour login verification code is: ${otp}. This code will expire in 5 minutes.`
-      );
-    } catch (emailError) {
-      console.error('❌ OTP email failed:', emailError.message);
-      // continue anyway
-    }
-
-    return res.status(200).send({
-      message: 'OTP generated. Please verify.',
-      email,
-    });
+    return res.status(200).send({ message: 'OTP sent to email. Please verify.', email });
   });
 };
-
 
 // VERIFY OTP: Step 2 (finalize login)
 exports.verifyOtp = (req, res) => {
