@@ -3,8 +3,10 @@ exports.analyzeText = async (req, res) => {
   try {
     const { text } = req.body;
 
+    const mlUrl = `http://${process.env.ML_API_URL}:${process.env.ML_PORT}/predict-sdg`;
+
     const runBert = async (inputText) => {
-      const response = await fetch(`${process.env.ML_API_URL}/predict-sdg`, {
+      const response = await fetch(mlUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: inputText })
