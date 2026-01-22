@@ -131,13 +131,18 @@ exports.signIn = (req, res) => {
     const otp = Math.floor(100000 + Math.random() * 900000);
     otpStore[email] = { code: otp, expires: Date.now() + 5 * 60 * 1000 }; // expires in 5 min
 
-    await sendEmail(
-      email,
-      'SDG Classification and Analytics : Login Verification Code',
-      `Hello ${user.firstname},\n\nYour login verification code is: ${otp}. This code will expire in 5 minutes.`
-    );
-
-    return res.status(200).send({ message: 'OTP sent to email. Please verify.', email });
+    try {
+      await sendEmail(
+        email,
+        'SDG Classification and Analytics : Login Verification Code',
+        `Hello ${user.firstname},\n\nYour login verification code is: ${otp}. This code will expire in 5 minutes.`
+      );
+      return res.status(200).send({ message: 'OTP sent to email. Please verify.', email });
+    } catch (err) {
+      console.error('Email error:', err.message);
+      // Still respond so login flow continues
+      return res.status(200).send({ message: 'Login successful, but email could not be sent.', email });
+    }
   });
 };
 
