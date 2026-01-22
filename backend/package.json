@@ -14,5 +14,9 @@
     "nodemailer": "^7.0.12",
     "openai": "^6.0.1",
     "path": "^0.12.7"
+  },
+  "scripts": {
+    "start": "node index.js"
   }
 }
+
