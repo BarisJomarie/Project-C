@@ -10,73 +10,101 @@ const { error } = require('console');
 
 
 //------------------------------------------------------------SIGNIN-------------------------------------------------------------------------------------------------
-exports.signUp = (req, res) => {
+exports.signUp = async (req, res) => {
   const {
     userCode, username, lastname, firstname, middlename, extension,
-    email, password, role, security_question, security_answer, 
-    //if user is rph or faculty
+    email, password, role, security_question, security_answer,
     department, course
   } = req.body;
 
-  // Check for existing email or username
+
+  if (!email || !username || !firstname || !lastname || !role || !password) {
+    return res.status(400).send({ message: 'Required fields are missing.' });
+  }
+
+
+  // Check if user already exists
   const checker = `SELECT * FROM users WHERE email = ? OR username = ? OR user_code = ?`;
   db.query(checker, [email, username, userCode], async (err, result) => {
     if (err) return res.status(500).send({ message: 'DB query failed', error: err });
-    if (result.length > 0) return res.status(400).send({ message: 'Email, User Code or Username already exists.' });
+    if (result.length > 0) return res.status(400).send({ message: 'Email, User Code, or Username already exists.' });
+
 
     try {
       const hashedPassword = await bcrypt.hash(password, 10);
       const defaultProfileImg = 'default_profile.jpg';
 
-      // Insert user into DB
-      db.query(
-        `INSERT INTO users 
+
+      // Insert new user
+      const insertQuery = `
+        INSERT INTO users
         (user_code, username, lastname, firstname, middlename, extension, email, password, profile_img, role, security_question, security_answer, department, course)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `;
+      db.query(
+        insertQuery,
         [userCode, username, lastname, firstname, middlename, extension, email, hashedPassword, defaultProfileImg, role, security_question, security_answer, department, course],
-        async (err, result) => {
-          if (err) {
-            console.error('DB insert error:', err);
+        async (insertErr) => {
+          if (insertErr) {
+            console.error('DB insert error:', insertErr);
             return res.status(500).send({ message: 'Failed to add user' });
           }
 
+
           const fullName = [lastname, firstname, middlename ? middlename + '.' : '', extension ? extension.toUpperCase() : '']
-            .filter(part => part) // removes empty strings
+            .filter(Boolean)
             .join(' ');
 
-            const emailBody = `
-              Hello ${fullName},
 
-              Your account has been successfully registered.
-              Your password is: ${password}
-
-              You can change this password later after logging in.
-
-              Thank you for joining us!
-              `;
+          // Plain text welcome email
+          const emailBody = `
+Hello ${fullName},
 
 
-          // Send welcome email
+Your account has been created by the admin for SDG Classification & Analytics.
+
+
+Your password is: ${password}
+
+
+Please login and change your password immediately to keep your account secure.
+
+
+Login here: ${process.env.FRONTEND_URL}/login
+
+
+Regards,
+SDG Classification & Analytics
+          `;
+
+
           try {
-            await sendEmail(
-              email,
-              'Welcome to SDG Classification and Analytics!',
-              emailBody
-            );
+            await sendEmail(email, 'Welcome to SDG Classification & Analytics', emailBody);
           } catch (emailErr) {
-            console.error('Failed to send email:', emailErr);
+            console.error('Failed to send welcome email:', emailErr);
           }
-          res.status(200).send({ message: 'User Registered!', emailSent: true });
-          const audit = await logAudit( userCode, role, 'User Registered', 'user');
-          console.log(audit);
+
+
+          // Audit log
+          try {
+            await logAudit(userCode, role, 'User Registered by Admin', 'user');
+          } catch (auditErr) {
+            console.error('Audit log error:', auditErr);
+          }
+
+
+          res.status(200).send({ message: 'User registered successfully! Welcome email sent.' });
         }
       );
+
+
     } catch (hashErr) {
       console.error('Password hashing failed:', hashErr);
       res.status(500).send({ message: 'Failed to hash password' });
     }
   });
 };
+
 
 
 
