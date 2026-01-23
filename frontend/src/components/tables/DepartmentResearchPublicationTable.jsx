@@ -49,7 +49,7 @@ const DepartmentResearchPublicationTable = ({ publication, loading, department, 
         ? [
             item.published_title,
             item.pub_author,
-            item.pub_co_authors?.join?.(', '),
+            item.co_authors?.join?.(', '),
             item.journal_title,
             item.conference_or_proceedings,
             item.publisher,
