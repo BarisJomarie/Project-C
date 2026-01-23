@@ -34,8 +34,8 @@ exports.signUp = async (req, res) => {
       // Insert new user
       const insertQuery = `
         INSERT INTO users
-        (user_code, username, lastname, firstname, middlename, extension, email, password, profile_img, role, security_question, security_answer, department, course)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        (user_code, username, lastname, firstname, middlename, extension, email, password, profile_img, role, security_question, security_answer, department, course, isActive)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
       `;
       db.query(
         insertQuery,
