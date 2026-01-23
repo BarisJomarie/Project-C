@@ -248,7 +248,7 @@ const closeSummaryModal = () => setIsSummaryOpen(false);
               <div className="slider-button">
                 <button 
                   onClick={() => {
-                    setSearchTerm('');
+                    setSearchTerm123('');
                     setYearRange({ start: '', end: '' });
                     resetSort();
                   }} 
