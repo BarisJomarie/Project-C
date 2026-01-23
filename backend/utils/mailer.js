@@ -1,11 +1,14 @@
 require('dotenv').config();
 const SibApiV3Sdk = require('sib-api-v3-sdk');
 
+
 // Configure Brevo API client
 const client = SibApiV3Sdk.ApiClient.instance;
 client.authentications['api-key'].apiKey = process.env.BREVO_API_KEY;
 
+
 const tranEmailApi = new SibApiV3Sdk.TransactionalEmailsApi();
+
 
 /**
  * Send email using Brevo Transactional Email API
@@ -31,3 +34,5 @@ exports.sendEmail = async (to, subject, message) => {
     throw error;
   }
 };
+
+

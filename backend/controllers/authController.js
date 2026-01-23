@@ -9,8 +9,7 @@ const crypto = require('crypto');
 const { error } = require('console');
 
 
-
-//------------------------------------------------------------SIGNUP-------------------------------------------------------------------------------------------------
+//------------------------------------------------------------SIGNIN-------------------------------------------------------------------------------------------------
 exports.signUp = async (req, res) => {
   const {
     userCode, username, lastname, firstname, middlename, extension,
@@ -47,21 +46,28 @@ exports.signUp = async (req, res) => {
             return res.status(500).send({ message: 'Failed to add user' });
           }
 
+
           const fullName = [lastname, firstname, middlename ? middlename + '.' : '', extension ? extension.toUpperCase() : '']
             .filter(Boolean)
             .join(' ');
+
 
           // Plain text welcome email
           const emailBody = `
 Hello ${fullName},
 
+
 Your account has been created by the admin for SDG Classification & Analytics.
+
 
 Your password is: ${password}
 
+
 Please login and change your password immediately to keep your account secure.
 
+
 Login here: ${process.env.FRONTEND_URL}/login
+
 
 Regards,
 SDG Classification & Analytics
@@ -93,6 +99,7 @@ SDG Classification & Analytics
 
 
 
+
 //------------------------------------------------------------LOGIN-------------------------------------------------------------------------------------------------
 // SIGN IN: Step 1 (send OTP)
 exports.signIn = (req, res) => {
@@ -101,12 +108,15 @@ exports.signIn = (req, res) => {
     return res.status(400).send({ message: 'Invalid input' });
   }
 
+
   const query = `SELECT * FROM users WHERE email = ?`;
   db.query(query, [email], async (err, result) => {
     if (err) return res.status(500).send(err);
     if (result.length === 0) return res.status(401).send({ message: 'User not found' });
 
+
     const user = result[0];
+
 
     // Check if account is locked
     if (user.lock_until && new Date(user.lock_until) > new Date()) {
@@ -114,7 +124,10 @@ exports.signIn = (req, res) => {
       return res.status(403).send({ message: `Account locked. Try again in ${minutesLeft} minutes.` });
     }
 
+
     const isMatch = await bcrypt.compare(password, user.password);
+
+
 
 
   if (!isMatch) {
@@ -123,25 +136,31 @@ exports.signIn = (req, res) => {
       let lockUntil = null;
       let message = 'Invalid email or password.';
 
+
       if (attempts >= 5) {
         // Lock account for 30 minutes
         lockUntil = new Date(Date.now() + 30 * 60 * 1000);
         message = 'Too many failed attempts. Account locked for 30 minutes.';
       }
 
+
       const updateQuery = `UPDATE users SET failed_attempts = ?, lock_until = ? WHERE email = ?`;
       db.query(updateQuery, [attempts, lockUntil, email]);
 
+
       return res.status(401).send({ message });
     }
+
 
     // Reset failed attempts after successful login
     const resetQuery = `UPDATE users SET failed_attempts = 0, lock_until = NULL WHERE email = ?`;
     db.query(resetQuery, [email]);
 
+
     // Proceed with OTP flow
     const otp = Math.floor(100000 + Math.random() * 900000);
     otpStore[email] = { code: otp, expires: Date.now() + 5 * 60 * 1000 }; // expires in 5 min
+
 
     await sendEmail(
       email,
@@ -149,9 +168,11 @@ exports.signIn = (req, res) => {
       `Hello ${user.firstname},\n\nYour login verification code is: ${otp}. This code will expire in 5 minutes.`
     );
 
+
     return res.status(200).send({ message: 'OTP sent to email. Please verify.', email });
   });
 };
+
 
 // VERIFY OTP: Step 2 (finalize login)
 exports.verifyOtp = (req, res) => {
@@ -326,10 +347,14 @@ exports.forgotPassword = (req, res) => {
   if (!email) return res.status(400).send({ message: 'Email is required.' });
 
 
+
+
   const query = 'SELECT * FROM users WHERE email = ?';
   db.query(query, [email], async (err, result) => {
     if (err) return res.status(500).send(err);
     if (result.length === 0) return res.status(404).send({ message: 'User not found.' });
+
+
 
 
     const user = result[0];
@@ -337,26 +362,36 @@ exports.forgotPassword = (req, res) => {
     const expiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
 
+
+
     const updateQuery = 'UPDATE users SET reset_token = ?, reset_token_expiry = ? WHERE email = ?';
     db.query(updateQuery, [token, expiry, email], async (err2) => {
       if (err2) return res.status(500).send(err2);
+
 
       const FRONTEND_URL = process.env.FRONTEND_URL;
       const resetLink = `${FRONTEND_URL}/reset-password/${token}`; // adjust if needed
 
 
+
+
         const emailBody = `
           Hello ${user.firstname},
 
+
           We received a request to reset the password for your SDG Classification & Analytics account.
+
 
           To continue, please open the link below:
           ${resetLink}
 
+
           This password reset link will expire in 1 hour.
+
 
           If you did not request a password reset, you can safely ignore this email.
           Your account will remain secure.
+
 
           Regards,
           SDG Classification & Analytics
@@ -377,6 +412,8 @@ exports.forgotPassword = (req, res) => {
       });
     });
   };
+
+
 // Step 2: Verify reset token
 exports.verifyResetToken = (req, res) => {
   const { token } = req.params;

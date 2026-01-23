@@ -10,8 +10,10 @@ exports.analyzeSdg = async (req, res) => {
       return res.status(400).json({ error: "Invalid input. 'year' and at least one department are required." });
     }
 
+    const mlUrl = `http://${process.env.ML_API_URL}:${process.env.ML_PORT}/analyze-text`;
+
     // Call FastAPI microservice
-    const response = await fetch(`${process.env.ML_API_URL}/analyze-text`, {
+    const response = await fetch(mlUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text: JSON.stringify(sdgData) })
