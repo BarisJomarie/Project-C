@@ -45,18 +45,26 @@ const DepartmentResearchPublicationTable = ({ publication, loading, department, 
     return publication.filter(item => {
       const search = author.toLowerCase();
 
+      const coAuthorsString = Array.isArray(item.co_authors)
+        ? item.co_authors.filter(co => co && co.trim() !== '').join(', ')
+        : (item.co_authors || '');
+
+      const indexTypeString = Array.isArray(item.index_type)
+        ? item.index_type.filter(idx => idx && idx.trim() !== '').join(', ')
+        : (item.index_type || '');
+
       const matchesSearch = author
         ? [
             item.published_title,
             item.pub_author,
-            item.co_authors?.join?.(', '),
+            coAuthorsString,
             item.journal_title,
             item.conference_or_proceedings,
             item.publisher,
             item.doi,
             item.issn_isbn,
             item.volume_issue,
-            item.index_type?.join?.(', '),
+            indexTypeString,
             item.date_of_publication
           ]
             .filter(Boolean)
