@@ -7,71 +7,83 @@ const { logAudit } = require('./auditsController');
 let otpStore = {}; // temporary storage for email → OTP mapping
 const crypto = require('crypto');
 const { error } = require('console');
-const nodemailer = require('nodemailer');
 
 
-//------------------------------------------------------------SIGNIN-------------------------------------------------------------------------------------------------
-exports.signUp = (req, res) => {
+
+//------------------------------------------------------------SIGNUP-------------------------------------------------------------------------------------------------
+exports.signUp = async (req, res) => {
   const {
     userCode, username, lastname, firstname, middlename, extension,
-    email, password, role, security_question, security_answer, 
-    //if user is rph or faculty
+    email, password, role, security_question, security_answer,
     department, course
   } = req.body;
 
-  // Check for existing email or username
+  if (!email || !username || !firstname || !lastname || !role || !password) {
+    return res.status(400).send({ message: 'Required fields are missing.' });
+  }
+
+  // Check if user already exists
   const checker = `SELECT * FROM users WHERE email = ? OR username = ? OR user_code = ?`;
   db.query(checker, [email, username, userCode], async (err, result) => {
     if (err) return res.status(500).send({ message: 'DB query failed', error: err });
-    if (result.length > 0) return res.status(400).send({ message: 'Email, User Code or Username already exists.' });
+    if (result.length > 0) return res.status(400).send({ message: 'Email, User Code, or Username already exists.' });
 
     try {
       const hashedPassword = await bcrypt.hash(password, 10);
       const defaultProfileImg = 'default_profile.jpg';
 
-      // Insert user into DB
-      db.query(
-        `INSERT INTO users 
+      // Insert new user
+      const insertQuery = `
+        INSERT INTO users
         (user_code, username, lastname, firstname, middlename, extension, email, password, profile_img, role, security_question, security_answer, department, course)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `;
+      db.query(
+        insertQuery,
         [userCode, username, lastname, firstname, middlename, extension, email, hashedPassword, defaultProfileImg, role, security_question, security_answer, department, course],
-        async (err, result) => {
-          if (err) {
-            console.error('DB insert error:', err);
+        async (insertErr) => {
+          if (insertErr) {
+            console.error('DB insert error:', insertErr);
             return res.status(500).send({ message: 'Failed to add user' });
           }
 
           const fullName = [lastname, firstname, middlename ? middlename + '.' : '', extension ? extension.toUpperCase() : '']
-            .filter(part => part) // removes empty strings
+            .filter(Boolean)
             .join(' ');
 
-            const emailBody = `
-              Hello ${fullName},
+          // Plain text welcome email
+          const emailBody = `
+Hello ${fullName},
 
-              Your account has been successfully registered.
-              Your password is: ${password}
+Your account has been created by the admin for SDG Classification & Analytics.
 
-              You can change this password later after logging in.
+Your password is: ${password}
 
-              Thank you for joining us!
-              `;
+Please login and change your password immediately to keep your account secure.
 
+Login here: ${process.env.FRONTEND_URL}/login
 
-          // Send welcome email
+Regards,
+SDG Classification & Analytics
+          `;
+
           try {
-            await sendEmail(
-              email,
-              'Welcome to SDG Classification and Analytics!',
-              emailBody
-            );
+            await sendEmail(email, 'Welcome to SDG Classification & Analytics', emailBody);
           } catch (emailErr) {
-            console.error('Failed to send email:', emailErr);
+            console.error('Failed to send welcome email:', emailErr);
           }
-          res.status(200).send({ message: 'User Registered!', emailSent: true });
-          const audit = await logAudit( userCode, role, 'User Registered', 'user');
-          console.log(audit);
+
+          // Audit log
+          try {
+            await logAudit(userCode, role, 'User Registered by Admin', 'user');
+          } catch (auditErr) {
+            console.error('Audit log error:', auditErr);
+          }
+
+          res.status(200).send({ message: 'User registered successfully! Welcome email sent.' });
         }
       );
+
     } catch (hashErr) {
       console.error('Password hashing failed:', hashErr);
       res.status(500).send({ message: 'Failed to hash password' });
@@ -333,36 +345,38 @@ exports.forgotPassword = (req, res) => {
       const resetLink = `${FRONTEND_URL}/reset-password/${token}`; // adjust if needed
 
 
-      const transporter = nodemailer.createTransport({
-        host: process.env.EMAIL_HOST,
-        port: Number(process.env.EMAIL_PORT),
-        secure: false, // true only for port 465
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS,
-        },
+        const emailBody = `
+          Hello ${user.firstname},
+
+          We received a request to reset the password for your SDG Classification & Analytics account.
+
+          To continue, please open the link below:
+          ${resetLink}
+
+          This password reset link will expire in 1 hour.
+
+          If you did not request a password reset, you can safely ignore this email.
+          Your account will remain secure.
+
+          Regards,
+          SDG Classification & Analytics
+          `;
+
+      try {
+        await sendEmail(
+          email,
+          'Password Reset Request',
+          emailBody
+        );
+
+        res.status(200).send({ message: 'Password reset link sent to your email.' });
+        } catch (emailErr) {
+          console.error('Failed to send reset email:', emailErr);
+          res.status(500).send({ message: 'Failed to send email.' });
+        }
       });
-
-
-      await transporter.sendMail({
-        from: process.env.EMAIL_FROM,
-        to: email,
-        subject: 'Password Reset Request',
-        text: `You requested to reset your password.
-
-      Click the link below to continue:
-      ${resetLink}
-
-      This link expires in 1 hour.`,
-      });
-
-
-
-      res.status(200).send({ message: 'Password reset link sent to your email.' });
     });
-  });
-};
-
+  };
 // Step 2: Verify reset token
 exports.verifyResetToken = (req, res) => {
   const { token } = req.params;

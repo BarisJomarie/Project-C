@@ -37,6 +37,8 @@ const DepartmentFacultyPaperTable = ({ fPapers, loading, role, dep_id, fetchFacu
   const [yearRange, setYearRange] = useState({ start: '', end: '' });
   const [searchTerm, setSearchTerm] = useState('');
 
+  const { isOpen, open, close, grouped } = useGroupedByField(fPapers, "researchers");
+
  const filteredData = useMemo(() => {
     return fPapers.filter(item => {
       // Multi-field search
@@ -73,10 +75,6 @@ const DepartmentFacultyPaperTable = ({ fPapers, loading, role, dep_id, fetchFacu
       return matchesSearch && matchesYear;
     });
   }, [fPapers, searchTerm, yearRange]);
-  // grouped data
-const grouped = useGroupedByField(filteredData, "sdg_labels");
-
-  const [isSummaryOpen, setIsSummaryOpen] = useState(false);
 
 // Functions to open/close modal
 const openSummaryModal = () => setIsSummaryOpen(true);
@@ -192,7 +190,7 @@ const closeSummaryModal = () => setIsSummaryOpen(false);
               <div className="slider-button">
                 <button 
                   type="button" 
-                  onClick={openSummaryModal}
+                  onClick={open}
                   name="dep-faculty"
                   >
                     <span className="material-symbols-outlined">
@@ -241,7 +239,7 @@ const closeSummaryModal = () => setIsSummaryOpen(false);
               <div className="slider-button">
                 <button 
                   onClick={() => {
-                    setResearchers('');
+                    setSearchTerm('');
                     setYearRange({ start: '', end: '' });
                     resetSort();
                   }} 
@@ -260,7 +258,7 @@ const closeSummaryModal = () => setIsSummaryOpen(false);
           </div>
       }
 
-      <div className={`count-div ${researchers !== '' || yearRange.start !== '' || yearRange.end !== '' ? 'active' : ''}`}>
+      <div className={`count-div ${searchTerm !== '' || yearRange.start !== '' || yearRange.end !== '' ? 'active' : ''}`}>
         <h4>Total Faculty Research Found: <span>{sortedData.length}</span></h4>
       </div>
 
@@ -480,10 +478,10 @@ const closeSummaryModal = () => setIsSummaryOpen(false);
         />
 
        <SummaryModal 
-  isOpen={isSummaryOpen} 
-  onClose={closeSummaryModal} 
-  grouped={grouped} 
-  fields={["research_title", "sdg_labels"]}
+          isOpen={isOpen} 
+          onClose={close} 
+          grouped={grouped} 
+          fields={["research_title", "sdg_labels"]}
 />
 
       <div className="toast-box" id="toast-box"></div>

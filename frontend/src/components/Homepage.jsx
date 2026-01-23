@@ -438,7 +438,7 @@ const SdgIconTick = ({ x, y, payload }) => {
                           <td>{users.filter(user => (user.role === 'rph' && user.isActive === 0)).length}</td>
                         </tr>
                         <tr>
-                          <td>Student</td>
+                          <td>Faculty</td>
                           <td>{totalFaculties}</td>
                           <td>{users.filter(user => (user.role === 'faculty' && user.isActive === 1)).length}</td>
                           <td>{users.filter(user => (user.role === 'faculty' && user.isActive === 0)).length}</td>

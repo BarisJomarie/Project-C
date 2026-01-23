@@ -33,7 +33,7 @@ export default function SummaryModal({ isOpen, onClose, grouped, fields }) {
       position: 'sticky',
       top: -20,
       backgroundColor: '#fff',
-      height: '100px',
+      height: '120px',
       borderBottom: '1px solid #ddd',
     }, 
     content: { 
@@ -179,7 +179,7 @@ export default function SummaryModal({ isOpen, onClose, grouped, fields }) {
       <div style={styles.content} ref={modalRef} onClick={(e) => e.stopPropagation()}>
         <style> {`@media print { th {-webkit-print-color-adjust: exact; print-color-adjust: exact;} .content-head { display: none; } }`} </style>
         <div className='content-head' style={styles.contentHead}>
-          <h1>Report Count</h1>
+          <h1 style={{textDecoration: 'underline'}}>Report Count</h1>
           <button style={styles.closeModalButton} onClick={onClose}>Close</button>
           <div style={styles.filterRow}>
             <input type="text" placeholder="Search..." style={styles.input} value={authorFilter} onChange={(e) => setAuthorFilter(e.target.value)} 

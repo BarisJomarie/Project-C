@@ -37,6 +37,7 @@ const DepartmentStudentPaperTable = ({ sPapers, loading, role, dep_id, fetchStud
   const [yearRange, setYearRange] = useState({ start: '', end: '' });
   const [searchTerm, setSearchTerm] = useState('');
 
+  const { isOpen, open, close, grouped } = useGroupedByField(sPapers, "adviser");
 
 
 const filteredData = useMemo(() => {
@@ -87,11 +88,6 @@ const [isSummaryOpen, setIsSummaryOpen] = useState(false);
 // Functions to open/close
 const openSummaryModal = () => setIsSummaryOpen(true);
 const closeSummaryModal = () => setIsSummaryOpen(false);
-
-// Grouped data for SummaryModal
-const grouped = useGroupedByField(filteredData, "sdg_labels");
-
-
 
 
   const { 
@@ -203,7 +199,7 @@ const grouped = useGroupedByField(filteredData, "sdg_labels");
               <div className="slider-button">
                 <button 
                   type="button" 
-                  onClick={openSummaryModal}
+                  onClick={open}
                   name="dep-student"
                   >
                     <span className="material-symbols-outlined">
@@ -252,7 +248,7 @@ const grouped = useGroupedByField(filteredData, "sdg_labels");
               <div className="slider-button">
                 <button 
                   onClick={() => {
-                    setAdviser('');
+                    setSearchTerm('');
                     setYearRange({ start: '', end: '' });
                     resetSort();
                   }} 
@@ -271,7 +267,7 @@ const grouped = useGroupedByField(filteredData, "sdg_labels");
           </div>
       }
 
-      <div className={`count-div ${adviser !== '' || yearRange.start !== '' || yearRange.end !== '' ? 'active' : ''}`}>
+      <div className={`count-div ${searchTerm !== '' || yearRange.start !== '' || yearRange.end !== '' ? 'active' : ''}`}>
         <h4>Total Student Thesis Found: <span>{sortedData.length}</span></h4>
       </div>
 
@@ -518,8 +514,8 @@ const grouped = useGroupedByField(filteredData, "sdg_labels");
         />
       
    <SummaryModal 
-  isOpen={isSummaryOpen} 
-  onClose={closeSummaryModal} 
+  isOpen={isOpen} 
+  onClose={close} 
   grouped={grouped} 
   fields={["research_title", "sdg_labels"]}
 />
