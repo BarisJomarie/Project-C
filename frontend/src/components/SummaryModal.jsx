@@ -5,15 +5,45 @@ export default function SummaryModal({ isOpen, onClose, grouped, fields }) {
   const modalRef = useRef(null);
 
   const [authorFilter, setAuthorFilter] = useState(""); 
+  const [yearFilter, setYearFilter] = useState({ start: '', end: '' });
 
-  const filteredGrouped = Object.entries(grouped)
-  .filter(([author]) => {
+  const filteredGrouped = Object.entries(grouped).filter(([author, { rows }]) => {
     // Author filter
     if (authorFilter && !author.toLowerCase().includes(authorFilter.toLowerCase())) {
       return false;
     }
+
+    // Year range filter (works for both academic_year and date-presented)
+    if (yearFilter.start || yearFilter.end) {
+      const matchesYear = rows.some(row => {
+        let year;
+
+        if (row["academic_year"]) {
+          // academic_year stored as number/string
+          year = parseInt(row["academic_year"], 10);
+        } else if (row["date_presented"]) {
+          // date-presented stored as full date
+          year = new Date(row["date_presented"]).getFullYear();
+        } else if (row['date_of_publication']) {
+          const match = row.date_of_publication.match(/\b(20\d{2})\b/); 
+          year = match ? parseInt(match[1], 10) : null;
+        }
+
+        if (!year) return false; // skip if no year found
+
+        const afterStart = yearFilter.start ? year >= parseInt(yearFilter.start, 10) : true;
+        const beforeEnd = yearFilter.end ? year <= parseInt(yearFilter.end, 10) : true;
+
+        return afterStart && beforeEnd;
+      });
+
+      if (!matchesYear) return false;
+    }
+
     return true;
-  })
+  });
+
+
 
 
   const styles = { 
@@ -29,28 +59,41 @@ export default function SummaryModal({ isOpen, onClose, grouped, fields }) {
       alignItems: "center", 
       zIndex: 1000000,
     },
+    contentContainer: {
+      padding: 10,
+      backgroundColor: "#fff",
+      borderRadius: 4,
+      boxShadow: "0 4px 8px rgba(0,0,0,0.2)", 
+    },
     contentHead: {
       position: 'sticky',
       top: -20,
       backgroundColor: '#fff',
       height: '120px',
       borderBottom: '1px solid #ddd',
+      zIndex: 100,
     }, 
     content: { 
-      backgroundColor: "#fff", 
       padding: "20px",
       maxWidth: "90vw",
-      minWidth: "300px", 
+      minWidth: "90vw", 
       width: "100%", 
       maxHeight: "90vh",
-      minHeight: '50vh', 
+      minHeight: '90vh', 
       overflowY: "auto", 
-      boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
       scrollbarWidth: 'thin',
       position: 'relative', 
     },
     groupBlock: { 
       marginBottom: "20px", 
+    },
+    uniqueHeader: {
+      position: 'sticky',
+      top: 100,
+      backgroundColor: '#fff',
+      zIndex: 90,
+      padding: '10px 0',
+      borderBottom: '1px solid #ccc',
     }, 
     table: { 
       width: "100%", 
@@ -61,7 +104,10 @@ export default function SummaryModal({ isOpen, onClose, grouped, fields }) {
       border: "1px solid #ddd", 
       padding: "8px", 
       backgroundColor: "#f2f2f2", 
-      textAlign: "left", 
+      textAlign: "left",
+      position: 'sticky',
+      top: 180,
+      zIndex: 80, 
     }, 
     td: { 
       border: "1px solid #ddd", 
@@ -77,11 +123,14 @@ export default function SummaryModal({ isOpen, onClose, grouped, fields }) {
       cursor: "pointer", 
     },
     numhead: {
-      width: '30px',
+      width: 50,
       border: "1px solid #ddd", 
       padding: "8px", 
       backgroundColor: "#f2f2f2", 
-      textAlign: "left", 
+      textAlign: "left",
+      position: 'sticky',
+      top: 180,
+      zIndex: 80,  
     },
     numbody: {
       width: '30px',
@@ -95,6 +144,7 @@ export default function SummaryModal({ isOpen, onClose, grouped, fields }) {
       display: "flex", 
       gap: "10px", 
       alignItems: "center",
+      justifyContent: 'space-between',
     },
     buttonContainer: {
       display: 'flex',
@@ -102,8 +152,8 @@ export default function SummaryModal({ isOpen, onClose, grouped, fields }) {
     },
     closeModalButton: {
       position: 'absolute',
-      top: 5,
-      right: 5,
+      top: 1,
+      right: 1,
       padding: "8px 12px", 
       backgroundColor: "#ddd", 
       color: "#fff", 
@@ -112,10 +162,22 @@ export default function SummaryModal({ isOpen, onClose, grouped, fields }) {
     },
     input: {
       padding: "8px 12px", 
-      backgroundColor: "#ddd",
-      border: "none", 
       cursor: "pointer",
       width: '400px',
+      outline: 'none',
+      border: '1px solid black',
+      marginRight: 10,
+    },
+    inputYear: {
+      padding: '8px 12px',
+      cursor: 'pointer',
+      width: 100,
+      outline: 'none',
+      border: '1px solid black',
+      marginRight: 10,
+    },
+    p: {
+      textAlign: 'center',
     },
   };
 
@@ -176,56 +238,77 @@ export default function SummaryModal({ isOpen, onClose, grouped, fields }) {
 
   return ( 
     <div style={styles.overlay} onClick={onClose}>
-      <div style={styles.content} ref={modalRef} onClick={(e) => e.stopPropagation()}>
-        <style> {`@media print { th {-webkit-print-color-adjust: exact; print-color-adjust: exact;} .content-head { display: none; } }`} </style>
-        <div className='content-head' style={styles.contentHead}>
-          <h1 style={{textDecoration: 'underline'}}>Report Count</h1>
-          <button style={styles.closeModalButton} onClick={onClose}>Close</button>
-          <div style={styles.filterRow}>
-            <input type="text" placeholder="Search..." style={styles.input} value={authorFilter} onChange={(e) => setAuthorFilter(e.target.value)} 
-            />
-            <div style={styles.buttonContainer}>
-              <button style={styles.closeButton} onClick={handlePrint}>Print</button> 
-              <button style={styles.closeButton} onClick={handleExportCSV}>Save as CSV</button>    
-            </div>
-          </div> 
-        </div> 
-        {filteredGrouped.map(([key, { count, rows }]) => (
-          <React.Fragment key={key}> 
-            <div key={key} style={styles.groupBlock}> 
-              <h3>{key} | Produce Paper Count: {count}</h3> 
-              <table style={styles.table}> 
-                <thead>
-                  <tr> 
-                    <th style={styles.numhead}>#</th>
-                    {fields.map((field) => ( 
-                      <th key={field} style={styles.th}>{field}</th> 
-                    ))} 
-                  </tr> 
-                </thead> 
-                <tbody> 
-                  {rows.map((row, idx) => ( 
-                    <tr key={idx}>
-                      <td style={styles.numbody}>{idx + 1}</td> 
-                      {fields.map((field) => ( 
-                        <td key={field} style={styles.td}>
-                          {field === "date-presented" && row[field]
-                            ? new Date(row[field]).getFullYear()  
-                            : Array.isArray(row[field])
-                              ? row[field].join(", ")
-                              : row[field]}
-                        </td>
+      <div style={styles.contentContainer}>
+        <div style={styles.content} ref={modalRef} onClick={(e) => e.stopPropagation()}>
+          <style> {`@media print { th {-webkit-print-color-adjust: exact; print-color-adjust: exact;} .content-head { display: none; } }`} </style>
+          <div className='content-head' style={styles.contentHead}>
+            <h1 style={{textDecoration: 'underline'}}>Report Count Produced</h1>
+            <button style={styles.closeModalButton} onClick={onClose}>Close</button>
+
+            <div style={styles.filterRow}>
+              <div>
+                <input type="text" placeholder="Search..." style={styles.input} value={authorFilter} onChange={(e) => setAuthorFilter(e.target.value)} />
+                <input type="number" placeholder="Start Year" style={styles.inputYear} value={yearFilter.start} onChange={(e) => setYearFilter({ ...yearFilter, start: e.target.value })} />
+                <input type="number" placeholder="End Year" style={styles.inputYear} value={yearFilter.end} onChange={(e) => setYearFilter({ ...yearFilter, end: e.target.value })}/>
+              </div>
+              
+              <div style={styles.buttonContainer}>
+                <button style={styles.closeButton} onClick={handlePrint}>Print</button> 
+                <button style={styles.closeButton} onClick={handleExportCSV}>Save as CSV</button>    
+              </div>
+            </div> 
+
+          </div>
+          {filteredGrouped.length > 0 ? (
+            filteredGrouped.map(([key, { count, rows }]) => (
+              <React.Fragment key={key}> 
+                <div key={key} style={styles.groupBlock}>
+                  <div style={styles.uniqueHeader}>
+                    <h3>{key} | Produce Paper Count: {count}</h3> 
+                  </div>
+                  <table style={styles.table}> 
+                    <thead>
+                      <tr> 
+                        <th style={styles.numhead}>#</th>
+                        {fields.map((field) => ( 
+                          <th key={field} style={styles.th}>{field}</th> 
+                        ))} 
+                      </tr> 
+                    </thead> 
+                    <tbody> 
+                      {rows.map((row, idx) => ( 
+                        <tr key={idx}>
+                          <td style={styles.numbody}>{idx + 1}</td> 
+                          {fields.map((field) => ( 
+                            <td key={field} style={styles.td}>
+                              {field === "acdemic_year" && row[field]
+                                ? new Date(row[field]).getFullYear()
+                                : field === 'date_presented' && row[field]
+                                  ? new Date(row[field]).toLocaleDateString("en-US", {
+                                      month: "long",   // "January"
+                                      day: "numeric",  // "24"
+                                      year: "numeric", // "2026"
+                                    })
+                                  : Array.isArray(row[field])
+                                    ? row[field].join(", ")
+                                    : row[field]}
+                            </td>
+                          ))} 
+                        </tr> 
                       ))} 
-                    </tr> 
-                  ))} 
-                </tbody> 
-              </table> 
-            </div>
-            <hr />
-          </React.Fragment> 
-        ))} 
-        
-      </div> 
+                    </tbody> 
+                  </table> 
+                </div>
+                <hr />
+              </React.Fragment> 
+            ))
+          ) : (
+            <React.Fragment>
+              <p style={styles.p}>Nothing found...</p>
+            </React.Fragment>
+          )}        
+        </div> 
+      </div>
     </div> 
   );
 }

@@ -131,9 +131,11 @@ exports.getDepartmentPapersFaculty = (req, res) => {
   const query = `
     SELECT 
       p.*,
-      d.department_name
+      d.department_name,
+      c.course_abb
     FROM research_paper p
     JOIN department d ON p.department_id = d.department_id
+    JOIN course c ON p.course_id = c.course_id
     WHERE p.department_id = ? AND p.research_type = ?
     ORDER BY p.created_at DESC
   `;

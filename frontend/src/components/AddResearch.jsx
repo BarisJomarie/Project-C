@@ -716,7 +716,6 @@ const AddResearch = () => {
                options={departmentCourses.map((c) => ({ value: c.course_id, label: c.course_name }))}
                value={course ? { value: course, label: departmentCourses.find(c => c.course_id === Number(course))?.course_name } : null}
                onChange={(selected) => setCourse(selected.value)}
-               isDisabled={researchType === "faculty"}
                placeholder="-- Select Course --"
                required={researchType !== "faculty"}
                styles={reactSelect}

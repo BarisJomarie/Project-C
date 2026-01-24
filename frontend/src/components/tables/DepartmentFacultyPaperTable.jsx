@@ -481,7 +481,7 @@ const closeSummaryModal = () => setIsSummaryOpen(false);
           isOpen={isOpen} 
           onClose={close} 
           grouped={grouped} 
-          fields={["research_title", "sdg_labels"]}
+          fields={["research_title", "sdg_labels", "department_name", 'course_abb', 'academic_year']}
 />
 
       <div className="toast-box" id="toast-box"></div>

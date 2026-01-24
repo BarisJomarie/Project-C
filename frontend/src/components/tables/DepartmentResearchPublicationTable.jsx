@@ -705,7 +705,7 @@ const DepartmentResearchPublicationTable = ({ publication, loading, department, 
         isOpen={isOpen} 
         onClose={close} 
         grouped={grouped} 
-        fields={["published_title"]}
+        fields={["published_title", 'doi', 'department_name', 'date_of_publication']}
       />
 
       <div className="toast-box" id="toast-box"></div>

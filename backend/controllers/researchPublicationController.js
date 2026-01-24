@@ -88,7 +88,7 @@ exports.getResearchPublicationsByDepartment = (req, res) => {
   }
 
   const query = `
-    SELECT rp.*, d.department_abb
+    SELECT rp.*, d.department_abb, d.department_name
     FROM research_publications rp
     JOIN department d ON d.department_id = rp.department_id
     WHERE rp.department_id = ?

@@ -777,7 +777,7 @@ const DepartmentResearchPresentationTable = ({ presentations, loading, departmen
         isOpen={isOpen} 
         onClose={close} 
         grouped={grouped} 
-        fields={["research_title", "sdg_alignment"]}
+        fields={["research_title", "sdg_alignment", 'department_name', 'date_presented']}
       />
 
       <div className="toast-box" id="toast-box"></div>

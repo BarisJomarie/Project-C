@@ -54,23 +54,23 @@ exports.signUp = async (req, res) => {
 
           // Plain text welcome email
           const emailBody = `
-Hello ${fullName},
+            Hello ${fullName},
 
 
-Your account has been created by the admin for SDG Classification & Analytics.
+            Your account has been created by the admin for SDG Classification & Analytics.
 
 
-Your password is: ${password}
+            Your password is: ${password}
 
 
-Please login and change your password immediately to keep your account secure.
+            Please login and change your password immediately to keep your account secure.
 
 
-Login here: ${process.env.FRONTEND_URL}/login
+            Login here: ${process.env.FRONTEND_URL}/login
 
 
-Regards,
-SDG Classification & Analytics
+            Regards,
+            SDG Classification & Analytics
           `;
 
           try {
