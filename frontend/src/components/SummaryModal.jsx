@@ -6,30 +6,44 @@ export default function SummaryModal({ isOpen, onClose, grouped, fields }) {
 
   const [authorFilter, setAuthorFilter] = useState(""); 
   const [yearFilter, setYearFilter] = useState({ start: '', end: '' });
+  const [courseFilter, setCourseFilter] = useState("");
 
-  const filteredGrouped = Object.entries(grouped).filter(([author, { rows }]) => {
+  const hasCourseAbb = Object.values(grouped).some(
+    group => group.rows.some(row => row.course_abb)
+  );
+
+ const filteredGrouped = Object.entries(grouped)
+  .map(([author, { count, rows }]) => {
     // Author filter
     if (authorFilter && !author.toLowerCase().includes(authorFilter.toLowerCase())) {
-      return false;
+      return null; // skip group
     }
 
-    // Year range filter (works for both academic_year and date-presented)
+    // Course abbreviation filter
+    let filteredRows = rows;
+    if (courseFilter && hasCourseAbb) {
+      filteredRows = rows.filter(row =>
+        row.course_abb &&
+        row.course_abb.toLowerCase().includes(courseFilter.toLowerCase())
+      );
+      if (filteredRows.length === 0) return null; // skip group if no matching rows
+    }
+
+    // Year range filter (works for academic_year, date_presented, or date_of_publication)
     if (yearFilter.start || yearFilter.end) {
-      const matchesYear = rows.some(row => {
+      filteredRows = filteredRows.filter(row => {
         let year;
 
-        if (row["academic_year"]) {
-          // academic_year stored as number/string
-          year = parseInt(row["academic_year"], 10);
-        } else if (row["date_presented"]) {
-          // date-presented stored as full date
-          year = new Date(row["date_presented"]).getFullYear();
-        } else if (row['date_of_publication']) {
-          const match = row.date_of_publication.match(/\b(20\d{2})\b/); 
+        if (row.academic_year) {
+          year = parseInt(row.academic_year, 10);
+        } else if (row.date_presented) {
+          year = new Date(row.date_presented).getFullYear();
+        } else if (row.date_of_publication) {
+          const match = row.date_of_publication.match(/\b(20\d{2})\b/);
           year = match ? parseInt(match[1], 10) : null;
         }
 
-        if (!year) return false; // skip if no year found
+        if (!year) return false;
 
         const afterStart = yearFilter.start ? year >= parseInt(yearFilter.start, 10) : true;
         const beforeEnd = yearFilter.end ? year <= parseInt(yearFilter.end, 10) : true;
@@ -37,11 +51,13 @@ export default function SummaryModal({ isOpen, onClose, grouped, fields }) {
         return afterStart && beforeEnd;
       });
 
-      if (!matchesYear) return false;
+      if (filteredRows.length === 0) return null; // skip group if no rows after year filter
     }
 
-    return true;
-  });
+    return [author, { count: filteredRows.length, rows: filteredRows }];
+  })
+  .filter(Boolean); // remove null groups
+
 
 
 
@@ -162,7 +178,7 @@ export default function SummaryModal({ isOpen, onClose, grouped, fields }) {
     },
     input: {
       padding: "8px 12px", 
-      cursor: "pointer",
+      cursor: "select",
       width: '400px',
       outline: 'none',
       border: '1px solid black',
@@ -170,11 +186,15 @@ export default function SummaryModal({ isOpen, onClose, grouped, fields }) {
     },
     inputYear: {
       padding: '8px 12px',
-      cursor: 'pointer',
+      cursor: 'select',
       width: 100,
       outline: 'none',
       border: '1px solid black',
       marginRight: 10,
+    },
+    inputCourse: {
+      padding: '8px 12px',
+      cursor: 'select',
     },
     p: {
       textAlign: 'center',
@@ -250,6 +270,8 @@ export default function SummaryModal({ isOpen, onClose, grouped, fields }) {
                 <input type="text" placeholder="Search..." style={styles.input} value={authorFilter} onChange={(e) => setAuthorFilter(e.target.value)} />
                 <input type="number" placeholder="Start Year" style={styles.inputYear} value={yearFilter.start} onChange={(e) => setYearFilter({ ...yearFilter, start: e.target.value })} />
                 <input type="number" placeholder="End Year" style={styles.inputYear} value={yearFilter.end} onChange={(e) => setYearFilter({ ...yearFilter, end: e.target.value })}/>
+
+               {hasCourseAbb && ( <input type="text" placeholder="Search Course (e.g. BSIT)" style={styles.inputCourse} value={courseFilter} onChange={(e) => setCourseFilter(e.target.value)} /> )}
               </div>
               
               <div style={styles.buttonContainer}>
