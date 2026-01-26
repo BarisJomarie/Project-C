@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import Select from 'react-select';
 
 export default function SummaryModal({ isOpen, onClose, grouped, fields }) {
   if (!isOpen) return null;
@@ -6,11 +7,23 @@ export default function SummaryModal({ isOpen, onClose, grouped, fields }) {
 
   const [authorFilter, setAuthorFilter] = useState(""); 
   const [yearFilter, setYearFilter] = useState({ start: '', end: '' });
-  const [courseFilter, setCourseFilter] = useState("");
+  const [courseFilter, setCourseFilter] = useState(null);
 
   const hasCourseAbb = Object.values(grouped).some(
     group => group.rows.some(row => row.course_abb)
   );
+
+  const courseOptions = Array.from(
+    new Set(
+      Object.values(grouped)
+        .flatMap(group => group.rows)
+        .map(row => row.course_abb)
+        .filter(Boolean)
+    )
+  ).map(course => ({
+    value: course,
+    label: course,
+  }));
 
  const filteredGrouped = Object.entries(grouped)
   .map(([author, { count, rows }]) => {
@@ -22,12 +35,13 @@ export default function SummaryModal({ isOpen, onClose, grouped, fields }) {
     // Course abbreviation filter
     let filteredRows = rows;
     if (courseFilter && hasCourseAbb) {
-      filteredRows = rows.filter(row =>
-        row.course_abb &&
-        row.course_abb.toLowerCase().includes(courseFilter.toLowerCase())
+      filteredRows = rows.filter(
+        row => row.course_abb === courseFilter.value
       );
-      if (filteredRows.length === 0) return null; // skip group if no matching rows
+
+      if (filteredRows.length === 0) return null;
     }
+
 
     // Year range filter (works for academic_year, date_presented, or date_of_publication)
     if (yearFilter.start || yearFilter.end) {
@@ -196,6 +210,13 @@ export default function SummaryModal({ isOpen, onClose, grouped, fields }) {
       padding: '8px 12px',
       cursor: 'select',
     },
+    filterInline: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '10px',
+      flexWrap: 'nowrap',
+    },
+
     p: {
       textAlign: 'center',
     },
@@ -266,14 +287,46 @@ export default function SummaryModal({ isOpen, onClose, grouped, fields }) {
             <button style={styles.closeModalButton} onClick={onClose}>Close</button>
 
             <div style={styles.filterRow}>
-              <div>
-                <input type="text" placeholder="Search..." style={styles.input} value={authorFilter} onChange={(e) => setAuthorFilter(e.target.value)} />
-                <input type="number" placeholder="Start Year" style={styles.inputYear} value={yearFilter.start} onChange={(e) => setYearFilter({ ...yearFilter, start: e.target.value })} />
-                <input type="number" placeholder="End Year" style={styles.inputYear} value={yearFilter.end} onChange={(e) => setYearFilter({ ...yearFilter, end: e.target.value })}/>
+              <div style={styles.filterInline}>
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  style={styles.input}
+                  value={authorFilter}
+                  onChange={(e) => setAuthorFilter(e.target.value)}
+                />
 
-               {hasCourseAbb && ( <input type="text" placeholder="Search Course (e.g. BSIT)" style={styles.inputCourse} value={courseFilter} onChange={(e) => setCourseFilter(e.target.value)} /> )}
+                <input
+                  type="number"
+                  placeholder="Start Year"
+                  style={styles.inputYear}
+                  value={yearFilter.start}
+                  onChange={(e) => setYearFilter({ ...yearFilter, start: e.target.value })}
+                />
+
+                <input
+                  type="number"
+                  placeholder="End Year"
+                  style={styles.inputYear}
+                  value={yearFilter.end}
+                  onChange={(e) => setYearFilter({ ...yearFilter, end: e.target.value })}
+                />
+
+                {hasCourseAbb && (
+                  <Select
+                    options={courseOptions}
+                    value={courseFilter}
+                    onChange={setCourseFilter}
+                    placeholder="Select Course"
+                    isClearable
+                    styles={{
+                      container: base => ({ ...base, width: 200 }),
+                      menu: base => ({ ...base, zIndex: 999999 }),
+                    }}
+                  />
+                )}
               </div>
-              
+
               <div style={styles.buttonContainer}>
                 <button style={styles.closeButton} onClick={handlePrint}>Print</button> 
                 <button style={styles.closeButton} onClick={handleExportCSV}>Save as CSV</button>    
