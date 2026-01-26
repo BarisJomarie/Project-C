@@ -10,7 +10,7 @@ const {getAllCourses, getCourses, getDepartmentCourses, addCourse, updateCourse,
 
 const {getUserAuditLogs, getAuditLogs, getAllAuditLogs, deleteLogs} = require('../controllers/auditsController');
 
-const {addResearch, deleteResearchPaper, getDepartmentPapers, getDepartmentPapersFaculty, getDepartmentTotalSDGPaper, getHighestLowestSDG, getCurretUploadedResearchPapers, getSinglePaper, fetchPaperForAnalysis, getStudentTypePapers, getFacultyTypePapers, getMostCommonSDG, addHistoryReport, getUserPapers} = require('../controllers/researchPaperController');
+const {addResearch, updatePaper, deleteResearchPaper, getDepartmentPapers, getDepartmentPapersFaculty, getDepartmentTotalSDGPaper, getHighestLowestSDG, getCurretUploadedResearchPapers, getSinglePaper, fetchPaperForAnalysis, getStudentTypePapers, getFacultyTypePapers, getMostCommonSDG, addHistoryReport, getUserPapers} = require('../controllers/researchPaperController');
 
 const {addResearchPresentation, presentationTitleChecker, getResearchPresentationsByDepartment, getCurrentUploadedPresentationUser, getPresentationIndexes, getPresentationRows, deleteResearchPresentation} = require('../controllers/researchPresentationController');
 
@@ -69,6 +69,8 @@ router.get('/department/total-sdg-papers', verifyToken, getDepartmentTotalSDGPap
 router.get('/department/highest-lowest-sdg', verifyToken, getHighestLowestSDG);
 router.get('/current-uploaded/research-papers', verifyToken, getCurretUploadedResearchPapers);
 router.get('/research-paper/:paper_id', verifyToken, getSinglePaper);
+
+router.put('/research-student-paper/:research_id', verifyToken, updatePaper);
 
 router.delete('/research-delete/:id', verifyToken, deleteResearchPaper);
 

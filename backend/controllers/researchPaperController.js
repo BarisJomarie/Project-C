@@ -191,6 +191,76 @@ exports.getUserPapers = (req, res) => {
   });
 };
 
+//UPDATE PAPER
+exports.updatePaper = (req, res) => {
+  console.log("Request body:", req.body); 
+  console.log("Request params:", req.params);
+  const { 
+    status,
+    semester,
+    sy,
+    course_id,
+    adviser,
+    researchers,
+    title,
+    abstract,
+    keywords,
+    sdg_number,
+    sdg_labels
+  } = req.body;
+  const { research_id } = req.params;
+
+  const beforeQuery = 'SELECT * FROM research_paper WHERE research_id = ?';
+
+  db.query(beforeQuery, [research_id], (err, result) => {
+    if (err) return res.status(500).json({ message: 'Database Error', error: err });
+    if (result.length === 0) return res.status(404).json({ message: 'Paper not found' });
+
+    const old_name = result[0].research_title;
+
+    const query = `
+      UPDATE research_paper SET 
+        semester = ?,
+        research_title = ?,
+        research_abstract = ?,
+        research_conclusion = ?,
+        adviser = ?,
+        researchers = ?,
+        course_id = ?,
+        sdg_number = ?,
+        sdg_labels = ?,
+        status = ?,
+        academic_year = ?
+      WHERE research_id = ?
+    `;
+
+    const values = [
+      semester, 
+      title, 
+      abstract, 
+      keywords, 
+      adviser, 
+      JSON.stringify(researchers),
+      course_id, 
+      JSON.stringify(sdg_number),
+      JSON.stringify(sdg_labels),
+      status,
+      sy,
+      research_id
+    ];
+
+
+    db.query(query, values, (err, result) => {
+      if (err) return res.status(500).send(err);
+      res.status(200).send({ message: 'Paper successfully updated' });
+
+      logAudit(req.user.user_code, req.user.role, `Updated Paper: ${old_name} -> ${title}`, 'user')
+        .then(auditId => console.log(auditId))
+        .catch(err => console.error('Audit log error: ', err));
+    });
+  });
+};
+
 //DELETE PAPER
 exports.deleteResearchPaper = (req, res) => {
   const { id } = req.params;
