@@ -34,7 +34,9 @@
 
 .edit-content-header {
   flex-shrink: 0;
-  margin-bottom: 10px;
+  font-size: 15px;
+  font-weight: bold;
+  border-bottom: 1px solid #ddd;
 }
 
 .edit-content-body {
@@ -49,10 +51,30 @@
 
 .edit-content-action {
   flex-shrink: 0;
-  margin-top: 20px;
+  padding: 10px 20px;
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   gap: 10px;
+  border-top: 1px solid #ddd;
+}
+
+.edit-content-action button {
+  padding: 8px 16px;
+  font-size: 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background: #aaa;
+  color: #fff;
+  transition: all 0.3s ease;
+}
+
+.edit-content-action button:hover {
+  opacity: 0.8;
+}
+
+.edit-content-body input {
+  padding: 10px 20px;
 }
 
 .edit-content-body input,
@@ -83,6 +105,23 @@
 
 .b-label {
   font-weight: bold;
+}
+
+.body-input {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.group-body-input {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+}
+
+.group-body-input .body-input {
+  flex: 1;
 }
 
 .sdg-checkbox-group div {

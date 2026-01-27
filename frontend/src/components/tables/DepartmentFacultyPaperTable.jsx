@@ -7,6 +7,9 @@ import { showToast } from "../../utils/toast";
 import useSortableTable from "../../hooks/useSortableTable";
 import SummaryModal from "../SummaryModal";
 import { useGroupedByField } from "../../hooks/useGroupedByField";
+import Select from 'react-select'
+import reactSelect from '../../styles/reactSelect';
+import '../../styles/editingModal.css';
 
 const DepartmentFacultyPaperTable = ({ fPapers, loading, role, dep_id, fetchFacultyPapers }) => {
   const navigate = useNavigate();
@@ -33,11 +36,120 @@ const DepartmentFacultyPaperTable = ({ fPapers, loading, role, dep_id, fetchFacu
     setModalConfig(prev => ({...prev, show:false}));
   };
 
-  const [researchers, setResearchers] = useState('');
   const [yearRange, setYearRange] = useState({ start: '', end: '' });
   const [searchTerm, setSearchTerm] = useState('');
+  const [departmentCourses, setDepartmentCourses] = useState([]);
 
   const { isOpen, open, close, grouped } = useGroupedByField(fPapers, "researchers");
+
+  const [editingPaperId, setEditingPaperId] = useState(null);
+  const editingPaper = fPapers.find(p => p.research_id === editingPaperId);
+  const [editingData, setEditingData] = useState({
+    status: '',
+    funding_source: '',
+    semester: '',
+    sy: null,
+    course_id: null,
+    researchers: [],
+    title: '',
+    abstract: '',
+    keywords: '',
+    sdg_number: [],
+    sdg_labels: [],
+  });
+
+  const sdgs = [
+    { number: 1, label: "No Poverty" },
+    { number: 2, label: "Zero Hunger" },
+    { number: 3, label: "Good Health and Well-being" },
+    { number: 4, label: "Quality Education" },
+    { number: 5, label: "Gender Equality" },
+    { number: 6, label: "Clean Water and Sanitation" },
+    { number: 7, label: "Affordable and Clean Energy" },
+    { number: 8, label: "Decent Work and Economic Growth" },
+    { number: 9, label: "Industry, Innovation and Infrastructure" },
+    { number: 10, label: "Reduced Inequalities" },
+    { number: 11, label: "Sustainable Cities and Communities" },
+    { number: 12, label: "Responsible Consumption and Production" },
+    { number: 13, label: "Climate Action" },
+    { number: 14, label: "Life Below Water" },
+    { number: 15, label: "Life on Land" },
+    { number: 16, label: "Peace, Justice and Strong Institutions" },
+    { number: 17, label: "Partnerships for the Goals" }
+  ];
+
+  const funding_source = [
+    {value: 'self-funded', label: 'Self-Funded'},
+    {value: 'earist', label: 'EARIST'},
+  ]
+
+  const status = [
+    {value: 'proposed', label: 'Proposed'},
+    {value: 'on-going', label: 'Ongoing'},
+    {value: 'completed', label: 'Completed'},
+  ]
+
+  const semester = [
+    {value: '1st', label: '1st'},
+    {value: '2nd', label: '2nd'}
+  ]
+
+  const handleEdit = (paper) => {
+    getDepartmentCourses();
+    setEditingPaperId(paper.research_id);
+    setEditingData({
+      research_id: paper.research_id,
+      funding_source: paper.funding_source || '',
+      status: paper.status || '',
+      semester: paper.semester || '',
+      sy: paper.academic_year || null,
+      course_id: paper.course_id || null,
+      researchers: Array.isArray(paper.researchers) 
+        ? paper.researchers 
+        : paper.researchers 
+          ? [paper.researchers]
+          : [],
+      title: paper.research_title || '',
+      abstract: paper.research_abstract || '',
+      keywords: paper.research_conclusion || '',
+      sdg_number: paper.sdg_number || [],
+      sdg_labels: paper.sdg_labels || [],
+    });
+  };
+
+  const saveEdit = async (editingData) => {
+    try {
+      const res = await axios.put(
+        `${API_URL}/api/users/research-faculty-paper/${editingData.research_id}`, 
+        editingData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      console.log("Update paper success:", res.data);
+      setEditingData(null);
+      fetchFacultyPapers();
+    } catch (error) {
+      console.error("Error updating paper:", error.response?.data || error.message);
+    }
+  };
+
+  // GET DEPARTMENT COURSES
+  const getDepartmentCourses = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/users/department-courses`, {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { department_id: dep_id },
+      });
+
+      if (Array.isArray(response.data)) {
+        setDepartmentCourses(response.data);
+        // console.log('Courses fetched:', response.data);
+      } else {
+        setDepartmentCourses([]);
+      }
+    } catch (err) {
+      console.error('Failed to fetch courses', err);
+    }
+  };
 
  const filteredData = useMemo(() => {
     return fPapers.filter(item => {
@@ -446,6 +558,10 @@ const closeSummaryModal = () => setIsSummaryOpen(false);
                       </td>
 
                       <td className="action-column">
+                        <button onClick={() => handleEdit(paper)}>
+                          <span className="material-symbols-outlined edit-icon">edit</span>
+                          <span className="tooltip">Edit Paper</span>
+                        </button>
                         <button onClick={() => navigate(`/user/department/${dep_id}/paper/${paper.research_id}`)}>
                           <span className="material-symbols-outlined view-icon">visibility</span>
                           <span className="tooltip">View Paper</span>
@@ -466,6 +582,187 @@ const closeSummaryModal = () => setIsSummaryOpen(false);
             </tbody>
           </table>
         </div>
+      )}
+
+      {editingPaperId && editingData && (
+        <React.Fragment>
+          <div className="edit-overlay">
+            <div className="edit-container">
+              <div className="edit-content">
+                <div className="edit-content-header">
+                  <h1>Editing: {editingPaper?.research_id}</h1>
+                </div>
+                <div className="edit-content-body">
+                  <div className="body-input">
+                    <label className="b-label">Title</label>
+                    <input 
+                      value={editingData.title} 
+                      onChange={(e) => setEditingData({ ...editingData, title: e.target.value })}
+                      />
+                  </div>
+                  
+                  <div className="body-input">
+                    <label className="b-label">Abstract</label>
+                    <textarea 
+                      value={editingData.abstract} 
+                      onChange={(e) => setEditingData({ ...editingData, abstract: e.target.value })}
+                      rows={4}
+                      />
+                  </div>
+
+                  <div className="body-input">
+                    <label className="b-label">Keywords</label>
+                    <input 
+                      value={editingData.keywords} 
+                      onChange={(e) => setEditingData({ ...editingData, keywords: e.target.value })}
+                      />
+                  </div>
+
+                  <div className="body-input">
+                    <label className="b-label">Researchers</label>
+                    {editingData.researchers.map((researcher, index) => (
+                      <input
+                      key={index}
+                      value={researcher}
+                      onChange={(e) => {
+                        const updatedResearchers = [...editingData.researchers];
+                        updatedResearchers[index] = e.target.value;
+                        setEditingData({ ...editingData, researchers: updatedResearchers });
+                      }}
+                      placeholder={`Researcher ${index + 1}`}
+                    />
+                  ))}
+                  </div>
+
+                  <div className="group-body-input">
+                    <div className="body-input">
+                      <label className="b-label">Academic Year</label>
+                      <input 
+                        value={editingData.sy} 
+                        onChange={(e) => setEditingData({ ...editingData, sy: e.target.value })}
+                        />
+                    </div>
+
+                    <div className="body-input"> 
+                      <label className="b-label">Semester</label>
+                      <Select 
+                        name="semester" 
+                      options={semester} 
+                      value={ 
+                        editingData.semester ? semester.find((s) => s.value === editingData.semester)
+                        : null
+                        }
+                      onChange={(selected) =>
+                        setEditingData({ ...editingData, semester: selected.value })
+                        }
+                      placeholder="-- Select Semester --"
+                      styles={reactSelect}
+                      />
+                    </div>
+
+                    <div className="body-input">
+                      <label className="b-label">Status</label>
+                      <Select 
+                        name="status" 
+                        options={status} 
+                        value={ 
+                          editingData.status ? status.find((s) => s.value === editingData.status)
+                        : null
+                        }
+                      onChange={(selected) =>
+                        setEditingData({ ...editingData, status: selected.value })
+                        }
+                      placeholder="-- Select Status --"
+                      styles={reactSelect}
+                      />
+                    </div>
+
+                    <div className="body-input"> 
+                      <label className="b-label">Funding Source</label>
+                      <Select 
+                        name="funding_source" 
+                      options={funding_source} 
+                      value={ 
+                        editingData.funding_source ? funding_source.find((s) => s.value === editingData.funding_source)
+                        : null
+                        }
+                      onChange={(selected) =>
+                        setEditingData({ ...editingData, funding_source: selected.value })
+                        }
+                      placeholder="-- Select Funding Source --"
+                      styles={reactSelect}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="body-input">
+                    <label className="b-label">Course</label>
+                    <Select name="course" options={departmentCourses.map((c) => ({
+                      value: c.course_id,
+                      label: c.course_name
+                    }))}
+                    value={
+                      editingData.course_id
+                        ? {
+                            value: editingData.course_id,
+                            label: departmentCourses.find(
+                              (c) => c.course_id === editingData.course_id
+                            )?.course_name
+                          }
+                        : null
+                    }
+                    onChange={(selected) =>
+                      setEditingData({ ...editingData, course_id: selected.value })
+                    }
+                    placeholder="-- Select Course --"
+                    styles={reactSelect}
+                  />
+                  </div>
+                  <div className="sdg-checkbox-group">
+                    <label>Select SDG</label>
+                    {sdgs.map((goal) => (
+                      <div key={goal.number}>
+                        <label>
+                          <input
+                            type="checkbox"
+                            value={goal.label}
+                            checked={editingData.sdg_labels.includes(goal.label)}
+                            onChange={(e) => {
+                              const checked = e.target.checked;
+                              const label = goal.label;
+                              const number = goal.number;
+
+                              setEditingData((prev) => {
+                                const updatedLabels = checked
+                                  ? [...prev.sdg_labels, label]
+                                  : prev.sdg_labels.filter((l) => l !== label);
+
+                                const updatedNumbers = checked
+                                  ? [...prev.sdg_number, number]
+                                  : prev.sdg_number.filter((n) => n !== number);
+
+                                return {
+                                  ...prev,
+                                  sdg_labels: updatedLabels,
+                                  sdg_number: updatedNumbers,
+                                };
+                              });
+                            }}
+                          />
+                          {goal.number}. {goal.label}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="edit-content-action">
+                <button onClick={() => saveEdit(editingData)}>Save</button>
+                <button className="close-button" onClick={() => setEditingPaperId(null)}>Cancel</button>
+              </div>
+            </div>
+          </div>
+        </React.Fragment>
       )}
 
       <ConfirmModal

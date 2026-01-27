@@ -91,8 +91,6 @@ const DepartmentStudentPaperTable = ({ sPapers, loading, role, dep_id, fetchStud
 
 
   const handleEdit = (paper) => {
-    console.log("Editing paper:", paper);
-
     getDepartmentCourses();
     setEditingPaperId(paper.research_id);
     setEditingData({
@@ -621,31 +619,43 @@ const DepartmentStudentPaperTable = ({ sPapers, loading, role, dep_id, fetchStud
                   <h1>Editing: {editingPaper?.research_id}</h1>
                 </div>
                 <div className="edit-content-body">
-                  <label className="b-label">Title</label>
-                  <input 
-                    value={editingData.title} 
-                    onChange={(e) => setEditingData({ ...editingData, title: e.target.value })}
-                    />
-                  <label className="b-label">Abstract</label>
-                  <textarea
-                    value={editingData.abstract}
-                    onChange={(e) => setEditingData({ ...editingData, abstract: e.target.value })}
-                    rows={6}
-                    placeholder="Enter abstract here..."
-                  ></textarea>
-                  <label className="b-label">Keywords</label>
-                  <input 
-                    value={editingData.keywords} 
-                    onChange={(e) => setEditingData({ ...editingData, keywords: e.target.value })}
-                    />
-                  <label className="b-label">Adviser</label>
-                  <input 
-                    value={editingData.adviser} 
-                    onChange={(e) => setEditingData({ ...editingData, adviser: e.target.value })}
-                    />
-                  <label className="b-label">Researchers</label>
-                  {editingData.researchers.map((researcher, index) => (
-                    <input
+                  <div className="body-input">
+                    <label className="b-label">Title</label>
+                    <input 
+                      value={editingData.title} 
+                      onChange={(e) => setEditingData({ ...editingData, title: e.target.value })}
+                      />
+                  </div>
+                  
+                  <div className="body-input">
+                    <label className="b-label">Abstract</label>
+                    <textarea 
+                      value={editingData.abstract} 
+                      onChange={(e) => setEditingData({ ...editingData, abstract: e.target.value })}
+                      rows={4}
+                      />
+                  </div>
+
+                  <div className="body-input">
+                    <label className="b-label">Keywords</label>
+                    <input 
+                      value={editingData.keywords} 
+                      onChange={(e) => setEditingData({ ...editingData, keywords: e.target.value })}
+                      />
+                  </div>
+
+                  <div className="body-input">
+                    <label className="b-label">Adviser</label>
+                    <input 
+                      value={editingData.adviser} 
+                      onChange={(e) => setEditingData({ ...editingData, adviser: e.target.value })}
+                      />
+                  </div>
+
+                  <div className="body-input">
+                    <label className="b-label">Researchers</label>
+                    {editingData.researchers.map((researcher, index) => (
+                      <input
                       key={index}
                       value={researcher}
                       onChange={(e) => {
@@ -656,45 +666,55 @@ const DepartmentStudentPaperTable = ({ sPapers, loading, role, dep_id, fetchStud
                       placeholder={`Researcher ${index + 1}`}
                     />
                   ))}
+                  </div>
 
-                  <label className="b-label">Academic Year</label>
-                  <input 
-                    value={editingData.sy} 
-                    onChange={(e) => setEditingData({ ...editingData, sy: e.target.value })}
-                    />
+                  <div className="group-body-input">
+                    <div className="body-input">
+                      <label className="b-label">Academic Year</label>
+                      <input 
+                        value={editingData.sy} 
+                        onChange={(e) => setEditingData({ ...editingData, sy: e.target.value })}
+                        />
+                    </div>
 
-                  <label className="b-label">Semester</label>
-                  <Select 
-                    name="semester" 
-                    options={semester} 
-                    value={ 
-                      editingData.semester ? semester.find((s) => s.value === editingData.semester)
-                      : null
-                      }
-                    onChange={(selected) =>
-                      setEditingData({ ...editingData, semester: selected.value })
-                      }
-                    placeholder="-- Select Semester --"
-                    styles={reactSelect}
-                    />
+                    <div className="body-input"> 
+                      <label className="b-label">Semester</label>
+                      <Select 
+                        name="semester" 
+                      options={semester} 
+                      value={ 
+                        editingData.semester ? semester.find((s) => s.value === editingData.semester)
+                        : null
+                        }
+                      onChange={(selected) =>
+                        setEditingData({ ...editingData, semester: selected.value })
+                        }
+                      placeholder="-- Select Semester --"
+                      styles={reactSelect}
+                      />
+                    </div>
 
-                  <label className="b-label">Status</label>
-                  <Select 
-                    name="status" 
-                    options={status} 
-                    value={ 
-                      editingData.status ? status.find((s) => s.value === editingData.status)
-                      : null
-                      }
-                    onChange={(selected) =>
-                      setEditingData({ ...editingData, status: selected.value })
-                      }
-                    placeholder="-- Select Status --"
-                    styles={reactSelect}
-                    />
+                    <div className="body-input">
+                      <label className="b-label">Status</label>
+                      <Select 
+                        name="status" 
+                        options={status} 
+                        value={ 
+                          editingData.status ? status.find((s) => s.value === editingData.status)
+                        : null
+                        }
+                      onChange={(selected) =>
+                        setEditingData({ ...editingData, status: selected.value })
+                        }
+                      placeholder="-- Select Status --"
+                      styles={reactSelect}
+                      />
+                    </div>
+                  </div>
 
-                  <label className="b-label">Course</label>
-                  <Select name="course" options={departmentCourses.map((c) => ({
+                  <div className="body-input">
+                    <label className="b-label">Course</label>
+                    <Select name="course" options={departmentCourses.map((c) => ({
                       value: c.course_id,
                       label: c.course_name
                     }))}
@@ -714,6 +734,7 @@ const DepartmentStudentPaperTable = ({ sPapers, loading, role, dep_id, fetchStud
                     placeholder="-- Select Course --"
                     styles={reactSelect}
                   />
+                  </div>
                   <div className="sdg-checkbox-group">
                     <label>Select SDG</label>
                     {sdgs.map((goal) => (
