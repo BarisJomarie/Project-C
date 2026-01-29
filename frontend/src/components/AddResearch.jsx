@@ -65,7 +65,12 @@ const AddResearch = () => {
   const userId = localStorage.getItem('userId');
 
   const API_URL = import.meta.env.VITE_API_URL;
-  const MAX_KEYWORDS = 5;
+  const MIN_KEYWORDS = 5;
+  const MAX_KEYWORDS = 7;
+  const keywordslength = conclusion
+    .split(',')
+    .map(k => k.trim())
+    .filter(k => k.length > 0).length;
 
 
 
@@ -235,6 +240,10 @@ const AddResearch = () => {
       showToast('warning', 'Missing Fields', 'Please select funding source for Faculty Research.');
       return;
     }
+
+    if (keywordslength < MIN_KEYWORDS) {
+      showToast('warning', 'Insufficient Keywords', `Please enter at least ${MIN_KEYWORDS} keywords. You currently have ${keywordslength}.`);
+      return;}
 
     showModal(
       'Adding Research Paper',
