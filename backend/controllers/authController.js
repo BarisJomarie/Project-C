@@ -66,7 +66,7 @@ exports.signUp = async (req, res) => {
             Please login and change your password immediately to keep your account secure.
 
 
-            Login here: ${process.env.FRONTEND_URL}/login
+            Login here: ${process.env.FRONTEND_URL}
 
 
             Regards,
